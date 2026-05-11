@@ -1,0 +1,65 @@
+<div th:fragment="conteudo" id="modal-vinculo" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] transition-opacity duration-300"
+     onclick="this.remove()">
+
+  <div class="bg-[#f3ffe5] rounded-3xl w-[95%] max-w-md p-4 sm:p-6 md:p-8 relative max-h-[90vh] overflow-visible"
+       onclick="event.stopPropagation()">
+
+    <button type="button" class="absolute top-4 right-6 text-zinc-800 text-3xl font-bold hover:text-red-600 transition-colors z-[110] cursor-pointer"
+            onclick="document.getElementById('modal-vinculo').remove()">×</button>
+
+    <h1 class="text-2xl font-bold text-zinc-800 mb-6 text-center">
+      Vínculo do Usuário
+    </h1>
+
+    <form th:action="@{/admin/usuarios/{id}/estabelecimento(id=${usuario.id})}"
+          method="post"
+          th:data-hx-post="@{/admin/usuarios/{id}/estabelecimento(id=${usuario.id})}"
+          data-hx-target="#slot-conteudo"
+          hx-on::after-request="if(event.detail.successful) document.getElementById('modal-vinculo').remove()"
+          class="space-y-6">
+
+      <div class="mb-3 text-center bg-[#f3ffe5] p-4 rounded-xl border border-black/20">
+        <h3 class="text-sm font-semibold text-zinc-800 uppercase tracking-wider mb-1">Usuário</h3>
+        <span class="text-zinc-700 font-bold text-lg" th:text="${usuario.username}"></span>
+
+        <div class="mt-4 mb-4">
+          <h3 class="text-sm font-semibold text-zinc-800 uppercase tracking-wider mb-1">Email</h3>
+          <span class="text-zinc-700" th:text="${usuario.email}"></span>
+        </div>
+
+        <div class="mt-4">
+          <h3 class="text-sm font-semibold text-zinc-800 uppercase tracking-wider mb-1">Cargo Atual</h3>
+          <span class="text-zinc-700 px-3 py-1 rounded-full border border-[#4A6E18] font-medium"
+                th:text="${usuario.cargo ?: 'Sem cargo'}"></span>
+        </div>
+      </div>
+
+      <div class="mb-6 mt-6">
+        <h3 class="text-lg font-bold text-zinc-800 mb-3 text-center">
+          Alterar Estabelecimento
+        </h3>
+        <div class="w-full max-w-xs mx-auto">
+          <div th:replace="~{components/ComboBox :: comboBox(
+              id='estabelecimentoId',
+              label='Estabelecimento',
+              name='estabelecimentoId',
+              options=${estabelecimentoOptions},
+              selectedValue=${usuario.estabelecimentoId != null ? usuario.estabelecimentoId.toString() : ''}
+          )}"></div>
+        </div>
+        <style>
+          /* Limita o dropdown a ~3 opções visíveis; o restante fica com rolagem */
+          #estabelecimentoId-menu {
+            max-height: 9.5rem;
+            overflow-y: auto;
+          }
+        </style>
+      </div>
+
+      <div class="flex justify-center space-x-4 pt-4">
+        <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-salvar-usuario', texto='Salvar', tipo='submit')}"></div>
+      </div>
+
+    </form>
+  </div>
+</div>

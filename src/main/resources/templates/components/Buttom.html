@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<button
+        th:fragment="btn-animado(idBtn, texto, tipo)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        class="relative group inline-block font-medium w-full min-w-[150px]"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-12 text-zinc-800 font-bold tracking-wide transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]" th:utext="${texto}">
+      Texto
+    </span>
+</button>
+
+<button
+        th:fragment="btn-animado-status(idBtn, texto, tipo, ds)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        th:attr="data-current-status=${ds}"
+        class="relative group inline-block font-medium w-full min-w-[150px]"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-12 text-zinc-800 font-bold tracking-wide transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]" th:utext="${texto}">
+      Texto
+    </span>
+</button>
+
+<button
+        th:fragment="btn-animado-criacao(idBtn, texto, tipo, dsc)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        th:attr="data-current-status-criacao=${dsc}"
+        class="relative group inline-block font-medium w-full min-w-[150px]"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-12 text-zinc-800 font-bold tracking-wide transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]" th:utext="${texto}">
+      Texto
+    </span>
+</button>
+
+<button
+        th:fragment="btn-icon(idBtn, iconeCss, tipo)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        class="relative group inline-block font-medium w-12 h-12"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-full text-[#4A6E18] text-xl transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]">
+        <i th:with="iconName=${#strings.substringBefore(iconeCss + ' ', ' ')}, iconClasses=${#strings.trim(#strings.substringAfter(iconeCss, ' '))}"
+           th:attr="data-lucide=${iconName}"
+           th:class="${iconClasses}"></i>
+    </span>
+</button>
+
+<button
+        th:fragment="btn-icon-sm(idBtn, iconeCss, tipo)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        class="relative group inline-block font-medium w-6 h-6"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-full text-[#4A6E18] text-lg transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]">
+        <i th:with="iconName=${#strings.substringBefore(iconeCss + ' ', ' ')}, iconClasses=${#strings.trim(#strings.substringAfter(iconeCss, ' '))}"
+           th:attr="data-lucide=${iconName}"
+           th:class="${iconClasses}"></i>
+    </span>
+</button>
+
+<button
+        th:fragment="btn-icon-status(idBtn, iconeCss, tipo, ds)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        th:attr="data-current-status=${ds}"
+        class="relative group inline-block font-medium w-12 h-12"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-full text-[#4A6E18] text-xl transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]">
+        <i th:with="iconName=${#strings.substringBefore(iconeCss + ' ', ' ')}, iconClasses=${#strings.trim(#strings.substringAfter(iconeCss, ' '))}"
+           th:attr="data-lucide=${iconName}"
+           th:class="${iconClasses}"></i>
+    </span>
+</button>
+
+<button
+        th:fragment="btn-icon-criacao(idBtn, iconeCss, tipo, dsc)"
+        th:id="${idBtn}"
+        th:type="${tipo}"
+        th:attr="data-current-status-criacao=${dsc}"
+        class="relative group inline-block font-medium w-12 h-12"
+>
+    <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
+    <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18] transition-all duration-300 ease-out"></span>
+    <span class="relative flex items-center justify-center w-full h-full text-[#4A6E18] text-xl transition-all duration-300 ease-out group-hover:-translate-y-[1px] group-active:translate-y-[1px]">
+        <i th:with="iconName=${#strings.substringBefore(iconeCss + ' ', ' ')}, iconClasses=${#strings.trim(#strings.substringAfter(iconeCss, ' '))}"
+           th:attr="data-lucide=${iconName}"
+           th:class="${iconClasses}"></i>
+    </span>
+</button>
+
+</body>
+</html>

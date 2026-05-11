@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="flutuante(id, name, type, label, value, required)"
+     th:with="corFundo='bg-[#f3ffe5]'"
+     class="relative mt-6 w-full group glow-wrapper rounded-xl p-[2px] bg-[#4A6E18] focus-within:bg-[#7AB648] transition-colors duration-200"
+     style="--mouse-x: -100px; --mouse-y: -100px;">
+
+    <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+         th:style="'background: radial-gradient(100px circle at var(--mouse-x) var(--mouse-y), ' + (${bgClass} != null ? '#e5e5e5' : '#f3ffe5') + ', transparent 100%);'">
+    </div>
+
+    <div th:class="'relative w-full rounded-[10px] ' + ${corFundo}">
+        <input th:id="${id}" th:name="${name}" th:type="${type}" th:value="${value}" th:required="${required}"
+               step="any" placeholder=" "
+               class="peer block w-full px-4 py-3 rounded-[10px] bg-transparent focus:outline-none text-lg text-zinc-800 font-semibold transition-all duration-200
+                      [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+
+        <label th:for="${id}"
+               th:class="'absolute left-4 top-1/2 -translate-y-1/2 px-2 pointer-events-none transition-all duration-200 text-base text-zinc-800 ' + ${corFundo} +
+                  ' peer-focus:-top-[11px] peer-focus:translate-y-0 peer-focus:text-xs' +
+                  ' peer-[:not(:placeholder-shown)]:-top-[11px] peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs'"
+               th:text="${label}">Label Padrão</label>
+    </div>
+</div>
+
+<div th:fragment="flutuante-editavel(id, name, type, label, value, required, disabled)"
+     th:with="corFundo='bg-[#f3ffe5]'"
+     th:classappend="${disabled} ? 'opacity-70' : ''"
+     class="relative mt-6 w-full group glow-wrapper rounded-xl p-[2px] bg-[#4A6E18] focus-within:bg-[#7AB648] transition-colors duration-200"
+     style="--mouse-x: -100px; --mouse-y: -100px;">
+
+    <div th:class="'relative w-full rounded-[10px] ' + ${corFundo}">
+        <input th:id="${id}" th:name="${name}" th:type="${type}" th:value="${value}" th:required="${required}" th:disabled="${disabled}"
+               step="any" placeholder=" "
+               class="peer block w-full px-4 py-3 rounded-[10px] bg-transparent focus:outline-none text-lg text-zinc-800 font-semibold transition-all duration-200 disabled:cursor-default
+                      [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
+
+        <label th:for="${id}"
+               th:class="'absolute left-4 top-1/2 -translate-y-1/2 px-2 pointer-events-none transition-all duration-200 text-base text-zinc-800 ' + ${corFundo} +
+                  ' peer-focus:-top-[11px] peer-focus:translate-y-0 peer-focus:text-xs' +
+                  ' peer-[:not(:placeholder-shown)]:-top-[11px] peer-[:not(:placeholder-shown)]:translate-y-0 peer-[:not(:placeholder-shown)]:text-xs'"
+               th:text="${label}">Label Padrão</label>
+    </div>
+</div>
+
+</body>
+</html>

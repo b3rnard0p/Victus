@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/output.css}" />
+    <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+    <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+</head>
+<body>
+
+<footer th:fragment="main-footer" class="w-full mt-auto pb-6">
+    <div class="px-8 md:px-16 lg:px-24">
+        <div class="bg-[#f3ffe5] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.10)] border border-white/50 py-3 px-6 flex flex-col items-center justify-center">
+
+            <div class="flex items-center space-x-8 mb-2"> <a href="" class="group flex flex-col items-center transition-all">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center transition-colors">
+                    <i data-lucide="message-circle" class="text-xl text-[#7AB648] hover:text-[#4A6E18]"></i>
+                </div>
+            </a>
+
+                <a href="" class="group flex flex-col items-center transition-all">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center  transition-colors">
+                        <i data-lucide="mail" class="text-xl text-[#7AB648] hover:text-[#4A6E18]"></i>
+                    </div>
+                </a>
+            </div>
+
+            <div class="w-16 h-[1px] bg-gray-200/50 mb-2"></div>
+
+            <p class="text-[10px] text-zinc-700 font-medium tracking-wide">
+                &copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2026</span>
+                <span class="text-[#7AB648] font-bold">Victus</span>. Todos os direitos reservados.
+            </p>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

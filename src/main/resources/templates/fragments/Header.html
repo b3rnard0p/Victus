@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title></title>
+    <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+    <link rel="stylesheet" th:href="@{/output.css}" />
+    <script th:src="@{/Scripts/ScriptGeral.js}"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        @keyframes slideInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #mobile-menu li {
+            opacity: 0;
+            animation: slideInDown 0.4s ease-out forwards;
+        }
+
+        #mobile-menu li:nth-child(1) { animation-delay: 0s; }
+        #mobile-menu li:nth-child(2) { animation-delay: 0.08s; }
+        #mobile-menu li:nth-child(3) { animation-delay: 0.16s; }
+        #mobile-menu li:nth-child(4) { animation-delay: 0.24s; }
+        #mobile-menu li:nth-child(5) { animation-delay: 0.32s; }
+        #mobile-menu li:nth-child(6) { animation-delay: 0.4s; }
+
+        #mobile-menu.closing li {
+            animation: none !important;
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+<div th:fragment="main-header">
+    <aside
+        id="dock-sidebar"
+        class="hidden xl:flex fixed top-1/2 -translate-y-1/2 left-4 z-50 rounded-[24px] bg-[#f3ffe5] p-2 flex flex-col items-center gap-3 w-[60px] py-2 shadow-[0_4px_20px_rgba(0,0,0,0.15)] border border-black/10">
+        <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'ADMIN'}">
+            <a th:href="@{/home}" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Página Inicial</span>
+                <i data-lucide="house" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/admin/usuarios"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/admin/usuarios" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Usuários</span>
+                <i data-lucide="users" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/admin/estabelecimentos"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/admin/estabelecimentos" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Estabelecimentos</span>
+                <i data-lucide="store" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+        </th:block>
+
+        <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
+            <a th:href="@{/home}" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Página Inicial</span>
+                <i data-lucide="house" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/ficha/nova"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/ficha/nova" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Criar Ficha</span>
+                <i data-lucide="file-plus" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/ficha"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/ficha" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Suas Fichas</span>
+                <i data-lucide="file-text" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/ingrediente"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+                    href="/ingrediente" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Seus Ingredientes</span>
+                <i data-lucide="carrot" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/refeicao"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/refeicao" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Suas Refeições</span>
+                <i data-lucide="utensils" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+
+        </th:block>
+
+        <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'PRODUCAO'}">
+            <a th:href="@{/home}" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Página Inicial</span>
+                <i data-lucide="house" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/ficha"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/ficha" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Fichas</span>
+                <i data-lucide="file-text" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+            <a hx-get="/refeicao"
+               hx-target="#slot-conteudo"
+               hx-push-url="true"
+               href="/refeicao" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Refeições</span>
+                <i data-lucide="utensils" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+            </a>
+        </th:block>
+
+        <div class="w-full h-[1px] bg-[#2D6A4F]/20 dark:bg-neutral-700 my-1 pointer-events-none"></div>
+
+        <button onclick="abrirModalPerfil()" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer" style="width: 48px; height: 48px;">
+            <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Perfil</span>
+            <img th:if="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}" th:src="@{'/' + ${usuarioLogado.caminhoImagem}}" alt="User" class="w-full h-full object-cover rounded-full shadow-sm" />
+            <i th:unless="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}" data-lucide="user-cog" class="internal-icon text-[#2D6A4F] group-hover:text-[#7AB648] transition-colors" style="font-size: 20px;"></i>
+        </button>
+        <form th:action="@{/sair-do-sistema}" method="post" class="m-0 p-0" onsubmit="localStorage.removeItem('rememberMe');">
+            <button type="submit" class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer border-none" style="width: 48px; height: 48px;">
+                <span class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-red-600 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Sair</span>
+                <i data-lucide="log-out" class="internal-icon text-red-400 group-hover:text-red-600 transition-colors" style="font-size: 20px;"></i>
+            </button>
+        </form>
+    </aside>
+
+    <header id="mobile-header" class="relative w-full xl:hidden z-50 bg-[#f3ffe5] transition-all duration-300 block">
+        <div class="container mx-auto flex justify-between items-center py-2 px-4 relative z-[60] bg-[#f3ffe5]">
+            <a th:href="@{/home}" class="flex items-center">
+                <img th:src="@{/imagens/Logo.avif}" alt="Logo" class="h-12 w-12 object-contain" />
+            </a>
+
+            <div class="flex items-center space-x-3">
+                <button
+                        id="hamburger-btn"
+                        class="relative w-4 h-4 flex flex-col justify-between items-center focus:outline-none z-[60] cursor-pointer"
+                        aria-label="Abrir menu"
+                >
+                    <span id="line1" class="block w-4 h-0.5 bg-[#2D6A4F] rounded transform transition-all duration-300 origin-center translate-y-0 rotate-0"></span>
+                    <span id="line2" class="block w-4 h-0.5 bg-[#2D6A4F] rounded transition-opacity duration-300 opacity-100"></span>
+                    <span id="line3" class="block w-4 h-0.5 bg-[#2D6A4F] rounded transform transition-all duration-300 origin-center translate-y-0 rotate-0"></span>
+                </button>
+            </div>
+        </div>
+
+        <div
+            id="mobile-menu"
+            class="w-full bg-[#f3ffe5] overflow-hidden transition-all duration-300 ease-[cubic-bezier(0.42,0,0.58,1)] relative z-40"
+            style="max-height: 0px; opacity: 0;"
+        >
+            <ul class="flex flex-col items-center p-0">
+                <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'ADMIN'}">
+                    <li class="w-full"><a th:href="@{/home}" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Página Inicial</a></li>
+                    <li class="w-full"><a href="/admin/usuarios" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Usuários</a></li>
+                    <li class="w-full"><a href="/admin/estabelecimentos" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Estabelecimentos</a></li>
+                </th:block>
+
+                <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
+                    <li class="w-full"><a th:href="@{/home}" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Página Inicial</a></li>
+                    <li class="w-full"><a href="/ficha/nova" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Criar Ficha</a></li>
+                    <li class="w-full"><a href="/ficha" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Suas Fichas</a></li>
+                    <li class="w-full"><a href="/ingrediente" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Seus Ingredientes</a></li>
+                    <li class="w-full"><a href="/refeicao" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Suas Refeições</a></li>
+                </th:block>
+
+                <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'PRODUCAO'}">
+                    <li class="w-full"><a th:href="@{/home}" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Página Inicial</a></li>
+                    <li class="w-full"><a href="/ficha" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Fichas</a></li>
+                    <li class="w-full"><a href="/refeicao" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Refeições</a></li>
+                </th:block>
+
+                <li class="w-full"><button onclick="abrirModalPerfil()" class="block text-sm text-zinc-800 hover:text-[#7AB648] font-bold w-full text-center py-4 tracking-wide">Perfil</button></li>
+                <li class="w-full"><button onclick="fazerLogout()" class="block text-sm text-red-500 hover:text-red-700 font-bold w-full text-center py-4 tracking-wide pb-6">Sair</button></li>
+            </ul>
+        </div>
+    </header>
+</div>
+</body>
+</html>

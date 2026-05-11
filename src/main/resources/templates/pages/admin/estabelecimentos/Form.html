@@ -1,0 +1,30 @@
+<div th:fragment="conteudo" id="modal-estabelecimento" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] transition-opacity duration-300"
+     onclick="this.remove()">
+
+  <div class="bg-[#f3ffe5] rounded-3xl w-[95%] max-w-xl p-4 sm:p-6 md:p-8 relative max-h-[90vh] overflow-y-auto"
+       onclick="event.stopPropagation()">
+
+    <button type="button" class="absolute top-4 right-6 text-zinc-800 text-3xl font-bold hover:text-red-600 transition-colors z-[110] cursor-pointer"
+            onclick="document.getElementById('modal-estabelecimento').remove()">×</button>
+
+    <h1 class="text-2xl font-bold text-center text-zinc-800 mb-6 mt-2 sm:mt-0"
+        th:text="${estabelecimento.id != null} ? 'Editar Estabelecimento' : 'Novo Estabelecimento'">
+    </h1>
+
+    <form th:action="${estabelecimento.id != null} ? @{/admin/estabelecimentos/{id}(id=${estabelecimento.id})} : @{/admin/estabelecimentos}"
+          method="post"
+          th:data-hx-post="${estabelecimento.id != null} ? @{/admin/estabelecimentos/{id}(id=${estabelecimento.id})} : @{/admin/estabelecimentos}"
+          data-hx-target="#slot-conteudo"
+          hx-on::after-request="if(event.detail.successful) document.getElementById('modal-estabelecimento').remove()">
+
+      <div class="mb-4 mt-8">
+        <div th:replace="~{components/Input :: flutuante(id='nome', name='nome', type='text', label='Nome do Estabelecimento', value=${estabelecimento.nome}, required=false)}"></div>
+      </div>
+
+      <div class="flex items-center justify-center mt-6 gap-4">
+        <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-salvar-estab', texto=${estabelecimento.id != null ? 'Atualizar' : 'Salvar'}, tipo='submit')}"></div>
+      </div>
+    </form>
+
+  </div>
+</div>

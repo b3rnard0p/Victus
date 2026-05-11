@@ -1,0 +1,61 @@
+<div th:fragment="form-refeicao" id="modal-nova-refeicao"
+     class="hidden fixed inset-0 bg-black/60 flex items-center justify-center z-[1000] transition-opacity duration-300 opacity-0"
+     onclick="fecharModalRefeicao()">
+
+    <div class="bg-[#f3ffe5] rounded-3xl p-4 md:p-6 px-4 w-[95%] sm:w-full max-w-md flex flex-col relative max-h-[90vh] overflow-y-auto"
+         style="box-shadow: 0 0 0 100vmax rgba(0,0,0,0.6);" onclick="event.stopPropagation()">
+
+        <button type="button" class="absolute top-3 right-4 text-zinc-800 text-3xl font-bold leading-none hover:text-red-600 transition-colors z-[110]"
+                onclick="fecharModalRefeicao()">×
+        </button>
+
+        <h1 id="modal-titulo" class="text-4xl font-bold mb-6 text-center text-zinc-800 w-full">Cadastro de Refeição</h1>
+
+        <form id="form-refeicao"
+              action="/refeicao/novo"
+              method="post"
+              hx-post="/refeicao/novo"
+              hx-target="#slot-conteudo"
+              class="rounded-lg p-2 w-full text-zinc-800">
+
+            <input type="hidden" name="status" th:value="${T(com.example.sistemanutricao.model.enuns.Status).ATIVA}" />
+
+
+            <div class="mb-4 mt-2">
+                <div th:replace="~{components/Input :: flutuante(id='nomeRefeicao', name='nome', type='text', label='Nome da Refeição', value='', required=false)}"></div>
+            </div> 
+
+            <div class="mb-6">
+                <div class="relative mt-2 w-full min-w-[150px]">
+
+                    <div th:replace="~{components/Input :: flutuante(id='fichaSearch', name='', type='text', label='Buscar fichas técnicas...', value='', required=false)}"></div>
+
+                    <select id="fichaSelectData" class="hidden">
+                        <option th:each="ficha : ${fichasTecnicasLista}"
+                                th:value="${ficha.id}"
+                                th:attr="data-vct=${ficha.vct}"
+                                th:text="${ficha.nomePreparacao}">
+                        </option>
+                    </select>
+
+                    <div id="fichaSuggestions" 
+                        class="hidden absolute left-0 right-0 top-[calc(100%+2px)] z-[9999] bg-[#f3ffe5] border border-[#4A6E18] rounded-[10px] shadow-lg shadow-green-950/20 max-h-60 overflow-y-auto overflow-x-hidden text-left [&::-webkit-scrollbar]:w-[5px] [&::-webkit-scrollbar-thumb]:bg-[#4A6E18] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent">
+                    </div>
+
+                </div>
+                <div id="selectedFichas" class="mt-3 space-y-2"></div>
+                <input type="hidden" id="fichasTecnicasIds" name="fichasTecnicasIds" value="" />
+            </div>
+
+            <div class="mb-4 flex justify-center">
+                <input type="text" id="kcalTotal" name="kcalTotal" placeholder="Total de Kcal" readonly
+                       class="bg-transparent shadow border border-[#4A6E18] rounded w-32 py-2 px-3 text-zinc-800 focus:outline-none" required />
+            </div>
+
+            <div class="flex flex-wrap gap-4 justify-center mt-6">
+                <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-refeicao-salvar', texto='Salvar', tipo='submit')}"></div>
+            </div>
+        </form>
+    </div>
+    <script th:src="@{/Scripts/pages/refeicoes/ScriptFormRefeicao.js}"></script>
+</div>

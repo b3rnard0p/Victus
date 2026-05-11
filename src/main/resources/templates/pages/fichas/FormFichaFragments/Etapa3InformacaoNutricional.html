@@ -1,0 +1,48 @@
+<div
+  th:fragment="etapa3"
+  class="max-h-0 opacity-0 transition-all duration-500 ease-in-out px-2 sm:px-6 py-0 border-t border-transparent w-full overflow-hidden bg-[#f3ffe5]"
+>
+  <div id="perfilNutricional" class="p-2 sm:p-4 w-full">
+    <div class="rounded-lg border border-[#4A6E18] shadow-sm overflow-x-auto">
+      <table class="w-full border-collapse min-w-[700px]">
+        <thead>
+          <tr class="">
+            <th class="px-2 py-2 border border-[#4A6E18] text-left">Ingredientes</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">PL (g)</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">PTN (g)</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">CHO (g)</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">LP (g)</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">Sódio (mg)</th>
+            <th class="px-2 py-2 border border-[#4A6E18] text-center">Gord. Sat (g)</th>
+          </tr>
+        </thead>
+        <tbody id="nutricionalIngredientes" class="bg-transparent"></tbody>
+      </table>
+    </div>
+
+    <div class="mt-6 flex flex-col items-center gap-2">
+      <span class="text-sm font-bold uppercase text-zinc-900">Valor Energético por Porção</span>
+      <div class="border-2 border-[#4A6E18] rounded-xl py-3 px-8 shadow-inner">
+        <span
+          id="vtc-display"
+          class="text-3xl font-black text-zinc-800 block text-center"
+          th:text="${ficha.id != null ? #numbers.formatDecimal(ficha.perfilNutricional.vtc, 1, 2) : '0.00'}"
+        ></span>
+        <span class="text-xs font-bold text-center block text-zinc-900">KCAL</span>
+      </div>
+    </div>
+
+    <input type="hidden" th:field="*{perfilNutricional.vtc}" id="vtc" />
+    <input type="hidden" th:field="*{perfilNutricional.kcalPtn}" id="kcalPtn" />
+    <input type="hidden" th:field="*{perfilNutricional.kcalCho}" id="kcalCho" />
+    <input type="hidden" th:field="*{perfilNutricional.kcalLip}" id="kcalLip" />
+    <input type="hidden" th:field="*{perfilNutricional.gramasPtn}" id="gramasPtn" />
+    <input type="hidden" th:field="*{perfilNutricional.gramasCho}" id="gramasCho" />
+    <input type="hidden" th:field="*{perfilNutricional.gramasLip}" id="gramasLip" />
+    <input type="hidden" th:field="*{perfilNutricional.gramasSodio}" id="gramasSodio" />
+    <input type="hidden" th:field="*{perfilNutricional.gramasSaturada}" id="gramasSaturada" />
+    <input type="hidden" th:field="*{perfilNutricional.porcentPtn}" id="porcentPtn" />
+    <input type="hidden" th:field="*{perfilNutricional.porcentCho}" id="porcentCho" />
+    <input type="hidden" th:field="*{perfilNutricional.porcentLip}" id="porcentLip" />
+  </div>
+</div>

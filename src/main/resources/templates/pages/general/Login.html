@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="pt_BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login</title>
+  <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+  <link rel="stylesheet" th:href="@{/output.css}" />
+  <link rel="stylesheet" th:href="@{/input.css}" />
+  <script th:src="@{/Scripts/ScriptGeral.js}"></script>
+  <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+  <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+</head>
+<body
+        class="bg-[#f3ffe5] min-h-screen flex items-center justify-center p-4 lg:p-8"
+>
+<div
+        class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-16 lg:gap-28 xl:gap-44"
+>
+  <div class="w-full max-w-sm lg:w-auto flex-1">
+
+    <div
+            id="login-card"
+            class="backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 shadow-xl shadow-black/20 border border-white/30 w-full"
+    >
+      <div class="p-6 md:p-8 lg:p-10">
+        <div class="flex justify-center mb-6 lg:hidden">
+          <img
+                  th:src="@{/imagens/Logo.avif}"
+                  alt="Logo do Sistema"
+                  class="h-16 md:h-20 w-auto object-contain"
+          />
+        </div>
+        <div class="hidden lg:flex justify-center mb-6">
+          <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-[#4A6E18]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+          >
+            <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"
+            />
+          </svg>
+        </div>
+
+        <div
+                th:if="${param.error}"
+                class="mb-4 p-3 bg-red-100 text-red-800 rounded-lg text-center border border-red-200 text-sm md:text-base"
+        >
+          E-mail ou senha inválidos.
+        </div>
+
+        <form th:action="@{/login}" method="post" class="space-y-4">
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='reg-email-login', name='email', type='email', label='Email', value='', required=true)}"></div>
+          </div>
+
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='reg-password', name='password', type='password', label='Senha', value='', required=true)}"></div>
+          </div>
+
+          <div class="flex items-center">
+            <input
+                type="checkbox"
+                    id="remember-me"
+                    name="remember-me"
+                    class="w-4 h-4 text-[#4A6E18] border-neutral-300 rounded focus:ring-[#4A6E18] focus:ring-2 accent-[#4A6E18]"
+            />
+            <label for="remember-me" class="ml-2 text-sm text-zinc-800 cursor-pointer">
+              Lembrar de mim
+            </label>
+          </div>
+
+          <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-login', texto='Entrar', tipo='submit')}"></div>
+        </form>
+
+        <div class="w-full mt-4 px-4 pb-4">
+          <div th:replace="~{components/Buttom :: btn-animado(idBtn='show-register', texto='Criar conta', tipo='submit')}"></div>
+        </div>
+      </div>
+    </div>
+
+    <div
+            id="register-card"
+            class="backdrop-blur-md rounded-2xl shadow-xl shadow-black/20 border border-white/30 overflow-hidden hidden transition-all duration-300 w-full"
+    >
+      <div class="p-6 md:p-8 lg:p-10">
+        <div class="flex justify-center mb-6 lg:hidden">
+          <img
+                  th:src="@{/imagens/Logo.avif}"
+                  alt="Logo do Sistema"
+                  class="h-16 md:h-20 w-auto object-contain"
+          />
+        </div>
+
+        <div class="hidden lg:flex justify-center mb-6">
+          <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  class="h-12 w-12 text-[#4A6E18]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+          >
+            <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"
+            />
+          </svg>
+        </div>
+
+        <form
+                id="register-form"
+                th:action="@{/registrar}"
+                method="post"
+                class="space-y-4"
+        >
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='new-username', name='username', type='text', label='Usuário', value='', required=true)}"></div>
+          </div>
+
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='new-email', name='email', type='email', label='Email', value='', required=true)}"></div>
+          </div>
+
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='new-password', name='senha', type='password', label='Senha', value='', required=true)}"></div>
+          </div>
+
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='new-confirm-password', name='confirmarSenha', type='password', label='Repita a senha', value='', required=true)}"></div>
+          </div>
+
+          <div class="w-full mt-4">
+            <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-registrar', texto='Registrar', tipo='submit')}"></div>
+          </div>
+        </form>
+
+        <div class="w-full mt-4 px-4 pb-4">
+          <div th:replace="~{components/Buttom :: btn-animado(idBtn='show-login', texto='Já tenho conta', tipo='button')}"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div
+          class="hidden lg:flex flex-col items-center justify-center w-full lg:w-auto mb-6 lg:mb-0 px-4 lg:order-last order-first"
+  >
+    <img
+            th:src="@{/imagens/Logo.avif}"
+            alt="Logo do Sistema"
+            class="w-auto h-64 xl:h-80 2xl:h-[28rem] object-contain transition-all duration-300"
+    />
+    <h1
+            class="text-3xl md:text-5xl lg:text-6xl xl:text-8xl text-[#4A6E18] font-bold text-center"
+    >
+      Victus
+    </h1>
+  </div>
+</div>
+<script th:src="@{/Scripts/pages/general/ScriptLogin.js}"></script>
+<div
+      id="toast-container"
+      class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
+    >
+      <th:block th:if="${errorMessage != null}">
+        <div
+          th:replace="~{components/Toast :: error(mensagem=${errorMessage})}"
+        ></div>
+      </th:block>
+
+      <th:block th:if="${param.erro != null}">
+        <div
+          th:replace="~{components/Toast :: error(mensagem=${param.erro[0]})}"
+        ></div>
+      </th:block>
+    </div>
+</body>
+</html>

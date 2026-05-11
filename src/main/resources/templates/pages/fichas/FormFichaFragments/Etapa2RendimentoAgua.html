@@ -1,0 +1,78 @@
+<div
+  th:fragment="etapa2"
+  class="max-h-0 opacity-0 transition-all duration-500 ease-in-out px-2 sm:px-6 py-0 border-t border-transparent w-full overflow-hidden bg-[#f3ffe5]"
+>
+  <div class="mb-8 pb-4 rounded-xl p-4">
+    <div class="flex flex-col items-center">
+      <h2 class="text-lg font-semibold mt-2">Foi utilizado água?</h2>
+      <div class="flex items-center justify-center mt-4 mb-4">
+        <input
+          type="checkbox"
+          id="aguaCheckbox"
+          class="h-5 w-5 rounded-full appearance-none border border-black checked:bg-[#4A6E18] focus:outline-none cursor-pointer"
+          th:checked="${ficha.preparacao.qntdAgua != null && ficha.preparacao.qntdAgua > 0}"
+        />
+        <label for="aguaCheckbox" class="ml-2 block text-sm font-bold text-zinc-800 cursor-pointer">
+          Sim, houve adição
+        </label>
+      </div>
+
+      <div
+        id="aguaInputs"
+        class="flex flex-col items-center mt-4"
+        th:classappend="${ficha.preparacao.qntdAgua != null && ficha.preparacao.qntdAgua > 0} ? '' : 'hidden'"
+      >
+        <div class="flex flex-wrap justify-center gap-6 mb-2">
+          <div class="w-32">
+            <div
+              th:replace="~{components/Input :: flutuante(id='qntdAgua', name='preparacao.qntdAgua', type='number', label='Qtd. mL', value=*{preparacao.qntdAgua}, required=false)}"
+            ></div>
+          </div>
+          <div class="w-32">
+            <div
+              th:replace="~{components/Input :: flutuante(id='porcentAgua', name='preparacao.porcentAgua', type='number', label='% Sobrou', value=*{preparacao.porcentAgua}, required=false)}"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-4 w-32">
+        <div
+          th:replace="~{components/Input :: flutuante(id='fcc', name='preparacao.fcc', type='number', label='FCC', value=*{preparacao.fcc}, required=false)}"
+        ></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex flex-col items-center mb-6 border-t border-black pt-6">
+    <div class="flex flex-wrap justify-center gap-6 w-full max-w-2xl mb-8">
+      <div class="w-48">
+        <div
+          th:replace="~{components/Input :: flutuante(id='tempoPreparo', name='preparacao.tempoPreparo', type='text', label='Tempo (ex: 1H15min)', value=*{preparacao.tempoPreparo}, required=false)}"
+        ></div>
+      </div>
+      <div class="w-48">
+        <div
+          th:replace="~{components/Input :: flutuante(id='medidaCaseiraFicha', name='medidaCaseira', type='text', label='Medida Caseira Final', value=*{medidaCaseira}, required=false)}"
+        ></div>
+      </div>
+    </div>
+    <div class="flex flex-wrap justify-center gap-6 w-full max-w-5xl">
+      <div class="w-32">
+        <div
+          th:replace="~{components/Input :: flutuante(id='pesoPorcao', name='pesoPorcao', type='number', label='Peso Porção', value=*{pesoPorcao}, required=false)}"
+        ></div>
+      </div>
+      <div class="w-32">
+        <div
+          th:replace="~{components/Input :: flutuante(id='rendimento', name='preparacao.rendimento', type='number', label='Rendimento', value=*{preparacao.rendimento}, required=false)}"
+        ></div>
+      </div>
+      <div class="w-32">
+        <div
+          th:replace="~{components/Input :: flutuante(id='numeroPorcoes', name='numeroPorcoes', type='number', label='Nº Porções', value=*{numeroPorcoes}, required=false)}"
+        ></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="comboBox(id, label, name, options, selectedValue)"
+     th:id="${id + '-wrapper'}"
+     class="relative mt-6 w-full group glow-wrapper rounded-xl p-[2px] bg-[#4A6E18] focus-within:bg-[#7AB648] transition-colors duration-200"
+     style="--mouse-x: -100px; --mouse-y: -100px;">
+
+  <input type="hidden"
+         th:id="${id + '-hidden'}"
+         th:name="${name}"
+         th:value="${selectedValue}" />
+
+  <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+       style="background: radial-gradient(100px circle at var(--mouse-x) var(--mouse-y), #f3ffe5, transparent 100%);">
+  </div>
+
+  <div class="relative w-full bg-[#f3ffe5] rounded-[10px]">
+
+    <div th:id="${id + '-control'}"
+         class="flex items-center justify-between px-4 py-3 cursor-pointer select-none rounded-[10px]
+                transition-all duration-200"
+         role="combobox" aria-haspopup="listbox" aria-expanded="false">
+
+      <span th:id="${id + '-display'}"
+        class="text-lg font-semibold text-zinc-800 min-h-[1.5rem] flex items-center gap-2">
+        <th:block th:each="opt : ${options}"
+          th:if="${opt.value == selectedValue}"
+          th:text="${opt.label}"></th:block>
+      </span>
+
+      <svg th:id="${id + '-chevron'}"
+           class="w-5 h-5 text-[#4A6E18] flex-shrink-0 transition-transform duration-200"
+           xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+           fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+
+            <label th:for="${id + '-control'}"
+              th:id="${id + '-label'}"
+              th:class="${selectedValue != null and selectedValue != ''}
+                ? 'absolute left-4 -top-[11px] translate-y-0 px-2 pointer-events-none transition-all duration-200 font-semibold text-xs text-zinc-800 bg-[#f3ffe5]'
+                : 'absolute left-4 top-1/2 -translate-y-1/2 px-2 pointer-events-none transition-all duration-200 font-semibold text-base text-zinc-800 bg-[#f3ffe5]'"
+              th:text="${label}">Rótulo</label>
+
+    <div th:id="${id + '-menu'}"
+         class="hidden absolute left-0 right-0 top-[calc(100%-2px)] z-[9999]
+                bg-[#f3ffe5] border border-[#4A6E18] border-t-0
+                rounded-b-[10px] shadow-lg shadow-green-950/20
+                max-h-60 overflow-y-auto overflow-x-hidden
+                [&::-webkit-scrollbar]:w-[5px]
+                [&::-webkit-scrollbar-thumb]:bg-[#4A6E18]
+                [&::-webkit-scrollbar-thumb]:rounded-full
+                [&::-webkit-scrollbar-track]:bg-transparent">
+
+      <div class="cb-option group/opt flex items-center px-4 py-3
+                  font-semibold text-base text-zinc-800 cursor-pointer
+                  hover:bg-[#e4f5cc] hover:translate-x-1
+                  transition-all duration-150 relative"
+           th:each="opt, iterStat : ${options}"
+           th:classappend="${opt.value == selectedValue} ? 'bg-[#d6eebe]' : ''"
+           th:attr="data-value=${opt.value}, data-label=${opt.label}"
+           th:style="'animation-delay:' + (${iterStat.index} * 50) + 'ms'"
+           th:id="${id + '-opt-' + iterStat.index}">
+
+        <span th:text="${opt.label}">Opção</span>
+
+        <span class="absolute bottom-[6px] left-4 h-[2px] w-0 bg-[#4A6E18] rounded-full
+                     transition-all duration-200 group-hover/opt:w-[calc(100%-2rem)]"></span>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    (function () {
+      var id = /*[[${id}]]*/ 'combobox';
+
+      function initComboBox() {
+        var wrapper  = document.getElementById(id + '-wrapper');
+        var hidden   = document.getElementById(id + '-hidden');
+        var control  = document.getElementById(id + '-control');
+        var display  = document.getElementById(id + '-display');
+        var menu     = document.getElementById(id + '-menu');
+        var label    = document.getElementById(id + '-label');
+        var chevron  = document.getElementById(id + '-chevron');
+
+        var options  = menu ? Array.from(menu.querySelectorAll('.cb-option')) : [];
+
+        if (!wrapper || !control || !menu) return;
+
+        if (wrapper.dataset.cbInitialized === 'true') return;
+        wrapper.dataset.cbInitialized = 'true';
+
+        function isOpen() { return !menu.classList.contains('hidden'); }
+
+        function floatLabel(active) {
+          if (active) {
+            label.classList.remove('top-1/2', '-translate-y-1/2', 'text-base');
+            label.classList.add('-top-[11px]', 'translate-y-0', 'text-xs');
+          } else {
+            label.classList.add('top-1/2', '-translate-y-1/2', 'text-base');
+            label.classList.remove('-top-[11px]', 'translate-y-0', 'text-xs');
+          }
+        }
+
+        function openMenu() {
+          menu.classList.remove('hidden');
+          chevron.style.transform = 'rotate(180deg)';
+          control.setAttribute('aria-expanded', 'true');
+          wrapper.querySelector('.bg-\\[\\#f3ffe5\\].rounded-\\[10px\\]')
+          && wrapper.querySelector('[id$="-control"]').parentElement
+                  .style.setProperty('border-radius', '10px 10px 0 0');
+          floatLabel(true);
+          options.forEach(function (opt, i) {
+            opt.style.opacity = '0';
+            opt.style.transform = 'translateY(-6px)';
+            setTimeout(function () {
+              opt.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+              opt.style.opacity = '1';
+              opt.style.transform = 'translateY(0)';
+            }, 30 + i * 40);
+          });
+        }
+
+        function closeMenu() {
+          menu.classList.add('hidden');
+          chevron.style.transform = 'rotate(0deg)';
+          control.setAttribute('aria-expanded', 'false');
+          floatLabel(!!hidden.value);
+        }
+
+        function selectOption(value, labelText) {
+          hidden.value = value;
+          display.textContent = labelText;
+          options.forEach(function (o) {
+            o.classList.toggle('bg-[#d6eebe]', o.getAttribute('data-value') === value);
+          });
+          closeMenu();
+          hidden.dispatchEvent(new Event('change', { bubbles: true }));
+          floatLabel(true);
+        }
+
+        control.addEventListener('click', function (e) {
+          e.stopPropagation();
+          isOpen() ? closeMenu() : openMenu();
+        });
+
+        options.forEach(function (opt) {
+          opt.addEventListener('click', function (e) {
+            e.stopPropagation();
+            selectOption(opt.getAttribute('data-value'), opt.getAttribute('data-label'));
+          });
+        });
+
+        document.addEventListener('click', function (e) {
+          if (!wrapper.contains(e.target)) closeMenu();
+        });
+
+        if (!window.InputGlowInitialized) {
+          window.InputGlowInitialized = true;
+          document.addEventListener('mousemove', function (e) {
+            document.querySelectorAll('.glow-wrapper').forEach(function (w) {
+              var rect = w.getBoundingClientRect();
+              w.style.setProperty('--mouse-x', (e.clientX - rect.left) + 'px');
+              w.style.setProperty('--mouse-y', (e.clientY - rect.top) + 'px');
+            });
+          });
+        }
+
+        var preSelected = options.find(function (o) {
+          return o.getAttribute('data-value') === hidden.value;
+        });
+        if (preSelected) {
+          display.textContent = preSelected.getAttribute('data-label');
+          floatLabel(true);
+        }
+      }
+
+      initComboBox();
+
+    })();
+  </script>
+</div>
+
+</body>
+</html>

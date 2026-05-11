@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt_BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404</title>
+    <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+    <link rel="stylesheet" th:href="@{/output.css}" />
+    <link rel="stylesheet" th:href="@{/input.css}" />
+    <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+    <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+</head>
+<body class="bg-[#f3ffe5] min-h-screen flex items-center justify-center p-4">
+
+<div class="max-w-md w-full text-center flex flex-col items-center">
+
+
+<div class="flex items-center justify-center gap-4 md:gap-8 mb-4 w-screen overflow-hidden">
+    <span class="text-[25vw] md:text-[35vh] leading-none font-extrabold text-[#4A6E18] select-none">
+        4
+    </span>
+    <div class="relative flex items-center justify-center w-[20vw] md:w-[30vh] h-[20vw] md:h-[30vh]">
+
+        <img id="donut-poster"
+             th:src="@{/imagens/Donut.avif}"
+             alt="0"
+             class="absolute inset-0 w-full h-full object-contain transition-opacity duration-1000 opacity-100 select-none" />
+
+        <video id="donut-video"
+               th:src="@{/imagens/Donut.webm}"
+               autoplay
+               muted
+               playsinline
+               loop
+               class="absolute inset-0 w-full h-full object-contain transition-opacity duration-1000 opacity-0 select-none scale-[2.9]">
+        </video>
+    </div>
+    <span class="text-[25vw] md:text-[35vh] leading-none font-extrabold text-[#4A6E18] select-none">
+        4
+    </span>
+</div>
+
+    <h2 class="text-2xl md:text-3xl font-bold text-zinc-800 mb-4">
+        Está página não existe.
+    </h2>
+
+     <a th:href="@{/}"
+                 data-hx-push-url="true"
+                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
+                <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
+                <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"></span>
+                <i data-lucide="home" class="relative z-10 text-[#4A6E18] text-xl"></i>
+    </a>
+
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const video = document.getElementById('donut-video');
+        const poster = document.getElementById('donut-poster');
+
+        video.oncanplaythrough = () => {
+            video.classList.remove('opacity-0');
+            video.classList.add('opacity-100');
+
+            poster.classList.remove('opacity-100');
+            poster.classList.add('opacity-0');
+
+            setTimeout(() => {
+                poster.classList.add('hidden');
+            }, 1000);
+        };
+    });
+</script>
+</body>
+</html>

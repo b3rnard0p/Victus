@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ficha Técnica - PDF</title>
+    <style>
+        @page { size: A4; margin: 0.5cm; }
+        body { font-family: 'Helvetica', 'Arial', sans-serif; color: #1a1a1a; margin: 0; padding: 0; font-size: 11px; line-height: 1.3; background-color: #fff; }
+        
+        .container { width: 100%; border: 1px solid #4A6E18; padding: 15px; border-radius: 8px; box-sizing: border-box; }
+        
+        /* Tables general */
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; table-layout: fixed; }
+        th, td { padding: 5px; text-align: left; vertical-align: top; word-wrap: break-word; }
+        .border-table th, .border-table td { border: 1px solid #ccc; }
+        .bg-gray-header { background-color: #f3f4f6; }
+        
+        /* Header Info */
+        .header-table td { padding: 5px 0; }
+        .font-semibold { font-weight: bold; color: #000; }
+        
+        /* Section Titles */
+        .section-title { font-size: 12px; font-weight: bold; color: #000; margin: 10px 0 5px 0; }
+        .section-title-center { text-align: center; font-size: 14px; font-weight: bold; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 8px; }
+        
+        /* Side boxes for costs */
+        .cost-box { background-color: #f9fafb; border: 1px solid #ddd; padding: 8px; border-radius: 4px; width: 130px; text-align: left; }
+        .cost-label { font-weight: bold; color: #374151; font-size: 10px; }
+        .cost-value { font-size: 14px; font-weight: bold; color: #000; margin-top: 2px; }
+        
+        /* Grid-like tables */
+        .grid-table td { border-bottom: 1px solid #eee; padding: 8px 4px; }
+        .bg-grid { background-color: #f9fafb; border-radius: 8px; padding: 10px; margin-bottom: 15px; border: 1px solid #f0f0f0; }
+        
+        /* Total Table */
+        .total-table { background-color: #f9fafb; }
+        .bg-empty { background-color: #e5e7eb; }
+        
+        /* VCT Box */
+        .vct-container { text-align: center; margin-top: 15px; }
+        .vct-box { display: inline-block; padding: 8px 16px; border: 2px solid #7AB648; background-color: #fff; font-weight: bold; font-size: 14px; }
+        
+        ol { margin: 0; padding-left: 20px; }
+        li { margin-bottom: 4px; color: #333; }
+        
+        /* Column Widths */
+        .col-ing { width: 25%; }
+        .col-med { width: 15%; }
+        .col-num { width: 10%; }
+        .col-cost { width: 15%; }
+    </style>
+</head>
+<body>
+    <th:block th:if="${ficha != null}">
+    <div class="container">
+        
+        <table class="header-table">
+            <tr>
+                <td width="45%"><span class="font-semibold">Nome da preparação:</span> <span th:text="${ficha.preparacao != null ? ficha.preparacao.nome : 'N/A'}"></span></td>
+                <td width="35%" style="text-align: center;"><span class="font-semibold">Categoria:</span> <span th:text="${ficha.preparacao != null and ficha.preparacao.categoria != null ? ficha.preparacao.categoria.getLabel() : 'N/A'}"></span></td>
+                <td width="20%" style="text-align: right;"><span class="font-semibold">N°:</span> <span th:text="${ficha.preparacao != null ? ficha.preparacao.numero : '0'}"></span></td>
+            </tr>
+        </table>
+
+        <table class="border-table">
+            <thead class="bg-gray-header">
+                <tr>
+                    <th class="col-ing">Ingredientes</th>
+                    <th class="col-med">Medida Caseira</th>
+                    <th class="col-num">PB</th>
+                    <th class="col-num">PL</th>
+                    <th class="col-num">FC</th>
+                    <th class="col-cost">Custo R$</th>
+                    <th class="col-cost">Custo Kg</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:if="${ficha.ingredientes != null}">
+                    <tr th:each="ingItem : ${ficha.ingredientes}">
+                        <td th:text="${ingItem.ingrediente != null ? ingItem.ingrediente.nome : 'N/A'}"></td>
+                        <td th:text="${ingItem.medidaCaseira != null ? ingItem.medidaCaseira : '-'}"></td>
+                        <td th:text="${ingItem.pb != null ? #numbers.formatDecimal(ingItem.pb, 1, 2) + ' g' : '0,00 g'}"></td>
+                        <td th:text="${ingItem.pl != null ? #numbers.formatDecimal(ingItem.pl, 1, 2) + ' g' : '0,00 g'}"></td>
+                        <td th:text="${ingItem.fc != null ? #numbers.formatDecimal(ingItem.fc, 1, 2) : '1,00'}"></td>
+                        <td th:text="${ingItem.custoUsado != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoUsado, 1, 2) : 'R$ 0,00'}"></td>
+                        <td th:text="${ingItem.custoKg != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoKg, 1, 2) : 'R$ 0,00'}"></td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+
+        <table>
+            <tr>
+                <td style="padding-right: 25px;">
+                    <div class="section-title">Equipamentos e utensílios utilizados:</div>
+                    <th:block th:if="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.equipamentos)}">
+                        <ol>
+                            <li th:each="equipItem : ${#strings.arraySplit(ficha.preparacao.equipamentos, '.')}" 
+                                th:if="${!#strings.isEmpty(#strings.trim(equipItem))}"
+                                th:text="${#strings.trim(equipItem)}"></li>
+                        </ol>
+                    </th:block>
+                    <div th:unless="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.equipamentos)}" style="padding-left: 25px; color: #666;">Nenhum informado.</div>
+                </td>
+                <td width="150" style="vertical-align: top; padding-top: 15px;">
+                    <div class="cost-box">
+                        <div class="cost-label">Custo total:</div>
+                        <div class="cost-value" th:text="${ficha.custoTotal != null ? 'R$ ' + #numbers.formatDecimal(ficha.custoTotal, 1, 2) : 'R$ 0,00'}"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <td style="padding-right: 25px;">
+                    <div class="section-title">Modo de preparo:</div>
+                    <th:block th:if="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.modoPreparo)}">
+                        <ol>
+                            <li th:each="passoItem : ${#strings.arraySplit(ficha.preparacao.modoPreparo, '.')}" 
+                                th:if="${!#strings.isEmpty(#strings.trim(passoItem))}"
+                                th:text="${#strings.trim(passoItem)}"></li>
+                        </ol>
+                    </th:block>
+                    <div th:unless="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.modoPreparo)}" style="padding-left: 25px; color: #666;">Não informado.</div>
+                </td>
+                <td width="150" style="vertical-align: top; padding-top: 15px;">
+                    <div class="cost-box">
+                        <div class="cost-label">Custo per capita:</div>
+                        <div class="cost-value" th:text="${ficha.custoPerCapita != null ? 'R$ ' + #numbers.formatDecimal(ficha.custoPerCapita, 1, 2) : 'R$ 0,00'}"></div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+
+        <div class="bg-grid">
+            <table class="grid-table" style="margin-bottom: 0;">
+                <tr>
+                    <td width="25%"><span class="font-semibold">Tempo de preparo:</span><br/><span th:text="${ficha.preparacao != null ? ficha.preparacao.tempoPreparo : '-'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Peso da porção:</span><br/><span th:text="${(ficha.pesoPorcao != null ? ficha.pesoPorcao : '0') + ' g'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Rendimento:</span><br/><span th:text="${(ficha.preparacao != null ? ficha.preparacao.rendimento : '0') + ' g'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Medida caseira:</span><br/><span th:text="${ficha.medidaCaseira != null ? ficha.medidaCaseira : '-'}"></span></td>
+                </tr>
+                <tr>
+                    <td><span class="font-semibold">Número de porções:</span><br/><span th:text="${ficha.numeroPorcoes != null ? ficha.numeroPorcoes : '0'}"></span></td>
+                    <td><span class="font-semibold">Quantidade de água:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.qntdAgua != null ? ficha.preparacao.qntdAgua : '0.00') + ' ml'}"></span></td>
+                    <td><span class="font-semibold">Água que sobrou:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.porcentAgua != null ? ficha.preparacao.porcentAgua : '0.00') + ' %'}"></span></td>
+                    <td><span class="font-semibold">Fcc:</span><br/><span th:text="${ficha.preparacao != null ? #numbers.formatDecimal(ficha.preparacao.fcc, 1, 2) : '1,00'}"></span></td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="section-title-center">Perfil Nutricional</div>
+        
+        <table class="border-table">
+            <thead class="bg-gray-header">
+                <tr>
+                    <th width="25%">Ingredientes</th>
+                    <th width="15%">Per Porção (PL)</th>
+                    <th width="12%">PTN</th>
+                    <th width="12%">CHO</th>
+                    <th width="12%">LIP</th>
+                    <th width="12%">Sódio</th>
+                    <th width="12%">Gordura Saturada</th>
+                </tr>
+            </thead>
+            <tbody>
+                <th:block th:if="${ficha.ingredientes != null}">
+                    <tr th:each="nutriItem : ${ficha.ingredientes}">
+                        <td th:text="${nutriItem.ingrediente != null ? nutriItem.ingrediente.nome : 'N/A'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.pl != null ? nutriItem.pl : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.ptnCalculado != null ? nutriItem.ptnCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.choCalculado != null ? nutriItem.choCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.lipCalculado != null ? nutriItem.lipCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.sodioCalculado != null ? nutriItem.sodioCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' mg'}"></td>
+                        <td th:text="${#numbers.formatDecimal((nutriItem.gorduraSaturadaCalculada != null ? nutriItem.gorduraSaturadaCalculada : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
+                    </tr>
+                </th:block>
+            </tbody>
+        </table>
+
+        <div class="section-title">Total</div>
+        <table class="border-table total-table">
+            <th:block th:if="${ficha.perfilNutricional != null}">
+                <tr>
+                    <td class="font-semibold" width="25%">Gramas</td>
+                    <td width="15%" th:text="${ficha.perfilNutricional.gramasPtn + ' g'}"></td>
+                    <td width="12%" th:text="${ficha.perfilNutricional.gramasCho + ' g'}"></td>
+                    <td width="12%" th:text="${ficha.perfilNutricional.gramasLip + ' g'}"></td>
+                    <td width="12%" th:text="${ficha.perfilNutricional.gramasSodio + ' mg'}"></td>
+                    <td width="12%" th:text="${ficha.perfilNutricional.gramasSaturada + ' g'}"></td>
+                    <td width="12%" class="bg-empty"></td>
+                </tr>
+                <tr>
+                    <td class="font-semibold">Kcal</td>
+                    <td th:text="${ficha.perfilNutricional.kcalPtn}"></td>
+                    <td th:text="${ficha.perfilNutricional.kcalCho}"></td>
+                    <td th:text="${ficha.perfilNutricional.kcalLip}"></td>
+                    <td colspan="3" class="bg-empty"></td>
+                </tr>
+                <tr>
+                    <td class="font-semibold">%</td>
+                    <td th:text="${ficha.perfilNutricional.porcentPtn + '%'}"></td>
+                    <td th:text="${ficha.perfilNutricional.porcentCho + '%'}"></td>
+                    <td th:text="${ficha.perfilNutricional.porcentLip + '%'}"></td>
+                    <td colspan="3" class="bg-empty"></td>
+                </tr>
+            </th:block>
+        </table>
+
+        <div class="vct-container" th:if="${ficha.perfilNutricional != null}">
+            <div class="vct-box">
+                VCT: <span th:text="${ficha.perfilNutricional.vtc + ' kcal'}"></span>
+            </div>
+        </div>
+
+    </div>
+    </th:block>
+</body>
+</html>

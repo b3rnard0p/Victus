@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt_BR" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+    <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+    <title>Acesso Negado</title>
+    <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+    <link rel="stylesheet" th:href="@{/output.css}" />
+  </head>
+  <body
+    class="bg-[#f3ffe5] min-h-screen flex items-center justify-center p-4 lg:p-8"
+  >
+    <div class="w-full max-w-md mx-auto">
+      <div
+        class="bg-[#f3ffe5] rounded-2xl overflow-hidden transition-all duration-300 shadow-xl shadow-green-950/50 w-full"
+      >
+        <div class="p-6 md:p-8 lg:p-10">
+          <div class="flex justify-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-16 w-16 text-red-500"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"
+              />
+            </svg>
+          </div>
+
+          <h1
+            class="text-2xl md:text-3xl font-bold text-black text-center mb-4"
+          >
+            Acesso Negado
+          </h1>
+
+          <div class="text-black text-center mb-6">
+            <p class="text-lg mb-2">
+              Sua conta está inativa ou não possui as permissões necessárias.
+            </p>
+          <div class="border border-[#4A6E18] p-4 mb-6 rounded-xl">
+            <p class="text-sm opacity-90">
+              Entre em contato com o administrador do sistema para mais
+              informações.
+            </p>
+          </div>
+          </div>
+
+          <div class="justify-center flex">
+            <a th:href="@{/}"
+                 data-hx-push-url="true"
+                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
+                <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
+                <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"></span>
+                <i data-lucide="home" class="relative z-10 text-[#4A6E18] text-xl"></i>
+              </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

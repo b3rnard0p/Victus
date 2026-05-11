@@ -1,0 +1,218 @@
+<div th:fragment="conteudo" class="w-full flex flex-col items-center">
+
+  <div class="flex-1 flex items-start justify-center w-full mt-4 sm:mt-8 px-2 sm:px-0">
+    <main class="p-4 sm:p-6 md:p-8 lg:p-10 w-[95%] max-w-6xl min-h-[500px] flex flex-col mb-8 mx-auto">
+        <div class="max-w-5xl w-full mx-auto">
+
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-zinc-800 mb-6">
+            <span th:text="${viewMode == 'taco'} ? 'Tabela Taco' : 'Seus Ingredientes'"></span>
+          </h1>
+
+          <div class="flex flex-col lg:flex-row items-center lg:items-end justify-center w-full mb-6 sm:mb-8 gap-4 lg:gap-6">
+
+            <div class="flex flex-row items-end justify-center gap-2 sm:gap-4 pb-[2px] w-full lg:w-auto">
+              <div th:if="${viewMode != 'taco'}"
+                   onclick="abrirModalIngrediente()" title="Cadastrar Ingrediente" class="cursor-pointer transform duration-200 hover:scale-110">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-novo-ingred', iconeCss='plus', tipo='button')}"></div>
+              </div>
+                  <div th:if="${viewMode != 'taco'}"
+                    hx-get="/ingrediente/taco?view=taco" hx-target="#slot-conteudo"
+                   title="Ver Tabela TACO" class="cursor-pointer transform duration-200 hover:scale-110">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='tacoButton', iconeCss='book', tipo='button')}"></div>
+              </div>
+
+              <div th:if="${viewMode == 'taco'}"
+                    hx-get="/ingrediente?view=meus" hx-target="#slot-conteudo"
+                   title="Ver Seus Ingredientes" class="cursor-pointer transform duration-200 hover:scale-110">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='tacoButtonMeus', iconeCss='list-checks', tipo='button')}"></div>
+              </div>
+
+              <div th:if="${viewMode != 'taco'}" class="flex gap-2 sm:gap-4">
+                <div title="Ver Arquivados/Desarquivados"
+                     class="cursor-pointer transform duration-200 hover:scale-110"
+                     th:attr="hx-get=@{/ingrediente/por-status(status=${statusAtual != null && statusAtual.name() == 'ATIVA' ? 'INATIVA' : 'ATIVA'}, view=${viewMode})}"
+                     hx-target="#slot-conteudo">
+                  <div th:replace="~{components/Buttom :: btn-icon-status(idBtn='toggleStatusBtn2', iconeCss=${statusAtual != null && statusAtual.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='button', ds=${statusAtual != null ? statusAtual : 'INATIVA'})}"></div>
+                </div>
+              </div>
+            </div>
+
+           <form id="pesquisaForm"
+      class="m-0 p-0 w-full lg:w-auto"
+      th:unless="${statusAtual?.name() == 'INATIVA'}"
+      th:with="tipoAtual=${param.tipoPesquisa != null ? param.tipoPesquisa[0] : 'especifico'},
+               campoAtual=${param.campo != null ? param.campo[0] : (param.nome != null ? 'nome' : (param.ptn != null ? 'PTN' : (param.cho != null ? 'CHO' : (param.lip != null ? 'LIP' : (param.sodio != null ? 'sodio' : (param.gorduraSaturada != null ? 'gorduras' : ''))))))},
+               tagAtual=${param.tag != null ? param.tag[0] : ''},
+               valorAtual=${param.valorPesquisa != null ? param.valorPesquisa[0] : (param.nome != null ? param.nome[0] : (param.ptn != null ? param.ptn[0] : (param.cho != null ? param.cho[0] : (param.lip != null ? param.lip[0] : (param.sodio != null ? param.sodio[0] : (param.gorduraSaturada != null ? param.gorduraSaturada[0] : ''))))))},
+               pesquisaAtiva=${param.campo != null or param.tag != null or param.valorPesquisa != null or param.nome != null or param.ptn != null or param.cho != null or param.lip != null or param.sodio != null or param.gorduraSaturada != null}"
+      onsubmit="event.preventDefault();">
+
+      <div class="flex flex-col lg:flex-row items-center lg:items-end justify-center gap-4 lg:gap-4 w-full">
+
+        <div class="flex flex-row items-end justify-center gap-2 w-full lg:w-auto">
+
+          <div class="relative w-40 sm:w-48 lg:w-48">
+            
+            <th:block th:replace="~{components/ComboBox :: comboBox(id='campoPesquisa', label='Filtrar por...', name='campoPesquisa', options=${filtroIngredienteOptions}, selectedValue=${campoAtual}, valField='value', labelField='label', emptyLabel='Filtro')}"></th:block>
+
+            <div class="absolute top-full mt-2 left-0 w-full flex flex-row justify-center gap-3 z-0">
+                <button type="button"
+                  id="btnPesquisaEspecifica"
+                  th:class="${tipoAtual == 'especifico'} ? 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#7AB648] border-[#4A6E18] text-green-950 shadow transition-all duration-200 focus:outline-none' : 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#f3ffe5] border-[#4A6E18] text-green-950 transition-all duration-200 focus:outline-none'"
+                  title="Pesquisa Específica">
+                  <i data-lucide="search" class="w-[10px] h-[10px]"></i>
+                </button>
+
+                <button type="button"
+                  id="btnPesquisaTag"
+                  th:class="${tipoAtual == 'tags'} ? 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#7AB648] border-[#4A6E18] text-green-950 shadow transition-all duration-200 focus:outline-none' : 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#f3ffe5] border-[#4A6E18] text-green-950 transition-all duration-200 focus:outline-none'"
+                  title="Pesquisa por Tags">
+                  <i data-lucide="tag" class="w-[10px] h-[10px]"></i>
+                </button>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="flex flex-row items-end justify-center gap-2 w-full lg:w-auto">
+
+          <div id="wrapperValorPesquisa"
+               th:class="${tipoAtual == 'tags'} ? 'hidden w-full sm:w-72' : 'w-full sm:w-72'"
+               th:style="${tipoAtual == 'tags'} ? 'display:none;' : 'display:block;'">
+            <div th:replace="~{components/Input :: flutuante(id='valorPesquisa', name='valorPesquisa', type='text', label='Pesquisar...', value=${valorAtual}, required=false)}"></div>
+          </div>
+
+          <div id="wrapperTagPesquisa"
+               th:class="${tipoAtual == 'tags'} ? 'w-full sm:w-72' : 'hidden w-full sm:w-72'"
+               th:style="${tipoAtual == 'tags'} ? 'display:block;' : 'display:none;'">
+            <th:block th:replace="~{components/ComboBox :: comboBox(id='tagPesquisa', label='Nível da Tag', name='tagPesquisa', options=${tagNivelOptions}, selectedValue=${tagAtual})}"></th:block>
+          </div>
+
+          <div class="pb-[2px]" title="Pesquisar">
+            <div id="btnPesquisar" class="cursor-pointer transform duration-200 hover:scale-110">
+              <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-search', iconeCss='search', tipo='button')}"></div>
+            </div>
+          </div>
+
+          <div id="btnLimparFiltro"
+               th:class="${pesquisaAtiva} ? 'pb-[2px] cursor-pointer transform duration-200 hover:scale-110' : 'hidden pb-[2px] cursor-pointer transform duration-200 hover:scale-110'"
+               title="Limpar Pesquisa">
+            <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-clear', iconeCss='eraser text-red-600', tipo='button')}"></div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <input type="hidden" id="viewType" th:value="${viewMode}" />
+      <input type="hidden" id="tipoPesquisa" th:value="${tipoAtual}" />
+</form>
+
+          </div>
+
+        <div id="ingredientes-lista" class="space-y-3 sm:space-y-4 pt-4">
+          <th:block th:fragment="itens">
+          <div th:each="ingrediente : ${ingredientes}" class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden">
+            <div class="px-6 py-4 flex justify-center items-center cursor-pointer relative" onclick="toggleCard(this)">
+              <div class="flex flex-grid w-full relative">
+
+                <div class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 gap-1" th:if="${viewMode != null and viewMode != 'taco'}" onclick="event.stopPropagation();">
+                  <button type="button" class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full" title="Editar Ingrediente" th:attr="onclick='editarIngrediente(' + ${ingrediente.id} + ')'">
+                    <i data-lucide="square-pen" class="text-xl relative top-[1px]"></i>
+                  </button>
+
+                  <form th:action="@{/ingrediente/atualiza-status/{id}(id=${ingrediente.id})}" method="post"
+                        th:attr="hx-post=@{/ingrediente/atualiza-status/{id}(id=${ingrediente.id})}" hx-target="#slot-conteudo">
+                    <button type="submit" class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full" th:title="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}">
+                      <i th:attr="data-lucide=${ingrediente.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}"
+                         class="text-xl relative top-[1px]"></i>
+                    </button>
+                  </form>
+                </div>
+
+                <div class="flex flex-col items-center justify-center gap-2 w-full">
+                  <div class="flex items-center justify-center gap-3 w-full">
+                    <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 truncate text-center w-full" style="margin-left: 0; margin-right: 0;" th:text="${ingrediente.nome}"></h2>
+                  </div>
+                </div>
+              </div>
+              <i data-lucide="chevron-down" class="text-zinc-800 transition-transform duration-300 absolute right-6"></i>
+            </div>
+
+            <div class="max-h-0 opacity-0 transition-all duration-500 ease-in-out px-4 sm:px-6 w-full flex flex-col gap-4 overflow-hidden">
+
+              <div class="flex sm:hidden justify-center gap-6 w-full pt-4 pb-2" th:if="${viewMode != null and viewMode != 'taco'}">
+                <div class="cursor-pointer transform duration-200 hover:scale-110" title="Editar Ingrediente" th:attr="onclick='editarIngrediente(' + ${ingrediente.id} + ')'">
+                  <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-edit-ing-mob-' + ${ingrediente.id}, iconeCss='square-pen', tipo='button')}"></div>
+                </div>
+
+                <form th:action="@{/ingrediente/atualiza-status/{id}(id=${ingrediente.id})}" method="post"
+                      th:attr="hx-post=@{/ingrediente/atualiza-status/{id}(id=${ingrediente.id})}" hx-target="#slot-conteudo"
+                      class="m-0 p-0 cursor-pointer transform duration-200 hover:scale-110" th:title="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}">
+                  <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-status-ing-mob-' + ${ingrediente.id}, iconeCss=${ingrediente.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"></div>
+                </form>
+              </div>
+
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-4 w-full text-center py-4">
+                <div class=" p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                  <div class="text-xs text-zinc-700 uppercase font-bold">PTN</div>
+                  <div class="font-semibold text-zinc-800" th:text="${ingrediente.ptn} + 'g'"></div>
+                </div>
+                <div class=" p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                  <div class="text-xs text-zinc-700 uppercase font-bold">CHO</div>
+                  <div class="font-semibold text-zinc-800" th:text="${ingrediente.cho} + 'g'"></div>
+                </div>
+                <div class=" p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                  <div class="text-xs text-zinc-700 uppercase font-bold">LIP</div>
+                  <div class="font-semibold text-zinc-800" th:text="${ingrediente.lip} + 'g'"></div>
+                </div>
+                <div class=" p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                  <div class="text-xs text-zinc-700 uppercase font-bold">Sódio</div>
+                  <div class="font-semibold text-zinc-800" th:text="${ingrediente.sodio} + 'mg'"></div>
+                </div>
+                <div class="col-span-2 sm:col-span-1 p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                  <div class="text-xs text-zinc-700 uppercase font-bold">Gordura Sat.</div>
+                  <div class="font-semibold text-zinc-800" th:text="${ingrediente.gorduraSaturada} + 'g'"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div th:if="${temMaisResultados}" class="load-more-container pt-2 text-center">
+            <div th:attr="hx-get=${proximaPaginaUrl}"
+                 hx-target="closest .load-more-container"
+                 hx-swap="outerHTML"
+                 hx-trigger="click"
+                 title="Carregar mais"
+                 class="cursor-pointer inline-block transform duration-200 hover:scale-110">
+              <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-load-more-ingredientes', iconeCss='plus', tipo='button')}"></div>
+            </div>
+          </div>
+          </th:block>
+        </div>
+
+        <div th:if="${paginaAtual == 0 and ingredientes != null and ingredientes.empty}" class="flex flex-col items-center justify-center py-12">
+          <div class="text-[#4A6E18]">
+            <i data-lucide="utensils" class="text-6xl mb-4"></i>
+          </div>
+          <p class="text-xl font-semibold text-center text-zinc-800">Nenhum ingrediente encontrado.</p>
+        </div>
+
+        <div th:replace="~{pages/ingredientes/FormIngrediente :: form-ingrediente}"></div>
+
+      </div>
+    </main>
+  </div>
+
+  <div class="hidden bg-green-200 border-green-700 text-green-900 shadow bg-white border-gray-300 text-gray-400"></div>
+  <span class="bg-[#599e4a] hidden"></span>
+  <span class="border-green-900 hidden"></span>
+  <span class="text-green-950 hidden"></span>
+  <span class="shadow hidden"></span>
+  <span class="bg-white hidden"></span>
+  <span class="border-gray-300 hidden"></span>
+  <span class="text-gray-400 hidden"></span>
+
+  <script th:src="@{/Scripts/pages/ingredientes/ScriptListIngrediente.js(v='20260506-01')}"></script>
+</div>

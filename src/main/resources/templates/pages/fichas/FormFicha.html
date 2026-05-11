@@ -1,0 +1,155 @@
+<div th:fragment="conteudo" class="w-full flex flex-col items-center">
+  <div
+    class="flex-1 w-full sm:flex sm:items-center sm:justify-center px-3 sm:px-4"
+  >
+    <main
+      class="mt-4 sm:mt-8 rounded-3xl p-3 sm:p-6 md:p-10 max-w-full lg:max-w-4xl xl:max-w-6xl flex flex-col gap-4 sm:gap-8 min-h-[700px] mb-8 w-full"
+    >
+      <div class="w-full flex items-center justify-between mb-4 md:mb-6">
+        <button
+          data-hx-get="/ficha"
+          data-hx-target="#slot-conteudo"
+          data-hx-push-url="true"
+          type="button"
+          class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]"
+        >
+          <i data-lucide="arrow-left" class="text-2xl"></i>
+        </button>
+        <h1
+          class="text-2xl sm:text-3xl md:text-4xl text-zinc-800 font-bold text-center flex-grow"
+          th:text="${ficha.id != null ? 'Edição de Ficha' : 'Cadastro de Ficha'}"
+        ></h1>
+        <div class="w-10"></div>
+      </div>
+
+      <form
+        th:action="@{${ficha.id != null ? '/ficha/editar/' + ficha.id : '/ficha'}}"
+        th:object="${ficha}"
+        method="post"
+        th:data-hx-post="@{${ficha.id != null ? '/ficha/editar/' + ficha.id : '/ficha'}}"
+        hx-on:htmx:before-request="if(!validarFormFicha()) event.preventDefault()"
+        data-hx-target="#slot-conteudo"
+        class="p-0.5 rounded-lg relative w-full max-w-full"
+        id="form-ficha"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <input type="hidden" th:field="*{preparacao.id}" />
+
+        <input
+          type="hidden"
+          name="status"
+          th:value="${ficha.status != null ? ficha.status.name() : 'ATIVA'}"
+        />
+        <input type="hidden" th:field="*{custoTotal}" id="custoTotalHidden" />
+        <input
+          type="hidden"
+          th:field="*{custoPerCapita}"
+          id="custoPerCapitaHidden"
+        />
+
+        <div
+          class="w-full mb-4 bg-transparent border border-[#4A6E18] rounded-xl sm:rounded-[2rem] overflow-hidden shadow-sm transition-all duration-300"
+        >
+          <div
+            class="px-4 py-4 sm:px-6 w-full flex justify-between items-center cursor-pointer bg-[#f3ffe5] hover:bg-[#e9fcca] transition-colors select-none group"
+            onclick="toggleFicha(this)"
+          >
+            <div
+              class="flex items-center gap-2 font-bold text-lg text-zinc-800"
+            >
+              <i data-lucide="chef-hat" class="text-[#4A6E18]"></i>
+              Etapa 1: Ingredientes e Preparo
+            </div>
+            <i
+              data-lucide="chevron-down"
+              class="chevron-down transition-transform duration-300 text-[#4A6E18] rotate-180"
+            ></i>
+          </div>
+          <div
+            th:replace="~{pages/fichas/FormFichaFragments/Etapa1IngredientesPreparo :: etapa1}"
+          ></div>
+        </div>
+
+        <div
+          class="w-full mb-4 bg-transparent border border-[#4A6E18] rounded-xl sm:rounded-[2rem] overflow-hidden shadow-sm transition-all duration-300"
+        >
+          <div
+            class="px-4 py-4 sm:px-6 w-full flex justify-between items-center cursor-pointer bg-[#f3ffe5] hover:bg-[#e9fcca] transition-colors select-none group"
+            onclick="toggleFicha(this)"
+          >
+            <div
+              class="flex items-center gap-2 font-bold text-lg text-zinc-800"
+            >
+              <i data-lucide="scale" class="text-[#4A6E18]"></i>
+              Etapa 2: Rendimento e Água
+            </div>
+            <i
+              data-lucide="chevron-down"
+              class="chevron-down transition-transform duration-300 text-[#4A6E18]"
+            ></i>
+          </div>
+          <div
+            th:replace="~{pages/fichas/FormFichaFragments/Etapa2RendimentoAgua :: etapa2}"
+          ></div>
+        </div>
+
+        <div
+          class="w-full mb-8 bg-transparent border border-[#4A6E18] rounded-xl sm:rounded-[2rem] overflow-hidden shadow-sm transition-all duration-300"
+        >
+          <div
+            class="px-4 py-4 sm:px-6 w-full flex justify-between items-center cursor-pointer bg-[#f3ffe5] hover:bg-[#e9fcca] transition-colors select-none group"
+            onclick="toggleFicha(this)"
+          >
+            <div
+              class="flex items-center gap-2 font-bold text-lg text-zinc-800"
+            >
+              <i data-lucide="activity" class="text-[#4A6E18]"></i>
+              Etapa 3: Informação Nutricional
+            </div>
+            <i
+              data-lucide="chevron-down"
+              class="chevron-down transition-transform duration-300 text-[#4A6E18]"
+            ></i>
+          </div>
+          <div
+            th:replace="~{pages/fichas/FormFichaFragments/Etapa3InformacaoNutricional :: etapa3}"
+          ></div>
+        </div>
+
+        <div
+          class="flex flex-col sm:flex-row justify-center gap-8 items-center w-full mt-10 pb-10"
+        >
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              id="statusCheckbox"
+              class="h-6 w-6 accent-[#4A6E18] cursor-pointer"
+              th:checked="${ficha.statusCriacao?.name() == 'COMPLETA'}"
+            />
+            <span class="font-bold text-lg text-zinc-800">Completa</span>
+          </label>
+
+          <input
+            type="hidden"
+            th:field="*{statusCriacao}"
+            id="statusCriacaoField"
+          />
+          <div class="cursor-pointer">
+            <div
+              th:replace="~{components/Buttom :: btn-animado(idBtn='btn-ficha-submit', texto=${ficha.id != null ? 'Atualizar Ficha' : 'Salvar Ficha'}, tipo='submit')}"
+            ></div>
+          </div>
+        </div>
+      </form>
+    </main>
+
+    <div
+      th:replace="~{pages/ingredientes/FormIngrediente :: form-ingrediente}"
+    ></div>
+  </div>
+
+  <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaCore.js}"></script>
+  <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaControls.js}"></script>
+  <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaDraft.js}"></script>
+  <script th:src="@{/Scripts/pages/fichas/ScriptFormFicha.js}"></script>
+</div>

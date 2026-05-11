@@ -1,0 +1,47 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Victus</title>
+    <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+    <script th:src="@{/Scripts/vendor/htmx.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/output.css}" />
+    <link rel="stylesheet" th:href="@{/input.css}" />
+    <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+    <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+    <script th:src="@{/Scripts/ScriptGeral.js}" defer></script>
+  </head>
+  <body class="bg-[#f3ffe5] min-h-screen flex flex-col overflow-x-hidden">
+    <div th:replace="~{fragments/Header :: main-header}"></div>
+    <div
+      class="flex-1 flex flex-col min-h-screen w-full xl:pl-[80px] overflow-y-auto"
+    >
+      <main id="slot-conteudo" class="flex-grow w-full">
+        <div th:replace="~{${view} :: conteudo}"></div>
+      </main>
+      <div th:replace="~{fragments/Footer :: main-footer}"></div>
+    </div>
+
+    <script th:src="@{/Scripts/fragments/ScriptHeader.js}"></script>
+    <script th:src="@{/Scripts/fragments/ScriptPerfil.js}"></script>
+
+    <div
+      id="toast-container"
+      class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
+    >
+      <div th:replace="~{components/Toast :: toast-templates}"></div>
+      <th:block th:if="${errorMessage != null}">
+        <div
+          th:replace="~{components/Toast :: error(mensagem=${errorMessage})}"
+        ></div>
+      </th:block>
+
+      <th:block th:if="${param.erro != null}">
+        <div
+          th:replace="~{components/Toast :: error(mensagem=${param.erro[0]})}"
+        ></div>
+      </th:block>
+    </div>
+  </body>
+</html>

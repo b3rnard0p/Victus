@@ -1,0 +1,225 @@
+<div th:fragment="conteudo" class="w-full flex flex-col items-center">
+  <main
+    class="flex-1 flex items-start justify-center w-full px-4 pt-8 md:pt-16 mb-16 sm:mb-0"
+  >
+    <div class="rounded-3xl w-full max-w-5xl sm:p-6 md:p-8 lg:p-10 xl:p-12">
+      <div class="flex justify-center items-center mb-8">
+        <h1 class="text-3xl font-bold text-zinc-800">Usuários</h1>
+      </div>
+
+      <div id="usuarios-lista" class="space-y-4">
+        <th:block th:fragment="itens">
+          <div
+            th:each="usuario : ${usuarios}"
+            class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative"
+          >
+            <div
+              class="grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr] gap-2 sm:gap-4 items-center w-full h-full"
+            >
+              <div
+                class="flex flex-col min-w-0 justify-center h-full items-center sm:items-start"
+              >
+                <div
+                  class="text-2xl font-medium text-zinc-800 truncate w-full text-center sm:text-left"
+                  th:text="${usuario.username}"
+                ></div>
+                <div
+                  class="text-sm text-zinc-800 truncate w-full text-center sm:text-left"
+                  th:text="${usuario.email}"
+                ></div>
+              </div>
+
+              <div class="flex justify-center gap-2">
+                <th:block th:unless="${usuario.id == adminId}">
+                  <form
+                    th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    method="post"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    data-hx-target="#slot-conteudo"
+                    class="m-0"
+                  >
+                    <input type="hidden" name="cargo" value="" />
+
+                    <div
+                      th:class="${usuario.cargo == null or #strings.isEmpty(usuario.cargo)} ?
+              'group relative cursor-pointer rounded-full ring-2 ring-[#7AB648] bg-zinc-800 transform duration-200 scale-110' :
+              'group relative cursor-pointer rounded-full opacity-60 hover:opacity-100 transition-all'"
+                    >
+                      <div
+                        th:replace="~{components/Buttom :: btn-icon(idBtn='btn-cargo-null-' + ${usuario.id}, iconeCss=${usuario.cargo == null or #strings.isEmpty(usuario.cargo) ? 'user text-[#7AB648]' : 'user text-gray-500'}, tipo='submit')}"
+                      ></div>
+
+                      <span
+                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 rounded bg-[#f3ffe5] text-zinc-800 border border-[#4A6E18] text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none"
+                        >Sem Cargo</span
+                      >
+                    </div>
+                  </form>
+
+                  <form
+                    th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    method="post"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    data-hx-target="#slot-conteudo"
+                    class="m-0"
+                  >
+                    <input type="hidden" name="cargo" value="NUTRICIONISTA" />
+
+                    <div
+                      th:class="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'NUTRICIONISTA'} ?
+              'group relative cursor-pointer rounded-full ring-2 ring-[#7AB648] bg-zinc-800 transform duration-200 scale-110' :
+              'group relative cursor-pointer rounded-full opacity-60 hover:opacity-100 transition-all'"
+                    >
+                      <div
+                        th:replace="~{components/Buttom :: btn-icon(idBtn='btn-cargo-nutri-' + ${usuario.id}, iconeCss=${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'NUTRICIONISTA' ? 'salad text-[#7AB648]' : 'salad text-gray-500'}, tipo='submit')}"
+                      ></div>
+
+                      <span
+                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 rounded bg-[#f3ffe5] text-zinc-800 border border-[#4A6E18] text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none"
+                        >Nutricionista</span
+                      >
+                    </div>
+                  </form>
+
+                  <form
+                    th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    method="post"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    data-hx-target="#slot-conteudo"
+                    class="m-0"
+                  >
+                    <input type="hidden" name="cargo" value="PRODUCAO" />
+
+                    <div
+                      th:class="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'PRODUCAO'} ?
+              'group relative cursor-pointer rounded-full ring-2 ring-[#7AB648] bg-zinc-800 transform duration-200 scale-110' :
+              'group relative cursor-pointer rounded-full opacity-60 hover:opacity-100 transition-all'"
+                    >
+                      <div
+                        th:replace="~{components/Buttom :: btn-icon(idBtn='btn-cargo-prod-' + ${usuario.id}, iconeCss=${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'PRODUCAO' ? 'utensils text-[#7AB648]' : 'utensils text-gray-500'}, tipo='submit')}"
+                      ></div>
+
+                      <span
+                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 rounded bg-[#f3ffe5] text-zinc-800 border border-[#4A6E18] text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none"
+                        >Produção</span
+                      >
+                    </div>
+                  </form>
+
+                  <form
+                    th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    method="post"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}"
+                    data-hx-target="#slot-conteudo"
+                    class="m-0"
+                  >
+                    <input type="hidden" name="cargo" value="ADMIN" />
+
+                    <div
+                      th:class="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'ADMIN'} ?
+              'group relative cursor-pointer rounded-full ring-2 ring-[#7AB648] bg-zinc-800 transform duration-200 scale-110' :
+              'group relative cursor-pointer rounded-full opacity-60 hover:opacity-100 transition-all'"
+                    >
+                      <div
+                        th:replace="~{components/Buttom :: btn-icon(idBtn='btn-cargo-admin-' + ${usuario.id}, iconeCss=${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'ADMIN' ? 'shield-user text-[#7AB648]' : 'shield-user text-gray-500'}, tipo='submit')}"
+                      ></div>
+
+                      <span
+                        class="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-max px-2 py-1 rounded bg-[#f3ffe5] text-zinc-800 border border-[#4A6E18] text-xs opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none"
+                        >Admin</span
+                      >
+                    </div>
+                  </form>
+                </th:block>
+              </div>
+
+              <div
+                class="flex flex-col sm:flex-row sm:justify-end items-center gap-2 w-full"
+              >
+                <div
+                  class="text-sm text-zinc-800 text-center sm:text-right font-medium"
+                  th:text="${usuario.estabelecimentoNome != null} ? ${usuario.estabelecimentoNome} : 'Não vinculado'"
+                ></div>
+
+                <div
+                  class="flex flex-row gap-2 items-center justify-center sm:justify-end"
+                >
+                  <div
+                    th:data-hx-get="@{/admin/usuarios/{id}/estabelecimento(id=${usuario.id})}"
+                    data-hx-target="body"
+                    data-hx-swap="beforeend"
+                    title="Vincular Estabelecimento"
+                    class="cursor-pointer"
+                  >
+                    <div
+                      th:replace="~{components/Buttom :: btn-icon(idBtn='btn-vinc-' + ${usuario.id}, iconeCss='link', tipo='button')}"
+                    ></div>
+                  </div>
+                  <form
+                    th:action="@{/admin/usuarios/{id}/toggle-ativo(id=${usuario.id})}"
+                    method="post"
+                    th:data-hx-post="@{/admin/usuarios/{id}/toggle-ativo(id=${usuario.id})}"
+                    data-hx-target="#slot-conteudo"
+                    class="flex justify-center m-0"
+                  >
+                    <button
+                      type="submit"
+                      th:title="${usuario.ativo ? 'Inativar Usuário' : 'Ativar Usuário'}"
+                      class="group w-10 h-10 rounded-full flex items-center justify-center bg-transparent border-none focus:outline-none cursor-pointer"
+                    >
+                      <i
+                        th:attr="data-lucide=${usuario.ativo ? 'toggle-right' : 'toggle-left'}"
+                        th:class="${usuario.ativo ? 'text-3xl text-[#7AB648] transition-colors' : 'text-3xl text-gray-500 transition-colors'}"
+                      ></i>
+                    </button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            th:if="${temMaisResultados}"
+            class="load-more-container pt-2 text-center"
+          >
+            <div
+              th:attr="hx-get=${proximaPaginaUrl}"
+              hx-target="closest .load-more-container"
+              hx-swap="outerHTML"
+              hx-trigger="click"
+              title="Carregar mais"
+              class="cursor-pointer inline-block transform duration-200 hover:scale-110"
+            >
+              <div
+                th:replace="~{components/Buttom :: btn-icon(idBtn='btn-load-more-usuarios', iconeCss='plus', tipo='button')}"
+              ></div>
+            </div>
+          </div>
+        </th:block>
+      </div>
+
+      <div
+        th:if="${paginaAtual == 0 and usuarios != null and usuarios.empty}"
+        class="flex flex-col items-center justify-center py-12 sm:py-16 gap-4"
+      >
+        <div class="text-[#4A6E18]">
+          <i data-lucide="users" class="text-6xl sm:text-7xl"></i>
+        </div>
+
+        <p class="text-zinc-800 text-lg sm:text-xl font-bold text-center px-4">
+          Nenhum usuário cadastrado.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <div class="hidden bg-green-200 border-green-700 text-green-900 shadow"></div>
+  <div class="hidden bg-white border-gray-300 text-zinc-800"></div>
+  <span class="bg-green-200 hidden"></span>
+  <span class="border-green-700 hidden"></span>
+  <span class="text-green-900 hidden"></span>
+  <span class="shadow hidden"></span>
+  <span class="bg-white hidden"></span>
+  <span class="border-gray-300 hidden"></span>
+  <span class="text-zinc-800 hidden"></span>
+</div>

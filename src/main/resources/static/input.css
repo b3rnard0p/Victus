@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Merienda:wght@300..900&display=swap&family=Goldman:wght@400;700&family=Iceland&family=Cause:wght@100..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Sniglet:wght@400;800&display=swap");
+
+/* Fonte */
+body {
+  /* font-family: "Edu NSW ACT Cursive", cursive; */
+  /* font-family: "Cinzel Decorative", serif; */
+  /* font-family: "Iceland", sans-serif; */
+  /* font-family: "Goldman", sans-serif; */
+  font-family: "Merienda", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+}
+
+/* Scroll */
+html {
+  scrollbar-gutter: stable;
+}
+::-webkit-scrollbar {
+  background: #f3ffe5;
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #4a6e18 transparent;
+}
+
+/* Input Number */
+input[type="number"] {
+  -moz-appearance: textfield !important;
+  appearance: textfield !important;
+}
+
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none !important;
+  margin: 0 !important;
+}
+
+/* Sidebar Active State */
+.dock-item.active .internal-icon {
+  color: #7ab648 !important;
+}

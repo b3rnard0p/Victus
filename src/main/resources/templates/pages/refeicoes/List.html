@@ -1,0 +1,200 @@
+<div th:fragment="conteudo" class="w-full flex flex-col items-center">
+
+  <div class="flex-1 flex items-start justify-center w-full mt-4 sm:mt-8 px-2 sm:px-0">
+    <main class="p-4 sm:p-6 md:p-8 lg:p-10 w-[95%] max-w-6xl min-h-[500px] flex flex-col mb-8 mx-auto">
+      <div class="max-w-5xl w-full mx-auto">
+
+
+        <div class="relative flex items-center justify-center w-full mb-6">
+
+          <div class="absolute left-0 sm:hidden z-10 transform duration-200 hover:scale-110"
+               th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}"
+               onclick="abrirModalNovo()" title="Cadastrar nova refeição">
+            <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-novo-mobile', iconeCss='plus', tipo='button')}"></div>
+          </div>
+
+          <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-center text-zinc-800">
+            Suas Refeições
+          </h1>
+
+          <div class="absolute right-0 sm:hidden z-10 transform duration-200 hover:scale-110"
+               th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}"
+               title="Ver Arquivadas/Desarquivadas"
+               th:attr="hx-get=@{/refeicao/por-status(status=${statusAtual != null and statusAtual.name() == 'ATIVA' ? 'INATIVA' : 'ATIVA'})}"
+            hx-target="#slot-conteudo">
+            <div th:replace="~{components/Buttom :: btn-icon-status(idBtn='toggleStatusBtn-mobile', iconeCss=${statusAtual != null and statusAtual.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='button', ds=${statusAtual != null ? statusAtual.name() : 'INATIVA'})}"></div>
+          </div>
+
+        </div>
+
+        <div class="flex flex-col sm:flex-row items-end justify-center w-full mb-6 sm:mb-8 gap-2 sm:gap-4">
+
+          <div th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}"
+               class="hidden sm:flex w-full sm:w-auto flex-col sm:flex-row items-end justify-end sm:justify-start gap-2 sm:gap-4 pb-[2px] mt-4 sm:mt-0">
+            <div onclick="abrirModalNovo()" title="Cadastrar nova refeição" class="cursor-pointer transform duration-200 hover:scale-110">
+              <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-novo', iconeCss='plus', tipo='button')}"></div>
+            </div>
+
+            <div title="Ver Arquivadas/Desarquivadas"
+                 class="cursor-pointer transform duration-200 hover:scale-110"
+                 th:attr="hx-get=@{/refeicao/por-status(status=${statusAtual != null and statusAtual.name() == 'ATIVA' ? 'INATIVA' : 'ATIVA'})}"
+                hx-target="#slot-conteudo">
+              <div th:replace="~{components/Buttom :: btn-icon-status(idBtn='toggleStatusBtn', iconeCss=${statusAtual != null and statusAtual.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='button', ds=${statusAtual != null ? statusAtual.name() : 'INATIVA'})}"></div>
+            </div>
+          </div>
+
+          <form th:action="@{/refeicao/pesquisar}"
+                method="get"
+                data-hx-get="/refeicao/pesquisar"
+                data-hx-target="#slot-conteudo"
+                class="w-full sm:w-auto m-0 p-0"
+                th:unless="${usuarioLogado != null and usuarioLogado.cargo.name() == 'NUTRICIONISTA' and statusAtual?.name() == 'INATIVA'}">
+
+            <div class="flex flex-row items-start gap-2 sm:gap-4 w-full">
+
+              <div class="w-full sm:w-72">
+                <div th:replace="~{components/Input :: flutuante(id='nome', name='nome', type='text', label='Pesquisar por nome', value=${termoBusca}, required=true)}"></div>
+              </div>
+
+              <div title="Pesquisar" class="mt-6 flex items-center h-[52px]">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-search', iconeCss='search', tipo='submit')}"></div>
+              </div>
+
+              <div th:if="${termoBusca != null and !termoBusca.isEmpty()}"
+                   data-hx-get="/refeicao"
+                   data-hx-target="#slot-conteudo"
+                   class="mt-6 flex items-center h-[52px]"
+                   title="Limpar Pesquisa">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-clear', iconeCss='eraser text-red-600', tipo='button')}"></div>
+              </div>
+
+            </div>
+          </form>
+
+        </div>
+
+        <div id="refeicoes-lista" class="space-y-3 sm:space-y-4">
+          <th:block th:fragment="itens">
+            <div th:each="refeicao : ${refeicoes}"
+                 class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden">
+
+                      <div class="px-6 py-4 flex justify-center items-center cursor-pointer relative" onclick="toggleCard(this)">
+                        <div class="flex flex-1 w-full relative">
+
+                          <div class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 gap-1" th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}" onclick="event.stopPropagation();">
+
+                            <button type="button" class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full" title="Editar Refeição" th:attr="onclick='editarRefeicao(' + ${refeicao.id} + ')'"><i data-lucide="square-pen" class="text-xl relative top-[1px]"></i></button>
+
+                            <form th:action="@{/refeicao/toggle-status/{id}(id=${refeicao.id})}"
+                                  method="post"
+                                  th:attr="hx-post=@{/refeicao/toggle-status/{id}(id=${refeicao.id})}"
+                                  hx-target="#slot-conteudo">
+                              <input type="hidden" name="currentStatus" th:value="${statusAtual?.name()}"/>
+                              <button type="submit" class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full" th:title="${refeicao.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}">
+                                <i th:attr="data-lucide=${refeicao.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}"
+                                   class="text-xl relative top-[1px]"></i>
+                              </button>
+                            </form>
+
+                          </div>
+
+                          <div class="flex flex-col items-center justify-center gap-2 w-full">
+                            <div class="flex items-center justify-center gap-3 w-full">
+                              <h2 class="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 truncate text-center w-full" style="margin-left: 0; margin-right: 0;" th:text="${refeicao.nome}"></h2>
+                            </div>
+                          </div>
+                        </div>
+                        <i data-lucide="chevron-down" class="text-zinc-800 transition-transform duration-300 absolute right-6 chevron-down"></i>
+                      </div>
+
+                      <div class="max-h-0 opacity-0 transition-all duration-500 ease-in-out px-4 sm:px-6 w-full flex flex-col gap-4 overflow-hidden">
+
+                        <div class="flex sm:hidden justify-center gap-6 w-full pt-4" th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
+
+                          <div class="cursor-pointer transform duration-200 hover:scale-110" title="Editar Refeição" th:attr="onclick='editarRefeicao(' + ${refeicao.id} + ')'"><div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-edit-mob-' + ${refeicao.id}, iconeCss='square-pen', tipo='button')}"></div></div>
+
+                          <form th:action="@{/refeicao/toggle-status/{id}(id=${refeicao.id})}"
+                                method="post"
+                                th:attr="hx-post=@{/refeicao/toggle-status/{id}(id=${refeicao.id})}"
+                                hx-target="#slot-conteudo"
+                                class="m-0 p-0 cursor-pointer transform duration-200 hover:scale-110"
+                                th:title="${refeicao.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}">
+
+                            <input type="hidden" name="currentStatus" th:value="${statusAtual?.name()}"/>
+                            <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-status-mob-' + ${refeicao.id}, iconeCss=${refeicao.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"></div>
+                          </form>
+
+                        </div>
+
+                        <div class="w-full flex flex-col gap-4">
+                          <div class="totais-nutrientes grid grid-cols-2 sm:grid-cols-5 gap-4 py-4 w-full"
+                               th:id="'totais-nutrientes-' + ${refeicao.id}">
+                              <div class="bg-[#f3ffe5] p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                                <div class="text-xs text-zinc-700 uppercase font-bold">Kcal</div>
+                                <div class="font-semibold text-zinc-800 nutri-valor" data-nutriente="kcalTotal">...</div>
+                              </div>
+                              <div class="bg-[#f3ffe5] p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                                <div class="text-xs text-zinc-700 uppercase font-bold">PTN</div>
+                                <div class="font-semibold text-zinc-800 nutri-valor" data-nutriente="totalGramasPTN">...</div>
+                              </div>
+                              <div class="bg-[#f3ffe5] p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                                <div class="text-xs text-zinc-700 uppercase font-bold">CHO</div>
+                                <div class="font-semibold text-zinc-800 nutri-valor" data-nutriente="totalGramasCHO">...</div>
+                              </div>
+                              <div class="bg-[#f3ffe5] p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                                <div class="text-xs text-zinc-700 uppercase font-bold">LIP</div>
+                                <div class="font-semibold text-zinc-800 nutri-valor" data-nutriente="totalGramasLIP">...</div>
+                              </div>
+                              <div class="bg-[#f3ffe5] p-2 xl:px-4 rounded-xl border border-[#4A6E18]">
+                                <div class="text-xs text-zinc-700 uppercase font-bold">Sódio</div>
+                                <div class="font-semibold text-zinc-800 nutri-valor" data-nutriente="totalGramasSodio">...</div>
+                              </div>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 justify-center">
+
+                              <a th:each="ficha : ${refeicao.fichasTecnicas}"
+                                 th:href="@{/ficha/{id}(id=${ficha.id})}"
+                                 style="text-decoration: none;">
+                                <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-ficha-' + ${ficha.id}, texto=${ficha.nomePreparacao}, tipo='button')}"></div>
+                              </a>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+            <div th:if="${temMaisResultados}" class="load-more-container pt-2 text-center">
+              <div th:attr="hx-get=${proximaPaginaUrl}"
+                   hx-target="closest .load-more-container"
+                   hx-swap="outerHTML"
+                   hx-trigger="click"
+                   title="Carregar mais"
+                   class="cursor-pointer inline-block transform duration-200 hover:scale-110">
+                <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-load-more-refeicoes', iconeCss='plus', tipo='button')}"></div>
+              </div>
+            </div>
+          </th:block>
+        </div>
+
+        <div th:if="${paginaAtual == 0 and (refeicoes == null or refeicoes.empty)}"
+             class="flex flex-col items-center justify-center py-12 sm:py-16 gap-4">
+
+          <div class="text-[#4A6E18]">
+            <i data-lucide="utensils" class="text-6xl sm:text-7xl"></i>
+          </div>
+
+          <p class="text-zinc-800 text-lg sm:text-xl font-bold text-center px-4">
+            Nenhuma refeição encontrada.
+          </p>
+        </div>
+
+        <div th:replace="~{pages/refeicoes/FormRefeicao :: form-refeicao}"></div>
+
+        <script th:src="@{/Scripts/pages/refeicoes/ScriptListRefeicao.js}"></script>
+
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Victus</title>
+    <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
+    <link rel="stylesheet" th:href="@{/output.css}" />
+    <link rel="stylesheet" th:href="@{/input.css}" />
+    <script th:src="@{/Scripts/ScriptGeral.js}"></script>
+    <script th:src="@{/Scripts/fragments/ScriptPerfil.js}"></script>
+    <script th:src="@{/Scripts/vendor/lucide.min.js}" defer></script>
+    <script th:src="@{/Scripts/lucide-init.js}" defer></script>
+    <style>
+        @media (max-width: 640px) {
+            .home-card {
+                overflow: hidden;
+            }
+
+            .home-card-icon {
+                width: 140px !important;
+                height: 140px !important;
+            }
+
+            .home-card-icon-plus {
+                width: 52px !important;
+                height: 52px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-[#f3ffe5] min-h-screen flex flex-col">
+
+<header class="w-full relative z-50 flex items-center justify-between py-4 px-8 md:px-16 lg:px-24 text-white overflow-visible">
+    <div class="flex items-center space-x-4">
+        <a th:href="@{/home}">
+            <img src="/imagens/Logo.avif" alt="Logo" class="w-20 h-24 md:w-20 md:h-20"/>
+        </a>
+    </div>
+    <div class="relative">
+        <button id="userBtn" class="text-white focus:outline-none">
+            <img th:if="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}" th:src="@{'/' + ${usuarioLogado.caminhoImagem}}" alt="Usuário" class="w-20 h-20 rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform"/>
+            <img th:unless="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}" th:src="@{/imagens/UserIcon.png}" alt="Usuário" class="w-20 h-20 rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform"/>
+        </button>
+
+        <div id="userDropdown" class="hidden absolute right-0 sm:left-1/2 sm:right-auto sm:-translate-x-1/2 mt-2 w-40 bg-white rounded-lg shadow-xl z-[70] border border-gray-200 overflow-hidden transition-all duration-300 ease-in-out transform origin-top">
+
+            <button type="button" onclick="abrirModalPerfil()" class="w-full px-4 py-3 flex items-center justify-center gap-2 text-zinc-800 transition-colors duration-200 group border-b border-gray-100">
+                <i data-lucide="user" class="text-lg text-zinc-800 group-hover:text-[#7AB648] transition-colors"></i>
+                <span class="group-hover:text-green-600 transition-colors font-medium">Meu Perfil</span>
+            </button>
+            <button onclick="fazerLogout()" class="w-full px-4 py-3 flex items-center justify-center gap-2 text-zinc-800 transition-colors duration-200 group">
+                <i data-lucide="log-out" class="text-lg text-zinc-800 group-hover:text-red-500 transition-colors"></i>
+                <span class="group-hover:text-red-600 transition-colors font-medium">Sair</span>
+            </button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const btn = document.getElementById("userBtn");
+            const dropdown = document.getElementById("userDropdown");
+            btn.addEventListener("click", (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle("hidden");
+            });
+            document.addEventListener("click", () => {
+                dropdown.classList.add("hidden");
+            });
+        });
+    </script>
+</header>
+
+<main class="flex-1 overflow-y-auto w-full px-4 py-3 flex flex-col items-center justify-center">
+
+    <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'ADMIN'}">
+        <div class="hover-grid-wrapper w-full max-w-5xl p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 relative">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+
+                <a th:href="@{/admin/estabelecimentos}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[150px] sm:h-[200px] mb-4 sm:mb-6">
+                        <i data-lucide="building" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-black mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Listar Estabelecimentos
+                    </span>
+                </a>
+
+                <a th:href="@{/admin/usuarios}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[150px] sm:h-[200px] mb-4 sm:mb-6">
+                        <i data-lucide="users" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-black mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Listar Usuários
+                    </span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
+        <div class="hover-grid-wrapper w-full max-w-7xl p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 mb-8 relative">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+                <a th:href="@{/ficha/nova}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[120px] sm:h-[150px] md:h-[180px] mb-4 sm:mb-6">
+                        <div class="relative">
+                            <i data-lucide="file" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                            <i data-lucide="plus" style="width: 160px; height: 160px;" class="home-card-icon-plus absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-[#7AB648] text-3xl sm:text-4xl md:text-5xl"></i>
+                        </div>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-zinc-800 mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Criar Ficha
+                    </span>
+                </a>
+
+
+                <a th:href="@{/ficha}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[120px] sm:h-[150px] md:h-[180px] mb-4 sm:mb-6">
+                        <i data-lucide="file" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-zinc-800 mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Suas Fichas
+                    </span>
+                </a>
+
+                <a th:href="@{/ingrediente}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[120px] sm:h-[150px] md:h-[180px] mb-4 sm:mb-6">
+                        <i data-lucide="sandwich" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-zinc-800 mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Seus Ingredientes
+                    </span>
+                </a>
+
+                <a th:href="@{/refeicao}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[120px] sm:h-[150px] md:h-[180px] mb-4 sm:mb-6">
+                        <i data-lucide="utensils" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-zinc-800 mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Suas Refeições
+                    </span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:if="${usuarioLogado != null && usuarioLogado.cargo != null && usuarioLogado.cargo.name() == 'PRODUCAO'}">
+        <div class="hover-grid-wrapper w-full max-w-4xl p-4 sm:p-6 md:p-8 lg:p-10 xl:p-12 relative">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 w-full">
+
+                <a th:href="@{/ficha}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[150px] sm:h-[200px] mb-4 sm:mb-6">
+                        <i data-lucide="file" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-black mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Suas Fichas
+                    </span>
+                </a>
+
+                <a th:href="@{/refeicao}" class="hover-card home-card relative z-10 bg-[#f3ffe5] rounded-xl p-4 sm:p-6 flex flex-col items-center shadow-md h-full transition-all duration-300 cursor-pointer transform hover:-translate-y-2 hover:shadow-lg">
+                    <div class="flex items-center justify-center w-full max-w-[300px] h-[150px] sm:h-[200px] mb-4 sm:mb-6">
+                        <i data-lucide="utensils" class="home-card-icon text-[#7AB648]" style="width: 200px; height: 200px;"></i>
+                    </div>
+                    <span class=" px-4 py-2 sm:px-6 sm:py-3 rounded-full text-black mt-auto text-center text-base sm:text-lg font-medium w-full max-w-[250px]">
+                        Suas Refeições
+                    </span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+
+</main>
+<div th:replace="~{fragments/Footer :: main-footer}"></div>
+<script th:src="@{/Scripts/pages/general/ScriptHome.js}"></script>
+</body>
+</html>
