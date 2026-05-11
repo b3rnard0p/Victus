@@ -1,10 +1,24 @@
-# Victus - Gestão Nutricional
+<h1 align="center">Victus - Gestão Nutricional</h1>
 
 O **Victus - Gestão Nutricional** é um sistema robusto desenvolvido para auxiliar profissionais de nutrição e equipes de produção na gestão técnica e operacional de serviços de alimentação. O sistema permite o controle detalhado de ingredientes, a criação de fichas técnicas complexas com cálculos automáticos de perfil nutricional e custos, além da organização de refeições completas.
 
 Com uma interface moderna e funcional, o Victus utiliza tecnologias como Spring Boot e HTMX para proporcionar uma experiência fluida, permitindo buscas dinâmicas, exportação de relatórios em PDF e uma gestão eficiente de estabelecimentos e usuários.
 
-## Controllers
+<h2 align="center">Sumário</h2>
+- [Controllers](#controllers)
+- [Exceptions](#exceptions)
+- [Mappers](#mappers)
+- [Model](#model)
+- [Records (DTOs)](#records-dtos)
+- [Repositories & Specifications](#repositories--specifications)
+- [Security](#security)
+- [Services (Regras de Negócio)](#services-regras-de-negócio)
+- [Qualidade & Testes](#qualidade--testes)
+- [Frontend (Arquitetura da Interface)](#frontend-arquitetura-da-interface)
+- [Tecnologias & Dependências](#tecnologias--dependências)
+- [Comandos Úteis](#comandos-úteis)
+
+<h2 align="center">Controllers</h2>
 
 Abaixo estão detalhados os controladores que compõem a lógica de negócio do sistema:
 
@@ -66,7 +80,7 @@ Componente auxiliar utilizado por diversos controladores para padronizar a naveg
 - **Paginação:** Calcula e injeta no modelo os atributos necessários para a navegação paginada, como a URL da próxima página e indicadores de continuidade de resultados.
 - **Renderização Dinâmica:** Gerencia a integração com o **HTMX**, decidindo se deve retornar a página completa com o Layout, apenas o conteúdo principal ou fragmentos específicos de listas, otimizando o tráfego de dados e a performance do frontend.
 
-## Exceptions
+<h2 align="center">Exceptions</h2>
 
 O sistema utiliza uma hierarquia de exceções personalizadas para garantir que erros de negócio e falhas de integridade sejam tratados de forma consistente. Abaixo estão todas as classes de exceção implementadas:
 
@@ -114,7 +128,7 @@ Utilizada no módulo administrativo para sinalizar que um estabelecimento vincul
 
 Exceção de segurança crítica, lançada quando um usuário autenticado tenta realizar operações que exigem um cargo (Role/Cargo) mas o seu perfil ainda não possui um atribuído.
 
-## Mappers
+<h2 align="center">Mappers</h2>
 
 O sistema utiliza a biblioteca **MapStruct** para gerenciar a transformação de dados entre as Entidades JPA e os DTOs (Records). Garante alta performance (através de geração de código em tempo de compilação sem reflexão), tipagem forte e redução de código repetitivo.
 
@@ -132,7 +146,7 @@ O sistema utiliza a biblioteca **MapStruct** para gerenciar a transformação de
 - **RefeicaoMapper:** Transforma a entidade `Refeicao` em `RefeicaoResponseDTO`, gerenciando a coleção de fichas vinculadas.
 - **UsuarioMapper:** Converte dados de `Usuario`, abstraindo relacionamentos com `Estabelecimento` e garantindo que apenas dados necessários cheguem à view.
 
-## Model
+<h2 align="center">Model</h2>
 
 O coração dos dados do Victus é composto por entidades JPA que representam o domínio da nutrição e gestão. A arquitetura utiliza relacionamentos complexos para garantir a integridade dos cálculos nutricionais e de custos.
 
@@ -188,7 +202,7 @@ Unidade organizacional do sistema.
 - **StatusCriacao:** Gerencia o fluxo de trabalho (`RASCUNHO`, `COMPLETA`).
 - **Tag:** Identificadores nutricionais visuais (`ALTO_SODIO`, `BAIXA_GORDURA`, etc.).
 
-## Records (DTOs)
+<h2 align="center">Records (DTOs)</h2>
 
 O sistema utiliza **Java Records** para implementar o padrão DTO (_Data Transfer Object_). Os Records são ideais para essa função por serem imutáveis, concisos e focados puramente em transportar dados entre a camada de persistência e a interface do usuário.
 
@@ -221,7 +235,7 @@ Os DTOs estão organizados por domínio e finalidade, garantindo que apenas os d
 - **UsuarioDTO / GetUsuarioDTO:** Gerenciam o fluxo de dados de perfil e registro, ocultando informações sensíveis como a senha na saída.
 - **EstabelecimentoDTO / GetEstabelecimentoDTO:** Transportam dados de identificação e listagem de unidades organizacionais.
 
-## Repositories & Specifications
+<h2 align="center">Repositories & Specifications</h2>
 
 A camada de acesso a dados do Victus utiliza o **Spring Data JPA** para abstrair a complexidade das operações de banco de dados, permitindo um código focado na regra de negócio.
 
@@ -258,7 +272,7 @@ Suporta a listagem e filtragem de cardápios.
 
 - **Dinamismo:** Permite filtrar refeições pelo nome e status, facilitando a gestão para o nutricionista.
 
-## Security
+<h2 align="center">Security</h2>
 
 A segurança do Victus é implementada utilizando o **Spring Security** com uma arquitetura baseada em **Tokens JWT (JSON Web Tokens)**, garantindo uma autenticação robusta e escalável (stateless).
 
@@ -285,7 +299,7 @@ O acesso às funcionalidades é estritamente controlado com base no cargo do usu
   - **AccessDeniedHandler:** Usuários autenticados que tentam acessar recursos fora de seu cargo são redirecionados para uma página de "Acesso Negado".
 - **Method Security:** Utiliza `@EnableMethodSecurity`, permitindo o uso de anotações como `@PreAuthorize` diretamente nos métodos dos serviços para um controle granular.
 
-## Services (Regras de Negócio)
+<h2 align="center">Services (Regras de Negócio)</h2>
 
 A camada de Service é onde reside a "inteligência" do Victus. Ela é responsável por orquestrar os dados, aplicar validações rigorosas e realizar os cálculos técnicos necessários para a gestão nutricional.
 
@@ -331,7 +345,7 @@ O Victus já nasce com uma base de dados rica graças ao processo de _Bootstrap_
   - **Dono do Sistema:** Todos os ingredientes da TACO são atribuídos a um usuário interno especial (`taco_user`), tornando-os disponíveis para consulta global por todos os nutricionistas, mas protegidos contra edição manual.
 - **Execução Inteligente:** A importação ocorre apenas na primeira execução ou quando o banco de dados está vazio, evitando duplicação e garantindo que o sistema esteja pronto para uso imediato após a instalação.
 
-## Qualidade & Testes
+<h2 align="center">Qualidade & Testes</h2>
 
 O Victus prioriza a estabilidade e a confiabilidade dos cálculos nutricionais. Para isso, conta com uma robusta suíte de testes que cobre as principais funcionalidades do sistema.
 
@@ -357,7 +371,7 @@ A suíte de testes é executada a cada alteração significativa no código, gar
 - Regras de segurança (RBAC) impeçam acessos indevidos.
 - Fluxos de importação de dados (como a TACO) funcionem corretamente em ambientes limpos.
 
-## Frontend (Arquitetura da Interface)
+<h2 align="center">Frontend (Arquitetura da Interface)</h2>
 
 A interface do Victus foi projetada para ser rápida, responsiva e de fácil manutenção, utilizando tecnologias modernas que permitem uma experiência de Single Page Application (SPA) dentro de um ambiente tradicional de servidor.
 
@@ -386,7 +400,7 @@ Localizados em `src/main/resources/templates`, utilizam o motor de templates **T
 - **HTMX:** Utilizado para criar interações dinâmicas (como carregamento de modais e atualizações parciais de listas) sem a necessidade de recarregar a página inteira, proporcionando uma navegação fluida.
 - **JavaScript Moderno:** Utilizado para manipulação refinada do DOM e integração com APIs de terceiros.
 
-## Tecnologias & Dependências
+<h2 align="center">Tecnologias & Dependências</h2>
 
 O Victus é construído sobre o ecossistema Java moderno, utilizando as bibliotecas mais estáveis e performáticas do mercado.
 
@@ -406,7 +420,7 @@ O Victus é construído sobre o ecossistema Java moderno, utilizando as bibliote
 - **Apache POI (5.4.1):** Processamento de arquivos Excel (Tabela TACO).
 - **P6Spy:** Monitoramento e log de queries SQL em tempo de desenvolvimento.
 
-## Comandos Úteis
+<h2 align="center">Comandos Úteis</h2>
 
 O projeto utiliza o **Maven Wrapper**, dispensando a necessidade de instalar o Maven globalmente.
 
@@ -441,3 +455,6 @@ Caso o wrapper não tenha permissão de execução:
 ```bash
 chmod +x mvnw
 ```
+
+---
+<p align="center">Este código é de propriedade exclusiva de <b>@b3rnard0p</b></p>
