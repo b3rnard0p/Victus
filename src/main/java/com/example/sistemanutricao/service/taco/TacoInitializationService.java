@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.example.sistemanutricao.repository.IngredienteRepository;
+import com.example.sistemanutricao.repository.specification.IngredienteSpecification;
 
 @Component
 @ConditionalOnProperty(name = "app.bootstrap.enabled", havingValue = "true", matchIfMissing = true)
@@ -32,6 +34,9 @@ public class TacoInitializationService implements CommandLineRunner {
     @Value("${app.taco.password}")
     private String tacoPassword;
 
+    @Value("${app.taco.import-on-startup:true}")
+    private boolean importOnStartup;
+
     private static final String TACO_CLASSPATH_FILE = "bootstrap/Taco.xlsx";
     private static final String ACIDOS_CLASSPATH_FILE = "bootstrap/Acidos.xlsx";
 
@@ -40,23 +45,37 @@ public class TacoInitializationService implements CommandLineRunner {
     private final TacoFileReader tacoFileReader;
     private final TacoExcelParser tacoExcelParser;
     private final TacoIngredientePersister tacoIngredientePersister;
+    private final IngredienteRepository ingredienteRepository;
 
     public TacoInitializationService(UsuarioRepository usuarioRepository,
                                      PasswordEncoder passwordEncoder,
                                      TacoFileReader tacoFileReader,
                                      TacoExcelParser tacoExcelParser,
-                                     TacoIngredientePersister tacoIngredientePersister) {
+                                     TacoIngredientePersister tacoIngredientePersister,
+                                     IngredienteRepository ingredienteRepository) {
         this.usuarioRepository = usuarioRepository;
         this.passwordEncoder = passwordEncoder;
         this.tacoFileReader = tacoFileReader;
         this.tacoExcelParser = tacoExcelParser;
         this.tacoIngredientePersister = tacoIngredientePersister;
+        this.ingredienteRepository = ingredienteRepository;
     }
 
     @Override
     public void run(String... args) {
         try {
+            if (!importOnStartup) {
+                logger.info("Importação da TACO desativada. Pulando inicialização.");
+                return;
+            }
+
             Usuario tacoUsuario = garantirUsuarioTaco();
+            
+            if (jaFoiImportado(tacoUsuario)) {
+                logger.info("Tabela TACO já foi importada anteriormente. Pulando importação.");
+                return;
+            }
+
             importarIngredientesSeNecessario(tacoUsuario);
         } catch (Exception e) {
             logger.error("Erro ao inicializar a tabela TACO: {}", e.getMessage(), e);
@@ -77,6 +96,12 @@ public class TacoInitializationService implements CommandLineRunner {
                     logger.info("Usuário TACO criado com sucesso.");
                     return salvo;
                 });
+    }
+
+    private boolean jaFoiImportado(Usuario tacoUsuario) {
+        var spec = IngredienteSpecification.filter(null, tacoUsuario.getId(), null, null);
+        long countIngredientes = ingredienteRepository.count(spec);
+        return countIngredientes > 0;
     }
 
 

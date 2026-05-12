@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.lang.NonNull;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.example.sistemanutricao.mapper.UsuarioMapper;
 import com.example.sistemanutricao.model.enuns.Cargo;
@@ -37,6 +38,15 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final ImageStorage imageStorage;
     private final UsuarioMapper usuarioMapper;
+
+    @Value("${app.admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${app.admin.email:admin@gmail.com}")
+    private String adminEmail;
+
+    @Value("${app.admin.password:1234567}")
+    private String adminPassword;
 
     public UsuarioService(UsuarioRepository usuarioRepository,
                           EstabelecimentoRepository estabelecimentoRepository,
@@ -109,26 +119,32 @@ public class UsuarioService {
     public void inicializarAdminPadrao() {
         var usuariosAdmin = usuarioRepository.findByCargo(Cargo.ADMIN);
         
-        if (usuariosAdmin.isEmpty()) {
+        // Verificar também se o email admin já existe
+        var adminEmailExists = usuarioRepository.findByEmail(adminEmail);
+        
+        if (usuariosAdmin.isEmpty() && adminEmailExists.isEmpty()) {
             logger.info("Nenhum usuário admin encontrado. Criando usuário admin padrão...");
             try {
                 Usuario admin = new Usuario();
-                admin.setUsername("admin");
-                admin.setEmail("admin@gmail.com");
-                admin.setSenha(passwordEncoder.encode("1234567"));
+                admin.setUsername(adminUsername);
+                admin.setEmail(adminEmail);
+                admin.setSenha(passwordEncoder.encode(adminPassword));
                 admin.setCargo(Cargo.ADMIN);
                 admin.setAtivo(true);
                 
                 usuarioRepository.save(admin);
                 logger.info("Usuário admin padrão criado com sucesso!");
-                logger.info("Username: admin");
-                logger.info("Email: admin@gmail.com");
-                logger.info("Senha: 1234567");
+                logger.info("Username: {}", adminUsername);
+                logger.info("Email: {}", adminEmail);
             } catch (Exception e) {
                 logger.error("Erro ao criar usuário admin padrão: {}", e.getMessage(), e);
             }
         } else {
-            logger.info("Usuário(s) admin já existente(s) no sistema. Nenhuma ação necessária.");
+            if (!usuariosAdmin.isEmpty()) {
+                logger.info("Usuário(s) admin já existente(s) no sistema. Nenhuma ação necessária.");
+            } else if (adminEmailExists.isPresent()) {
+                logger.info("Email {} já existe no sistema. Nenhuma ação necessária.", adminEmail);
+            }
         }
     }
 
