@@ -5,18 +5,19 @@ O **Victus - Gestão Nutricional** é um sistema robusto desenvolvido para auxil
 Com uma interface moderna e funcional, o Victus utiliza tecnologias como Spring Boot e HTMX para proporcionar uma experiência fluida, permitindo buscas dinâmicas, exportação de relatórios em PDF e uma gestão eficiente de estabelecimentos e usuários.
 
 <h2 align="center">Sumário</h2>
-- [Controllers](#controllers)
-- [Exceptions](#exceptions)
-- [Mappers](#mappers)
-- [Model](#model)
-- [Records (DTOs)](#records-dtos)
-- [Repositories & Specifications](#repositories--specifications)
-- [Security](#security)
-- [Services (Regras de Negócio)](#services-regras-de-negócio)
-- [Qualidade & Testes](#qualidade--testes)
-- [Frontend (Arquitetura da Interface)](#frontend-arquitetura-da-interface)
-- [Tecnologias & Dependências](#tecnologias--dependências)
-- [Comandos Úteis](#comandos-úteis)
+
+* [Controllers](#controllers)
+* [Exceptions](#exceptions)
+* [Mappers](#mappers)
+* [Model](#model)
+* [Records (DTOs)](#records-dtos)
+* [Repositories & Specifications](#repositories--specifications)
+* [Security](#security)
+* [Services (Regras de Negócio)](#services-regras-de-negócio)
+* [Qualidade & Testes](#qualidade--testes)
+* [Frontend (Arquitetura da Interface)](#frontend-arquitetura-da-interface)
+* [Tecnologias & Dependências](#tecnologias--dependências)
+* [Comandos Úteis](#comandos-úteis)
 
 <h2 align="center">Controllers</h2>
 
