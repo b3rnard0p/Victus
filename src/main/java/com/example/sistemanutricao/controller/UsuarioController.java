@@ -113,7 +113,7 @@ public class UsuarioController {
             throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
         }
         usuarioService.create(registroDto);
-        return "redirect:/registro-sucesso";
+        return "pages/general/Registrado";
     }
 
     // PERFIL

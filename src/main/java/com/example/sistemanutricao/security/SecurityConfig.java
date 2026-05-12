@@ -37,7 +37,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/", "/login", "/registrar", "/sair-do-sistema", "/acesso-negado", "/imagens/**", "/registro-sucesso", "/error/**").permitAll()
+                    .requestMatchers("/", "/login", "/registrar", "/usuario/registrar", "/sair-do-sistema", "/acesso-negado", "/imagens/**", "/registro-sucesso", "/error/**").permitAll()
                         .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
                         .requestMatchers("/*.css", "/Scripts/**", "/imagens-perfil/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")

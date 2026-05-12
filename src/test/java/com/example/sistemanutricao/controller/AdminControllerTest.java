@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -43,31 +43,31 @@ class AdminControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private UsuarioService usuarioService;
 
-    @MockBean
+    @MockitoBean
     private EstabelecimentoService estabelecimentoService;
 
-    @MockBean
+    @MockitoBean
     private PaginacaoViewSupport paginacaoViewSupport;
 
-    @MockBean
+    @MockitoBean
     private com.example.sistemanutricao.security.JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    @MockBean
+    @MockitoBean
     private com.example.sistemanutricao.security.CustomAuthenticationProvider authenticationProvider;
 
-    @MockBean
+    @MockitoBean
     private com.example.sistemanutricao.security.SecurityTokenManager tokenManager;
 
-    @MockBean
+    @MockitoBean
     private org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
 
-    @MockBean
+    @MockitoBean
     private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
 
-    @MockBean
+    @MockitoBean
     private com.example.sistemanutricao.security.AuthSessionService authSessionService;
 
 

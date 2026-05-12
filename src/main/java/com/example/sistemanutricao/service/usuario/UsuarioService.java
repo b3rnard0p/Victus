@@ -118,9 +118,8 @@ public class UsuarioService {
     @Transactional(rollbackFor = Exception.class)
     public void inicializarAdminPadrao() {
         var usuariosAdmin = usuarioRepository.findByCargo(Cargo.ADMIN);
-        
-        // Verificar também se o email admin já existe
-        var adminEmailExists = usuarioRepository.findByEmail(adminEmail);
+
+        var adminEmailExists = usuarioRepository.findByEmailIgnoreCase(adminEmail);
         
         if (usuariosAdmin.isEmpty() && adminEmailExists.isEmpty()) {
             logger.info("Nenhum usuário admin encontrado. Criando usuário admin padrão...");

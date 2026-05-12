@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
@@ -87,6 +88,21 @@ class UsuarioControllerTest {
                 .andExpect(view().name("fragments/Perfil"));
 
         verify(usuarioService).findById(eq(1L));
+    }
+
+    @Test
+    @DisplayName("Deve registrar usuario e redirecionar para sucesso")
+    void deveRegistrarUsuario() throws Exception {
+        when(usuarioService.create(org.mockito.ArgumentMatchers.any())).thenReturn(new Usuario());
+
+        mockMvc.perform(post("/usuario/registrar")
+                        .param("username", "novo.usuario")
+                        .param("email", "novo.usuario@example.com")
+                        .param("senha", "Senha123!"))
+            .andExpect(status().isOk())
+            .andExpect(view().name("pages/general/Registrado"));
+
+        verify(usuarioService).create(org.mockito.ArgumentMatchers.any());
     }
 
     private UsuarioSecurity usuarioNutricionista() {

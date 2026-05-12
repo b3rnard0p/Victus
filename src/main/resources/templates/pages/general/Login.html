@@ -117,7 +117,7 @@
 
         <form
                 id="register-form"
-                th:action="@{/registrar}"
+          th:action="@{/usuario/registrar}"
                 method="post"
                 class="space-y-4"
         >
@@ -169,6 +169,7 @@
       id="toast-container"
       class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
     >
+      <div th:replace="~{components/Toast :: toast-templates}"></div>
       <th:block th:if="${errorMessage != null}">
         <div
           th:replace="~{components/Toast :: error(mensagem=${errorMessage})}"

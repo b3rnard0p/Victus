@@ -84,6 +84,7 @@ public class TacoInitializationService implements CommandLineRunner {
 
     private Usuario garantirUsuarioTaco() {
         return usuarioRepository.findByUsernameIgnoreCase(tacoUsername)
+                .or(() -> usuarioRepository.findByEmailIgnoreCase(tacoEmail))
                 .orElseGet(() -> {
                     logger.info("Usuário TACO não encontrado. Criando usuário padrão...");
                     Usuario usuario = new Usuario();
