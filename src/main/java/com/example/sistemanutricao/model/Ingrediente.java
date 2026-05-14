@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @NamedEntityGraph(
@@ -22,8 +23,8 @@ public class Ingrediente {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 512)
     @NotBlank(message = "O nome é obrigatório.")
+    @Size(max = 500, message = "O nome pode ter no máximo 100 caracteres.")
     private String nome;
 
     @NotNull(message = "A proteína é obrigatória.")

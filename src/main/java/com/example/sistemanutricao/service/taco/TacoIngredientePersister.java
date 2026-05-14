@@ -104,4 +104,5 @@ public class TacoIngredientePersister {
             logger.info("Importação da TACO concluída. {} ingrediente(s) adicionados ao usuário {}.", novosIngredientes.size(), tacoUsuario.getUsername());
         }
     }
+
 }

@@ -7,7 +7,10 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
 
@@ -40,13 +43,15 @@ public class FichaTecnica {
     private BigDecimal custoTotal;
 
     @NotNull
-
+    @Max(value = 9999, message = "O número de porções deve ter no máximo 4 dígitos.")
     private Integer numeroPorcoes;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O peso da porção deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal pesoPorcao;
 
     @NotNull
+    @Size(max = 100, message = "A medida caseira pode ter no máximo 100 caracteres.")
     private String medidaCaseira;
 
     @Enumerated(EnumType.STRING)

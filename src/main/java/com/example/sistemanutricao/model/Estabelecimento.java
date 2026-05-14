@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.util.List;
 import java.util.Objects;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Estabelecimento {
@@ -15,6 +16,7 @@ public class Estabelecimento {
 
     @Column(unique = true)
     @NotBlank(message = "O nome do estabelecimento é obrigatório.")
+    @Size(max = 100, message = "O nome pode ter no máximo 100 caracteres.")
     private String nome;
 
     @OneToMany(mappedBy = "estabelecimento", cascade = CascadeType.ALL)

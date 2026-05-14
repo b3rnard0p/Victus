@@ -175,17 +175,17 @@
                 class="px-6 py-4 flex justify-center items-center cursor-pointer relative"
                 onclick="toggleCard(this)"
               >
-                <div class="flex flex-grid w-full relative">
+                <div class="flex flex-grid w-full relative min-w-0">
                   <div
                     class="hidden sm:flex absolute left-0 top-1/2 -translate-y-1/2 gap-1"
                     th:if="${viewMode != null and viewMode != 'taco'}"
                     onclick="event.stopPropagation()"
                   >
-                    <button
+                      <button
                       type="button"
                       class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full"
                       title="Editar Ingrediente"
-                      th:attr="onclick='editarIngrediente(' + ${ingrediente.id} + ')'"
+                      th:attr="onclick=|editarIngrediente(${ingrediente.id})|"
                     >
                       <i
                         data-lucide="square-pen"
@@ -213,14 +213,15 @@
                   </div>
 
                   <div
-                    class="flex flex-col items-center justify-center gap-2 w-full"
+                    class="flex flex-col items-center justify-center gap-2 w-full min-w-0"
                   >
-                    <div class="flex items-center justify-center gap-3 w-full">
+                    <div class="flex items-center justify-center gap-2 w-full min-w-0 px-10 sm:px-14">
                       <h2
-                        class="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 truncate text-center w-full"
+                        class="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 text-center w-full min-w-0 flex items-center justify-center overflow-hidden"
                         style="margin-left: 0; margin-right: 0"
-                        th:text="${ingrediente.nome}"
-                      ></h2>
+                      >
+                        <span class="ingrediente-list-nome-truncate force-truncate" data-truncate="true" th:text="${ingrediente.nome}"></span>
+                      </h2>
                     </div>
                   </div>
                 </div>
@@ -240,7 +241,7 @@
                   <div
                     class="cursor-pointer transform duration-200 hover:scale-110"
                     title="Editar Ingrediente"
-                    th:attr="onclick='editarIngrediente(' + ${ingrediente.id} + ')'"
+                    th:attr="onclick=|editarIngrediente(${ingrediente.id})|"
                   >
                     <div
                       th:replace="~{components/Buttom :: btn-icon(idBtn='btn-edit-ing-mob-' + ${ingrediente.id}, iconeCss='square-pen', tipo='button')}"

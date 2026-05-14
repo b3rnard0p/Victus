@@ -9,10 +9,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
+import com.example.sistemanutricao.SistemaNutricaoApplication;
 import com.example.sistemanutricao.repository.IngredienteRepository;
 import com.example.sistemanutricao.repository.UsuarioRepository;
 
-@SpringBootTest
+@SpringBootTest(classes = SistemaNutricaoApplication.class)
 @ActiveProfiles("test")
 @TestPropertySource(properties = "app.bootstrap.enabled=true")
 @DisplayName("Bootstrap - Teste de Inicialização TACO")

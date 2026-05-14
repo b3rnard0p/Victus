@@ -1541,6 +1541,89 @@ video {
   white-space: nowrap;
 }
 
+/* Truncamento multilinha (2 linhas) com reticências. Usa -webkit-line-clamp para navegadores WebKit/Blink. */
+.truncate-multiline-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+  min-width: 0;
+}
+
+/* Truncamento seguro que permite quebra de palavras longas e evita empurrar elementos vizinhos. */
+.truncate-break {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  word-break: break-all !important;
+  overflow-wrap: normal !important;
+  max-width: 100% !important;
+}
+
+.ficha-list-nome-truncate {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ingrediente-list-nome-truncate {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* allow flex shrinking when inside a flex container */
+  flex: 1 1 auto;
+}
+
+/* Stronger rule for ingredient list names to prevent overflow in tricky layouts */
+.ingrediente-list-nome-truncate.force-truncate {
+  display: inline-block !important;
+  width: min(45ch, 100%) !important;
+  max-width: min(45ch, 100%) !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  flex: 1 1 auto !important;
+  box-sizing: border-box !important;
+}
+
+.ingrediente-nome-cell {
+  width: 100%;
+  max-width: 100%;
+}
+
+@media (min-width: 950px) {
+  .ingrediente-nome-cell {
+    width: 28%;
+    max-width: 0;
+  }
+}
+
+/* Tooltip targets: permitir quebra de palavras longas dentro do popup global */
+.tooltip-text-target {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+#global-tooltip-text {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+}
+
 .whitespace-nowrap {
   white-space: nowrap;
 }

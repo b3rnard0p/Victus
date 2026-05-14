@@ -19,12 +19,12 @@
   <div class="relative w-full bg-[#f3ffe5] rounded-[10px]">
 
     <div th:id="${id + '-control'}"
-         class="flex items-center justify-between px-4 py-3 cursor-pointer select-none rounded-[10px]
+         class="flex items-center justify-between gap-2 min-w-0 px-4 py-3 cursor-pointer select-none rounded-[10px]
                 transition-all duration-200"
          role="combobox" aria-haspopup="listbox" aria-expanded="false">
 
       <span th:id="${id + '-display'}"
-        class="text-lg font-semibold text-zinc-800 min-h-[1.5rem] flex items-center gap-2">
+        class="text-lg font-semibold text-zinc-800 min-h-[1.5rem] flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2">
         <th:block th:each="opt : ${options}"
           th:if="${opt.value == selectedValue}"
           th:text="${opt.label}"></th:block>
@@ -66,7 +66,7 @@
            th:style="'animation-delay:' + (${iterStat.index} * 50) + 'ms'"
            th:id="${id + '-opt-' + iterStat.index}">
 
-        <span th:text="${opt.label}">Opção</span>
+        <span class="block w-full overflow-hidden text-ellipsis whitespace-nowrap" th:text="${opt.label}">Opção</span>
 
         <span class="absolute bottom-[6px] left-4 h-[2px] w-0 bg-[#4A6E18] rounded-full
                      transition-all duration-200 group-hover/opt:w-[calc(100%-2rem)]"></span>

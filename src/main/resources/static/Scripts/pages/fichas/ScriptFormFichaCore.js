@@ -79,8 +79,44 @@ window.adicionarIngrediente = function () {
   const pl = parseFloat(document.getElementById("pl").value) || 0;
   const custoKg = parseFloat(document.getElementById("custoKg").value) || 0;
 
-  if (!medidaCaseira || !pb || !custoKg) {
-    mostrarToastErro("Preencha todos os campos do ingrediente!");
+  if (!validarTextoMaximo(medidaCaseira, 100)) {
+    dispararErroFicha(
+      "A medida caseira do ingrediente pode ter no máximo 100 caracteres.",
+    );
+    return;
+  }
+
+  if (
+    !validarCampoObrigatorio(document.getElementById("pb")?.value) ||
+    !validarNumeroComMaximoDigitos(document.getElementById("pb").value, 4, 2)
+  ) {
+    dispararErroFicha(
+      "O PB do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
+    return;
+  }
+
+  if (
+    !validarCampoObrigatorio(document.getElementById("pl")?.value) ||
+    !validarNumeroComMaximoDigitos(document.getElementById("pl").value, 4, 2)
+  ) {
+    dispararErroFicha(
+      "O PL do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
+    return;
+  }
+
+  if (
+    !validarCampoObrigatorio(document.getElementById("custoKg")?.value) ||
+    !validarNumeroComMaximoDigitos(
+      document.getElementById("custoKg").value,
+      4,
+      2,
+    )
+  ) {
+    dispararErroFicha(
+      "O custo por kg do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
     return;
   }
 
@@ -103,8 +139,10 @@ window.adicionarIngrediente = function () {
       <input type="hidden" class="ingrediente-saturada" value="${parseFloat(selectedOption.dataset.saturada) || 0}">
       <input type="hidden" name="ingredientes[${idx}].ingredienteId" value="${ingredienteId}">
 
-      <td class="col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
-        ${selectedOption.text}
+      <td class="ingrediente-nome-cell col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
+        <div class="min-w-0 text-left" style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+          <span style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-truncate="true">${selectedOption.text}</span>
+        </div>
       </td>
       
       <td class="col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
@@ -155,8 +193,10 @@ window.adicionarIngrediente = function () {
   if (window.renderLucideIcons) {
     window.renderLucideIcons(row);
   }
+  if (typeof window.__applyTruncate === "function") {
+    window.__applyTruncate();
+  }
 
-  // Limpa o footer
   select.value = "";
   document.getElementById("medidaCaseira").value = "";
   document.getElementById("pb").value = "";
@@ -414,6 +454,50 @@ function dispararErroFicha(msg) {
   }, 500);
 }
 
+function validarTextoMaximo(valor, maximo) {
+  return typeof valor === "string" && valor.trim().length <= maximo;
+}
+
+function validarNumeroComMaximoDigitos(
+  valor,
+  maxInteiros,
+  maxFracionarios = 2,
+) {
+  if (valor === null || valor === undefined || String(valor).trim() === "") {
+    return false;
+  }
+
+  const normalizado = String(valor).trim().replace(",", ".");
+  const numero = Number(normalizado);
+  if (Number.isNaN(numero) || numero < 0) {
+    return false;
+  }
+
+  const partes = normalizado.split(".");
+  const parteInteira = partes[0].replace(/^0+(?=\d)/, "");
+
+  if (parteInteira.length > maxInteiros) return false;
+
+  if (partes.length > 1 && partes[1].length > maxFracionarios) {
+    return false;
+  }
+
+  return true;
+}
+
+function validarNumeroDe0a100(valor) {
+  if (valor === null || valor === undefined || String(valor).trim() === "") {
+    return false;
+  }
+
+  const numero = Number(String(valor).trim().replace(",", "."));
+  return !Number.isNaN(numero) && numero >= 0 && numero <= 100;
+}
+
+function validarCampoObrigatorio(valor) {
+  return valor !== null && valor !== undefined && String(valor).trim() !== "";
+}
+
 window.validarFormFicha = function () {
   const nome = document.getElementById("nomePreparacao")?.value?.trim();
   const categoria = document.getElementById("categoria-hidden")?.value;
@@ -444,6 +528,87 @@ window.validarFormFicha = function () {
   const porcentAguaVal = porcentAguaInput?.value?.trim() ?? "";
   const qntdAgua = parseFloat(qntdAguaVal);
   const porcentAgua = parseFloat(porcentAguaVal);
+
+  if (!validarTextoMaximo(nome, 100)) {
+    dispararErroFicha(
+      "O nome da preparação deve ter no máximo 100 caracteres.",
+    );
+    return false;
+  }
+
+  if (!validarTextoMaximo(tempoPreparo, 10)) {
+    dispararErroFicha("O tempo de preparo deve ter no máximo 10 caracteres.");
+    return false;
+  }
+
+  if (!validarTextoMaximo(medidaCaseiraFicha, 100)) {
+    dispararErroFicha(
+      "A medida caseira final deve ter no máximo 100 caracteres.",
+    );
+    return false;
+  }
+
+  if (!validarNumeroComMaximoDigitos(numeroPreparacao, 4, 0)) {
+    dispararErroFicha(
+      "O número da preparação deve ter no máximo 4 dígitos inteiros.",
+    );
+    return false;
+  }
+
+  if (!validarNumeroComMaximoDigitos(rendimentoVal, 4, 2)) {
+    dispararErroFicha(
+      "O rendimento deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
+    return false;
+  }
+
+  if (!validarNumeroComMaximoDigitos(pesoPorcaoVal, 4, 2)) {
+    dispararErroFicha(
+      "O peso da porção deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
+    return false;
+  }
+
+  if (qntdAguaVal !== "" && !validarNumeroComMaximoDigitos(qntdAguaVal, 4, 2)) {
+    dispararErroFicha(
+      "A quantidade de água deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+    );
+    return false;
+  }
+
+  if (porcentAguaVal !== "" && !validarNumeroDe0a100(porcentAguaVal)) {
+    dispararErroFicha("A porcentagem de água deve estar entre 0 e 100.");
+    return false;
+  }
+
+  for (let i = 0; i < ingredientes.length; i++) {
+    const row = ingredientes[i];
+    const pbInput = row.querySelector('input[name$=".pb"]');
+    const plInput = row.querySelector('input[name$=".pl"]');
+    const custoKgInput = row.querySelector('input[name$=".custoKg"]');
+    const nomeIngrediente =
+      row.querySelector("td:first-of-type")?.textContent?.trim() ||
+      "Ingrediente";
+
+    if (!validarNumeroComMaximoDigitos(pbInput?.value, 4, 2)) {
+      dispararErroFicha(
+        `O PB do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+      );
+      return false;
+    }
+    if (!validarNumeroComMaximoDigitos(plInput?.value, 4, 2)) {
+      dispararErroFicha(
+        `O PL do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+      );
+      return false;
+    }
+    if (!validarNumeroComMaximoDigitos(custoKgInput?.value, 4, 2)) {
+      dispararErroFicha(
+        `O custo por kg do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+      );
+      return false;
+    }
+  }
 
   if (!nome) {
     dispararErroFicha("O nome da preparação é obrigatório.");

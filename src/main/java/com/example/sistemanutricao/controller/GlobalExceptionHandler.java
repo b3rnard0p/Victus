@@ -2,6 +2,7 @@ package com.example.sistemanutricao.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,11 +18,17 @@ public class GlobalExceptionHandler {
         FormValidationException.class,
         ValidationException.class,
         EntityNotFoundException.class,
-        org.springframework.dao.DataIntegrityViolationException.class
+        org.springframework.dao.DataIntegrityViolationException.class,
+        ConstraintViolationException.class
     })
     public ModelAndView handleException(Exception ex, HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response,
                                                        RedirectAttributes redirectAttributes) {
         String message = ex.getMessage();
+
+        if (ex instanceof ConstraintViolationException constraintViolationException
+                && !constraintViolationException.getConstraintViolations().isEmpty()) {
+            message = constraintViolationException.getConstraintViolations().iterator().next().getMessage();
+        }
         
         if (ex instanceof org.springframework.dao.DataIntegrityViolationException) {
             message = "Não é possível realizar esta operação pois o registro possui vínculos ou restrições de integridade.";

@@ -3,8 +3,10 @@ package com.example.sistemanutricao.model;
 import java.math.BigDecimal;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class IngredientesPorFicha {
@@ -14,12 +16,15 @@ public class IngredientesPorFicha {
     private Long id;
 
     @NotBlank
+    @Size(max = 100, message = "A medida caseira pode ter no máximo 100 caracteres.")
     private String medidaCaseira;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O PB deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal pb;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O PL deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal pl;
 
     @NotNull
@@ -29,6 +34,7 @@ public class IngredientesPorFicha {
     private BigDecimal custoUsado;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O custo por kg deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal custoKG;
 
     private BigDecimal ptnCalculado;

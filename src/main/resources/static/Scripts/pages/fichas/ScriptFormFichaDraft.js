@@ -131,7 +131,6 @@
             el.value = value;
             el.dispatchEvent(new Event("input", { bubbles: true }));
             
-            // Tratamento especial para ComboBox
             const isCombo = form.querySelector(`#${name.split(".").pop()}-hidden`);
             if (isCombo) {
               const comboId = name.split(".").pop();
@@ -164,8 +163,10 @@
           <input type="hidden" class="ingrediente-sodio" value="${ing.sodio}" />
           <input type="hidden" class="ingrediente-saturada" value="${ing.saturada}" />
 
-          <td class="col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
-            ${ing.nome}
+          <td class="ingrediente-nome-cell col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
+            <div class="min-w-0 text-left" style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              <span style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-truncate="true">${ing.nome}</span>
+            </div>
           </td>
 
           <td class="col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
@@ -219,6 +220,9 @@
       });
 
       if (window.lucide) window.lucide.createIcons();
+      if (typeof window.__applyTruncate === "function") {
+        window.__applyTruncate();
+      }
 
       recalcularTotaisDaFichaComProtecao();
       if (typeof initCalculoFCC === "function") {

@@ -22,6 +22,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @NamedEntityGraph(
@@ -53,6 +54,7 @@ public class Refeicao {
     private Long id;
 
     @NotBlank(message = "O nome não pode estar em branco")
+    @Size(max = 100, message = "O nome da refeição pode ter no máximo 100 caracteres.")
     @Column(nullable = false)
     private String nome;
 

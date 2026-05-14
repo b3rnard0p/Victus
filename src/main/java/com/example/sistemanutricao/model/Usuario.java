@@ -15,6 +15,9 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Usuario {
@@ -24,12 +27,18 @@ public class Usuario {
     private Long id;
 
     @Column(nullable = false)
+    @NotBlank(message = "O nome de usuário é obrigatório.")
+    @Size(max = 100, message = "O nome de usuário pode ter no máximo 100 caracteres.")
     private String username;
 
     @Column(unique = true, nullable = false)
+    @NotBlank(message = "O e-mail é obrigatório.")
+    @Email(message = "O e-mail deve ser válido.")
+    @Size(max = 100, message = "O e-mail pode ter no máximo 100 caracteres.")
     private String email;
 
     @Column(nullable = false)
+    @NotBlank(message = "A senha é obrigatória.")
     private String senha;
 
     @Enumerated(EnumType.STRING)

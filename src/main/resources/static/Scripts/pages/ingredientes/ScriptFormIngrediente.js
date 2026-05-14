@@ -160,8 +160,6 @@ function dispararErro(msg) {
             }),
           );
         } else {
-          // Se não for JSON mas for sucesso (200), provavelmente é HTML de redirecionamento ou fragmento
-          // Nesses casos, vamos apenas fechar o modal e avisar o sucesso
           window.fecharModalIngrediente();
           if (window.mostrarToastSucesso) {
             window.mostrarToastSucesso("Ingrediente salvo!");

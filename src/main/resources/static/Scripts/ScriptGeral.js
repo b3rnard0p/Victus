@@ -1,4 +1,4 @@
-window.mostrarToastErro = function(mensagem) {
+window.mostrarToastErro = function (mensagem) {
   const container = document.getElementById("toast-container");
   const template = document.getElementById("template-toast-error");
   if (!container || !template) {
@@ -22,7 +22,7 @@ window.mostrarToastErro = function(mensagem) {
   }, 5000);
 };
 
-window.mostrarToastSucesso = function(mensagem) {
+window.mostrarToastSucesso = function (mensagem) {
   const container = document.getElementById("toast-container");
   const template = document.getElementById("template-toast-success");
   if (!container || !template) {
@@ -32,7 +32,8 @@ window.mostrarToastSucesso = function(mensagem) {
 
   const toast = template.content.firstElementChild.cloneNode(true);
   const messageEl = toast.querySelector(".toast-message");
-  if (messageEl) messageEl.textContent = mensagem || "Operação realizada com sucesso!";
+  if (messageEl)
+    messageEl.textContent = mensagem || "Operação realizada com sucesso!";
 
   container.prepend(toast);
   if (typeof lucide !== "undefined") lucide.createIcons({ root: toast });

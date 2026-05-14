@@ -4,8 +4,12 @@ import com.example.sistemanutricao.model.enuns.Categoria;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 @Entity
 public class Preparacao {
@@ -15,6 +19,7 @@ public class Preparacao {
     private Long id;
 
     @NotBlank
+    @Size(max = 100, message = "O nome pode ter no máximo 100 caracteres.")
     private String nome;
 
     @Enumerated(EnumType.STRING)
@@ -22,9 +27,11 @@ public class Preparacao {
     private Categoria categoria;
 
     @NotNull
+    @Max(value = 9999, message = "O número deve ter no máximo 4 dígitos.")
     private Integer numero;
 
     @NotBlank
+    @Size(max = 10, message = "O tempo de preparo pode ter no máximo 10 caracteres.")
     private String tempoPreparo;
 
     @Column(length = 1000)
@@ -35,14 +42,18 @@ public class Preparacao {
     @NotBlank
     private String modoPreparo;
 
+    @Digits(integer = 4, fraction = 2, message = "A quantidade de água deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal qntdAgua;
 
+    @DecimalMax(value = "100", message = "A porcentagem de água deve ser menor ou igual a 100.")
     private BigDecimal porcentAgua;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O FCC deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal fcc;
 
     @NotNull
+    @Digits(integer = 4, fraction = 2, message = "O rendimento deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
     private BigDecimal rendimento;
 
     public Preparacao() {
