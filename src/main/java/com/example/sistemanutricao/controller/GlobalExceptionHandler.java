@@ -7,13 +7,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.sistemanutricao.exception.FormValidationException;
+import com.example.sistemanutricao.exception.ValidationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
     @ExceptionHandler({
-        IllegalArgumentException.class, 
-        FormValidationException.class, 
+        IllegalArgumentException.class,
+        FormValidationException.class,
+        ValidationException.class,
         EntityNotFoundException.class,
         org.springframework.dao.DataIntegrityViolationException.class
     })

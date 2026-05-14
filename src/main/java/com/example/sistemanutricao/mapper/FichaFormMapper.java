@@ -10,8 +10,6 @@ import com.example.sistemanutricao.record.PerfilNutricionalDTO.PerfilNutricional
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
 @Mapper(componentModel = "spring")
 public interface FichaFormMapper {
 

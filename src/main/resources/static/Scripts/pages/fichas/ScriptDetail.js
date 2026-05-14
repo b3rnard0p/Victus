@@ -35,4 +35,66 @@
 
     newClose.addEventListener('click', () => mobileMenu.classList.add('hidden'));
   }
+
+  // Modal Functions
+  window.abrirModalEquipamentos = function() {
+    const modal = document.getElementById('modal-equipamentos');
+    const content = document.getElementById('modal-equipamentos-content');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      content.classList.remove('scale-95', 'opacity-0');
+      content.classList.add('scale-100', 'opacity-100');
+      if (window.lucide) window.lucide.createIcons();
+    }, 10);
+  };
+
+  window.fecharModalEquipamentos = function() {
+    const modal = document.getElementById('modal-equipamentos');
+    const content = document.getElementById('modal-equipamentos-content');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 300);
+  };
+
+  window.abrirModalPreparo = function() {
+    const modal = document.getElementById('modal-preparo');
+    const content = document.getElementById('modal-preparo-content');
+    modal.classList.remove('hidden');
+    setTimeout(() => {
+      content.classList.remove('scale-95', 'opacity-0');
+      content.classList.add('scale-100', 'opacity-100');
+      if (window.lucide) window.lucide.createIcons();
+    }, 10);
+  };
+
+  window.fecharModalPreparo = function() {
+    const modal = document.getElementById('modal-preparo');
+    const content = document.getElementById('modal-preparo-content');
+    content.classList.remove('scale-100', 'opacity-100');
+    content.classList.add('scale-95', 'opacity-0');
+    setTimeout(() => {
+      modal.classList.add('hidden');
+    }, 300);
+  };
+
+  // Attach listeners to buttons
+  const btnEquip = document.getElementById('btn-modal-equipamentos');
+  if (btnEquip) {
+    btnEquip.addEventListener('click', window.abrirModalEquipamentos);
+  }
+
+  const btnPreparo = document.getElementById('btn-modal-preparo');
+  if (btnPreparo) {
+    btnPreparo.addEventListener('click', window.abrirModalPreparo);
+  }
+
+  // Close on backdrop click
+  window.onclick = function(event) {
+    const modalEquip = document.getElementById('modal-equipamentos');
+    const modalPreparo = document.getElementById('modal-preparo');
+    if (event.target == modalEquip) fecharModalEquipamentos();
+    if (event.target == modalPreparo) fecharModalPreparo();
+  }
 })();

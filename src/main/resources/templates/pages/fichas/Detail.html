@@ -1,20 +1,25 @@
 <div th:fragment="conteudo" class="w-full flex flex-col items-center">
   <div class="flex-1 flex items-center justify-center w-full">
-    <main class="mt-4 sm:mt-16 p-4 sm:p-6 w-[95%] max-w-5xl mx-auto min-h-fit mb-8">
-
+    <main
+      class="mt-4 sm:mt-16 p-4 sm:p-6 w-[95%] max-w-5xl mx-auto min-h-fit mb-8"
+    >
       <div class="w-full max-w-4xl mx-auto mb-8">
         <div class="sm:hidden mb-3">
           <div class="grid grid-cols-[auto,1fr,auto] items-center min-h-[48px]">
             <div class="flex-shrink-0 z-10">
-              <button data-hx-get="/ficha"
-                      data-hx-target="#slot-conteudo"
-                      data-hx-push-url="true"
-                      class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]">
+              <button
+                data-hx-get="/ficha"
+                data-hx-target="#slot-conteudo"
+                data-hx-push-url="true"
+                class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]"
+              >
                 <i data-lucide="arrow-left" class="text-2xl"></i>
               </button>
             </div>
 
-            <h1 class="text-3xl font-bold text-zinc-800 text-center justify-self-center">
+            <h1
+              class="text-3xl font-bold text-zinc-800 text-center justify-self-center"
+            >
               Ficha Técnica
             </h1>
 
@@ -23,239 +28,459 @@
 
           <div class="flex items-center justify-center gap-4">
             <th:block th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
-              <a th:href="@{/ficha/editar/{id}(id=${ficha.id})}"
-                 th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
-                 data-hx-target="#slot-conteudo"
-                 data-hx-push-url="true"
-                 title="Editar Ficha"
-                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
-                <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
-                <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"></span>
-                <i data-lucide="square-pen" class="relative z-10 text-[#4A6E18] text-xl"></i>
+              <a
+                th:href="@{/ficha/editar/{id}(id=${ficha.id})}"
+                th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
+                data-hx-target="#slot-conteudo"
+                data-hx-push-url="true"
+                title="Editar Ficha"
+                class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110"
+              >
+                <span
+                  class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"
+                ></span>
+                <span
+                  class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"
+                ></span>
+                <i
+                  data-lucide="square-pen"
+                  class="relative z-10 text-[#4A6E18] text-xl"
+                ></i>
               </a>
 
-              <form th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
-                    method="post"
-                    th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
-                    data-hx-target="#slot-conteudo"
-                    class="inline m-0 flex items-center">
-
-                <div class="cursor-pointer inline-block transform duration-200 hover:scale-110"
-                     th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'">
-                  <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-arquivar-ficha', iconeCss=${ficha.status().name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"></div>
+              <form
+                th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
+                method="post"
+                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
+                data-hx-target="#slot-conteudo"
+                class="inline m-0 flex items-center"
+              >
+                <div
+                  class="cursor-pointer inline-block transform duration-200 hover:scale-110"
+                  th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'"
+                >
+                  <div
+                    th:replace="~{components/Buttom :: btn-icon(idBtn='btn-arquivar-ficha', iconeCss=${ficha.status().name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"
+                  ></div>
                 </div>
               </form>
             </th:block>
           </div>
         </div>
 
-        <div class="relative hidden sm:flex items-center justify-between w-full min-h-[48px]">
-
+        <div
+          class="relative hidden sm:flex items-center justify-between w-full min-h-[48px]"
+        >
           <div class="flex-shrink-0 z-10">
-            <button data-hx-get="/ficha"
-                    data-hx-target="#slot-conteudo"
-                    data-hx-push-url="true"
-                    class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]">
+            <button
+              data-hx-get="/ficha"
+              data-hx-target="#slot-conteudo"
+              data-hx-push-url="true"
+              class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]"
+            >
               <i data-lucide="arrow-left" class="text-2xl"></i>
             </button>
           </div>
 
-          <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
-            <h1 class="text-3xl sm:text-4xl font-bold text-zinc-800 text-center pointer-events-auto">
+          <div
+            class="absolute inset-0 flex items-center justify-center pointer-events-none z-0"
+          >
+            <h1
+              class="text-3xl sm:text-4xl font-bold text-zinc-800 text-center pointer-events-auto"
+            >
               Ficha Técnica
             </h1>
           </div>
 
           <div class="flex-shrink-0 z-10 flex items-center gap-4 sm:gap-6">
             <th:block th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
-
-              <a th:href="@{/ficha/editar/{id}(id=${ficha.id})}"
-                 th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
-                 data-hx-target="#slot-conteudo"
-                 data-hx-push-url="true"
-                 title="Editar Ficha"
-                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
-                <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
-                <span class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"></span>
-                <i data-lucide="square-pen" class="relative z-10 text-[#4A6E18] text-xl"></i>
+              <a
+                th:href="@{/ficha/editar/{id}(id=${ficha.id})}"
+                th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
+                data-hx-target="#slot-conteudo"
+                data-hx-push-url="true"
+                title="Editar Ficha"
+                class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110"
+              >
+                <span
+                  class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"
+                ></span>
+                <span
+                  class="absolute inset-0 w-full h-full rounded-full bg-[#f3ffe5] border-2 border-[#4A6E18]"
+                ></span>
+                <i
+                  data-lucide="square-pen"
+                  class="relative z-10 text-[#4A6E18] text-xl"
+                ></i>
               </a>
 
-              <form th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
-                    method="post"
-                    th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
-                    data-hx-target="#slot-conteudo"
-                    class="inline m-0 flex items-center">
-
-                <div class="cursor-pointer inline-block transform duration-200 hover:scale-110"
-                     th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'">
-                  <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-arquivar-ficha', iconeCss=${ficha.status().name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"></div>
+              <form
+                th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
+                method="post"
+                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}"
+                data-hx-target="#slot-conteudo"
+                class="inline m-0 flex items-center"
+              >
+                <div
+                  class="cursor-pointer inline-block transform duration-200 hover:scale-110"
+                  th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'"
+                >
+                  <div
+                    th:replace="~{components/Buttom :: btn-icon(idBtn='btn-arquivar-ficha', iconeCss=${ficha.status().name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"
+                  ></div>
                 </div>
-
               </form>
             </th:block>
           </div>
         </div>
       </div>
 
-      <div class="max-w-4xl mx-auto bg-white border border-[#4A6E18] p-4 sm:p-6 rounded-lg shadow-xl overflow-x-auto">
-        <div class="mb-8 min-w-[600px]">
+      <div
+        class="max-w-4xl mx-auto bg-white border border-[#4A6E18] p-4 sm:p-8 rounded-lg shadow-xl"
+      >
+        <div class="mb-8">
+          <!-- Cabeçalho responsivo: Início, Meio e Fim no Desktop | Empilhado e Centralizado no Mobile -->
+          <div
+            class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6 text-sm sm:text-base border-b sm:border-none pb-4 sm:pb-0 text-center items-center"
+          >
+            <div
+              class="order-3 sm:order-1 font-semibold text-zinc-900 sm:text-left min-w-0 flex flex-col sm:flex-row sm:gap-2 sm:items-baseline"
+            >
+              <span class="whitespace-nowrap">Nome da preparação:</span>
+              <span
+                class="font-normal text-zinc-800 truncate"
+                th:title="${ficha.preparacao().nome()}"
+                th:text="${ficha.preparacao().nome()}"
+              ></span>
+            </div>
+            <div
+              class="order-2 sm:order-2 font-semibold text-zinc-900 sm:text-center min-w-0 flex flex-col sm:flex-row sm:justify-center sm:gap-2 sm:items-baseline"
+            >
+              <span class="whitespace-nowrap">Categoria:</span>
+              <span
+                class="font-normal text-zinc-800 truncate"
+                th:title="${ficha.preparacao().categoria().getLabel()}"
+                th:text="${ficha.preparacao().categoria().getLabel()}"
+              ></span>
+            </div>
+            <div
+              class="order-1 sm:order-3 font-semibold text-zinc-900 sm:text-right min-w-0 flex flex-col sm:flex-row sm:justify-end sm:gap-2 sm:items-baseline"
+            >
+              <span class="whitespace-nowrap">N°:</span>
+              <span
+                class="font-normal text-zinc-800 truncate"
+                th:text="${ficha.preparacao().numero()}"
+              ></span>
+            </div>
+          </div>
 
-          <table class="w-full mb-6 text-sm sm:text-base">
-            <tr>
-              <td class="font-semibold text-zinc-900 py-2">
-                Nome da preparação: <span class="font-normal text-zinc-800" th:text="${ficha.preparacao().nome()}"></span>
-              </td>
-              <td class="font-semibold text-zinc-900 py-2">
-                Categoria: <span class="font-normal text-zinc-800" th:text="${ficha.preparacao().categoria().getLabel()}"></span>
-              </td>
-              <td class="font-semibold text-zinc-900 py-2">
-                N°: <span class="font-normal text-zinc-800" th:text="${ficha.preparacao().numero()}"></span>
-              </td>
-            </tr>
-          </table>
+          <!-- Tabela de Ingredientes com Scroll Lateral no Mobile -->
+          <div class="overflow-x-auto mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <table class="min-w-[650px] sm:w-full border text-sm sm:text-base">
+              <thead class="bg-gray-100">
+                <tr>
+                  <th class="border p-2 text-left text-zinc-900 w-1/3">
+                    Ingredientes
+                  </th>
+                  <th class="border p-2 text-left text-zinc-900">
+                    Medida Caseira
+                  </th>
+                  <th class="border p-2 text-left text-zinc-900">PB</th>
+                  <th class="border p-2 text-left text-zinc-900">PL</th>
+                  <th class="border p-2 text-left text-zinc-900">FC</th>
+                  <th class="border p-2 text-left text-zinc-900">Custo R$</th>
+                  <th class="border p-2 text-left text-zinc-900">Custo Kg</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="ingrediente : ${ficha.ingredientes()}">
+                  <td
+                    class="border p-2 text-zinc-900 break-words"
+                    th:text="${ingrediente.ingrediente().nome()}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="${ingrediente.medidaCaseira()}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="${ingrediente.pb()} + ' g'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="${ingrediente.pl()} + ' g'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="${ingrediente.fc()}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoUsado(), 1, 2)}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-900"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoKg(), 1, 2)}"
+                  ></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-          <table class="w-full border mb-6 text-sm sm:text-base">
-            <thead class="bg-gray-100">
-            <tr>
-              <th class="border p-2 text-left text-zinc-900">Ingredientes</th>
-              <th class="border p-2 text-left text-zinc-900">Medida Caseira</th>
-              <th class="border p-2 text-left text-zinc-900">PB</th>
-              <th class="border p-2 text-left text-zinc-900">PL</th>
-              <th class="border p-2 text-left text-zinc-900">FC</th>
-              <th class="border p-2 text-left text-zinc-900">Custo R$</th>
-              <th class="border p-2 text-left text-zinc-900">Custo Kg</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="ingrediente : ${ficha.ingredientes()}">
-              <td class="border p-2 text-zinc-900" th:text="${ingrediente.ingrediente().nome()}"></td>
-              <td class="border p-2 text-zinc-900" th:text="${ingrediente.medidaCaseira()}"></td>
-              <td class="border p-2 text-zinc-900" th:text="${ingrediente.pb()} + ' g'"></td>
-              <td class="border p-2 text-zinc-900" th:text="${ingrediente.pl()} + ' g'"></td>
-              <td class="border p-2 text-zinc-900" th:text="${ingrediente.fc()}"></td>
-              <td class="border p-2 text-zinc-900" th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoUsado(), 1, 2)}"></td>
-              <td class="border p-2 text-zinc-900" th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoKg(), 1, 2)}"></td>
-            </tr>
-            </tbody>
-          </table>
-
-          <div class="space-y-6 mb-6">
-            <div class="flex flex-col md:flex-row gap-6">
-              <div class="flex-1">
-                <h2 class="text-lg font-semibold text-zinc-900 mb-2">Equipamentos e utensílios utilizados:</h2>
-                <div class="pl-4">
-                  <ol class="list-decimal text-zinc-800 text-sm sm:text-base">
-                    <li th:each="equipamento : ${#strings.arraySplit(ficha.preparacao().equipamentos(), '.')}" th:text="${#strings.trim(equipamento)}"></li>
-                  </ol>
+          <div class="flex flex-col gap-6 mb-6">
+            <!-- Equipamentos e Custo Total (Título com botão de olho) -->
+            <div
+              class="flex flex-col md:flex-row gap-6 items-center md:items-start"
+            >
+              <div
+                class="flex-1 flex flex-col items-center md:items-start min-w-0"
+              >
+                <div class="flex flex-col items-center md:items-start gap-2 mb-2">
+                  <h2 class="text-lg font-semibold text-zinc-900 text-center md:text-left">
+                    Equipamentos e utensílios utilizados
+                  </h2>
+                  <div
+                    th:replace="~{components/Buttom :: btn-icon(idBtn='btn-modal-equipamentos', iconeCss='eye', tipo='button')}"
+                  ></div>
                 </div>
               </div>
-              <div class="md:w-48 flex-shrink-0 bg-gray-50 p-3 rounded border">
+              <div
+                class="md:w-48 flex-shrink-0 bg-gray-50 p-3 rounded border text-center md:text-left"
+              >
                 <p class="font-semibold text-zinc-900">Custo total:</p>
-                <p class="text-lg font-bold text-zinc-800" th:text="'R$ ' + ${#numbers.formatDecimal(ficha.custoTotal(), 1, 2)}"></p>
+                <p
+                  class="text-lg font-bold text-zinc-800"
+                  th:text="'R$ ' + ${#numbers.formatDecimal(ficha.custoTotal(), 1, 2)}"
+                ></p>
               </div>
             </div>
 
-            <div class="flex flex-col md:flex-row gap-6">
-              <div class="flex-1">
-                <h2 class="text-lg font-semibold text-zinc-900 mb-2">Modo de preparo:</h2>
-                <div class="pl-4">
-                  <ol class="list-decimal text-zinc-800 text-sm sm:text-base">
-                    <li th:each="passo : ${#strings.arraySplit(ficha.preparacao().modoPreparo(), '.')}" th:text="${#strings.trim(passo)}"></li>
-                  </ol>
+            <!-- Modo de Preparo e Custo Per Capita (Título com botão de olho) -->
+            <div
+              class="flex flex-col md:flex-row gap-6 items-center md:items-start"
+            >
+              <div
+                class="flex-1 flex flex-col items-center md:items-start min-w-0"
+              >
+                <div class="flex flex-col items-center md:items-start gap-2 mb-2">
+                  <h2 class="text-lg font-semibold text-zinc-900 text-center md:text-left">
+                    Modo de preparo
+                  </h2>
+                  <div
+                    th:replace="~{components/Buttom :: btn-icon(idBtn='btn-modal-preparo', iconeCss='eye', tipo='button')}"
+                  ></div>
                 </div>
               </div>
-              <div class="md:w-48 flex-shrink-0 bg-gray-50 p-3 rounded border">
+              <div
+                class="md:w-48 flex-shrink-0 bg-gray-50 p-3 rounded border text-center md:text-left"
+              >
                 <p class="font-semibold text-zinc-900">Custo per capita:</p>
-                <p class="text-lg font-bold text-zinc-800" th:text="'R$ ' + ${#numbers.formatDecimal(ficha.custoPerCapita(), 1, 2)}"></p>
+                <p
+                  class="text-lg font-bold text-zinc-800"
+                  th:text="'R$ ' + ${#numbers.formatDecimal(ficha.custoPerCapita(), 1, 2)}"
+                ></p>
               </div>
             </div>
           </div>
 
           <div class="mb-8">
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 border-t border-b py-4 bg-gray-50 rounded px-4 text-sm sm:text-base">
-              <div><p class="font-semibold text-zinc-900">Tempo de preparo:</p><p th:text="${ficha.preparacao().tempoPreparo()}"></p></div>
-              <div><p class="font-semibold text-zinc-900">Peso da porção:</p><p th:text="${ficha.pesoPorcao()} + ' g'"></p></div>
-              <div><p class="font-semibold text-zinc-900">Rendimento:</p><p th:text="${ficha.preparacao().rendimento()} + ' g'"></p></div>
-              <div><p class="font-semibold text-zinc-900">Medida caseira:</p><p th:text="${ficha.medidaCaseira()}"></p></div>
-              <div><p class="font-semibold text-zinc-900">Número de porções:</p><p th:text="${ficha.numeroPorcoes()}"></p></div>
+            <div
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4 border-t border-b py-4 bg-gray-50 rounded px-4 text-sm sm:text-base text-center md:text-left"
+            >
+              <div>
+                <p class="font-semibold text-zinc-900">Tempo de preparo:</p>
+                <p th:text="${ficha.preparacao().tempoPreparo()}"></p>
+              </div>
+              <div>
+                <p class="font-semibold text-zinc-900">Peso da porção:</p>
+                <p th:text="${ficha.pesoPorcao()} + ' g'"></p>
+              </div>
+              <div>
+                <p class="font-semibold text-zinc-900">Rendimento:</p>
+                <p th:text="${ficha.preparacao().rendimento()} + ' g'"></p>
+              </div>
+              <div>
+                <p class="font-semibold text-zinc-900">Medida caseira:</p>
+                <p th:text="${ficha.medidaCaseira()}"></p>
+              </div>
+              <div>
+                <p class="font-semibold text-zinc-900">Número de porções:</p>
+                <p th:text="${ficha.numeroPorcoes()}"></p>
+              </div>
 
-              <div th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
-                <p class="font-semibold text-zinc-900">Fcc:</p><p th:text="${ficha.preparacao().fcc()}"></p>
+              <div
+                th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}"
+              >
+                <p class="font-semibold text-zinc-900">Fcc:</p>
+                <p th:text="${ficha.preparacao().fcc()}"></p>
               </div>
-              <div th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}" class="col-span-2">
-                <p class="font-semibold text-zinc-900">Água:</p><p>Não</p>
+              <div
+                th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}"
+              >
+                <p class="font-semibold text-zinc-900">Água:</p>
+                <p>Não</p>
               </div>
 
-              <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
-                <p class="font-semibold text-zinc-900">Quantidade de água:</p><p th:text="${ficha.preparacao().qntdAgua()} + ' ml'"></p>
+              <div
+                th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}"
+              >
+                <p class="font-semibold text-zinc-900">Quantidade de água:</p>
+                <p th:text="${ficha.preparacao().qntdAgua()} + ' ml'"></p>
               </div>
-              <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
-                <p class="font-semibold text-zinc-900">Água que sobrou:</p><p th:text="${ficha.preparacao().porcentAgua()} + ' %'"></p>
+              <div
+                th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}"
+              >
+                <p class="font-semibold text-zinc-900">Água que sobrou:</p>
+                <p th:text="${ficha.preparacao().porcentAgua()} + ' %'"></p>
               </div>
-              <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
-                <p class="font-semibold text-zinc-900">Fcc:</p><p th:text="${ficha.preparacao().fcc()}"></p>
+              <div
+                th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}"
+              >
+                <p class="font-semibold text-zinc-900">Fcc:</p>
+                <p th:text="${ficha.preparacao().fcc()}"></p>
               </div>
             </div>
           </div>
 
           <div class="border-t pt-4">
-            <h2 class="text-xl text-center font-bold text-zinc-900 mb-4">Perfil Nutricional</h2>
-            <table class="w-full border mb-6 text-sm sm:text-base">
-              <thead class="bg-gray-100">
-              <tr>
-                <th class="border p-2 text-zinc-900 text-left">Ingredientes</th>
-                <th class="border p-2 text-zinc-900 text-left">Per Porção (PL)</th>
-                <th class="border p-2 text-zinc-900 text-left">PTN</th>
-                <th class="border p-2 text-zinc-900 text-left">CHO</th>
-                <th class="border p-2 text-zinc-900 text-left">LIP</th>
-                <th class="border p-2 text-zinc-900 text-left">Sódio</th>
-                <th class="border p-2 text-zinc-900 text-left">Gordura Saturada</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr th:each="ingrediente : ${ficha.ingredientes()}">
-                <td class="border p-2 text-zinc-800" th:text="${ingrediente.ingrediente.nome}"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.pl != null ? ingrediente.pl : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.ptnCalculado != null ? ingrediente.ptnCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.choCalculado != null ? ingrediente.choCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.lipCalculado != null ? ingrediente.lipCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.sodioCalculado != null ? ingrediente.sodioCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' mg'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${#numbers.formatDecimal((ingrediente.gorduraSaturadaCalculada != null ? ingrediente.gorduraSaturadaCalculada : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"></td>
-              </tr>
-              </tbody>
-            </table>
+            <h2 class="text-xl text-center font-bold text-zinc-900 mb-4">
+              Perfil Nutricional
+            </h2>
 
-            <h3 class="text-lg font-semibold text-zinc-900 mb-2">Total</h3>
-            <table class="w-full border mb-4 text-sm sm:text-base bg-gray-50">
-              <tr>
-                <td class="border p-2 font-semibold">Gramas</td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasPtn()} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasCho()} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasLip()} + ' g'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSodio()} + ' mg'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSaturada()} + ' g'"></td>
-              </tr>
-              <tr>
-                <td class="border p-2 font-semibold text-zinc-900">Kcal</td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().kcalPtn()}"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().kcalCho()}"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().kcalLip()}"></td>
-                <td class="border p-2 bg-gray-200"></td>
-                <td class="border p-2 bg-gray-200"></td>
-              </tr>
-              <tr>
-                <td class="border p-2 font-semibold text-zinc-900">%</td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().porcentPtn()} + '%'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().porcentCho()} + '%'"></td>
-                <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().porcentLip()} + '%'"></td>
-                <td class="border p-2 bg-gray-200"></td>
-                <td class="border p-2 bg-gray-200"></td>
-              </tr>
-            </table>
+            <div class="overflow-x-auto mb-6 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <table
+                class="min-w-[650px] sm:w-full border text-sm sm:text-base"
+              >
+                <thead class="bg-gray-100">
+                  <tr>
+                    <th class="border p-2 text-zinc-900 text-left w-1/4">
+                      Ingredientes
+                    </th>
+                    <th class="border p-2 text-zinc-900 text-left">
+                      Per Porção (PL)
+                    </th>
+                    <th class="border p-2 text-zinc-900 text-left">PTN</th>
+                    <th class="border p-2 text-zinc-900 text-left">CHO</th>
+                    <th class="border p-2 text-zinc-900 text-left">LIP</th>
+                    <th class="border p-2 text-zinc-900 text-left">Sódio</th>
+                    <th class="border p-2 text-zinc-900 text-left">
+                      Gordura Saturada
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr th:each="ingrediente : ${ficha.ingredientes()}">
+                    <td
+                      class="border p-2 text-zinc-800 break-words"
+                      th:text="${ingrediente.ingrediente.nome}"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.pl != null ? ingrediente.pl : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.ptnCalculado != null ? ingrediente.ptnCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.choCalculado != null ? ingrediente.choCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.lipCalculado != null ? ingrediente.lipCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.sodioCalculado != null ? ingrediente.sodioCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' mg'"
+                    ></td>
+                    <td
+                      class="border p-2 text-zinc-800"
+                      th:text="${#numbers.formatDecimal((ingrediente.gorduraSaturadaCalculada != null ? ingrediente.gorduraSaturadaCalculada : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'"
+                    ></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h3
+              class="text-lg font-semibold text-zinc-900 mb-2 text-center md:text-left"
+            >
+              Total
+            </h3>
+            <div class="overflow-x-auto mb-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <table
+                class="min-w-[650px] sm:w-full border text-sm sm:text-base bg-gray-50"
+              >
+                <tr>
+                  <td class="border p-2 font-semibold">Gramas</td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().gramasPTN()} + ' g'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().gramasCHO()} + ' g'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().gramasLIP()} + ' g'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().gramasSodio()} + ' mg'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().gramasSaturada()} + ' g'"
+                  ></td>
+                </tr>
+                <tr>
+                  <td class="border p-2 font-semibold text-zinc-900">Kcal</td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().kcalPTN()}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().kcalCHO()}"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().kcalLIP()}"
+                  ></td>
+                  <td class="border p-2 bg-gray-200"></td>
+                  <td class="border p-2 bg-gray-200"></td>
+                </tr>
+                <tr>
+                  <td class="border p-2 font-semibold text-zinc-900">%</td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().porcentPTN()} + '%'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().porcentCHO()} + '%'"
+                  ></td>
+                  <td
+                    class="border p-2 text-zinc-800"
+                    th:text="${ficha.perfilNutricional().porcentLIP()} + '%'"
+                  ></td>
+                  <td class="border p-2 bg-gray-200"></td>
+                  <td class="border p-2 bg-gray-200"></td>
+                </tr>
+              </table>
+            </div>
 
             <div class="flex justify-center mt-4">
-              <p class="font-semibold text-lg bg-white px-4 py-2 rounded border border-[#7AB648]">
-                VCT: <span class="font-bold text-zinc-900" th:text="${ficha.perfilNutricional().vtc()} + ' kcal'"></span>
+              <p
+                class="font-semibold text-lg bg-white px-4 py-2 rounded border border-[#7AB648]"
+              >
+                VCT:
+                <span
+                  class="font-bold text-zinc-900"
+                  th:text="${ficha.perfilNutricional().vtc()} + ' kcal'"
+                ></span>
               </p>
             </div>
           </div>
@@ -263,6 +488,10 @@
       </div>
     </main>
   </div>
+
+  <!-- Modais -->
+  <div th:replace="~{pages/fichas/ModalText :: modal-equipamentos(ficha=${ficha})}"></div>
+  <div th:replace="~{pages/fichas/ModalText :: modal-preparo(ficha=${ficha})}"></div>
 
   <script th:src="@{/Scripts/pages/fichas/ScriptDetail.js}"></script>
 </div>

@@ -23,38 +23,38 @@ public class PerfilNutricionalCalculator {
     public PerfilNutricionalDTO calcularPerfilNutricionalPorPorcaoCreate(List<IngredientePorFichaDTO> ingredientes, int numeroPorcoes) {
         TotaisNutrientes totais = calcularTotaisNutrientes(ingredientes);
         return new PerfilNutricionalDTO(
-                null,
-                dividir(totais.vtc(), numeroPorcoes),
-                dividir(totais.kcalPtn(), numeroPorcoes),
-                dividir(totais.kcalCho(), numeroPorcoes),
-                dividir(totais.kcalLip(), numeroPorcoes),
-                dividir(totais.gramasPtn(), numeroPorcoes),
-                dividir(totais.gramasCho(), numeroPorcoes),
-                dividir(totais.gramasLip(), numeroPorcoes),
-                dividir(totais.gramasSodio(), numeroPorcoes),
-                dividir(totais.gramasSaturada(), numeroPorcoes),
-                totais.porcentPtn(),
-                totais.porcentCho(),
-                totais.porcentLip()
+            null,
+            dividir(totais.vtc(), numeroPorcoes),
+            dividir(totais.kcalPTN(), numeroPorcoes),
+            dividir(totais.kcalCHO(), numeroPorcoes),
+            dividir(totais.kcalLIP(), numeroPorcoes),
+            dividir(totais.gramasPTN(), numeroPorcoes),
+            dividir(totais.gramasCHO(), numeroPorcoes),
+            dividir(totais.gramasLIP(), numeroPorcoes),
+            dividir(totais.gramasSodio(), numeroPorcoes),
+            dividir(totais.gramasSaturada(), numeroPorcoes),
+            totais.porcentPTN(),
+            totais.porcentCHO(),
+            totais.porcentLIP()
         );
     }
 
     public PerfilNutricionalDTO calcularPerfilNutricionalPorPorcaoUpdate(List<IngredientePorFichaDTO> ingredientes, int numeroPorcoes) {
         TotaisNutrientes totais = calcularTotaisNutrientes(ingredientes);
         return new PerfilNutricionalDTO(
-                null,
-                dividir(totais.vtc(), numeroPorcoes),
-                dividir(totais.kcalPtn(), numeroPorcoes),
-                dividir(totais.kcalCho(), numeroPorcoes),
-                dividir(totais.kcalLip(), numeroPorcoes),
-                dividir(totais.gramasPtn(), numeroPorcoes),
-                dividir(totais.gramasCho(), numeroPorcoes),
-                dividir(totais.gramasLip(), numeroPorcoes),
-                dividir(totais.gramasSodio(), numeroPorcoes),
-                dividir(totais.gramasSaturada(), numeroPorcoes),
-                totais.porcentPtn(),
-                totais.porcentCho(),
-                totais.porcentLip()
+            null,
+            dividir(totais.vtc(), numeroPorcoes),
+            dividir(totais.kcalPTN(), numeroPorcoes),
+            dividir(totais.kcalCHO(), numeroPorcoes),
+            dividir(totais.kcalLIP(), numeroPorcoes),
+            dividir(totais.gramasPTN(), numeroPorcoes),
+            dividir(totais.gramasCHO(), numeroPorcoes),
+            dividir(totais.gramasLIP(), numeroPorcoes),
+            dividir(totais.gramasSodio(), numeroPorcoes),
+            dividir(totais.gramasSaturada(), numeroPorcoes),
+            totais.porcentPTN(),
+            totais.porcentCHO(),
+            totais.porcentLIP()
         );
     }
 
@@ -120,18 +120,18 @@ public class PerfilNutricionalCalculator {
         return valor != null ? valor : BigDecimal.ZERO;
     }
 
-    private record TotaisNutrientes(
+        private record TotaisNutrientes(
             BigDecimal vtc,
-            BigDecimal kcalPtn,
-            BigDecimal kcalCho,
-            BigDecimal kcalLip,
-            BigDecimal gramasPtn,
-            BigDecimal gramasCho,
-            BigDecimal gramasLip,
+            BigDecimal kcalPTN,
+            BigDecimal kcalCHO,
+            BigDecimal kcalLIP,
+            BigDecimal gramasPTN,
+            BigDecimal gramasCHO,
+            BigDecimal gramasLIP,
             BigDecimal gramasSodio,
             BigDecimal gramasSaturada,
-            BigDecimal porcentPtn,
-            BigDecimal porcentCho,
-            BigDecimal porcentLip
-    ) {}
+            BigDecimal porcentPTN,
+            BigDecimal porcentCHO,
+            BigDecimal porcentLIP
+        ) {}
 }
