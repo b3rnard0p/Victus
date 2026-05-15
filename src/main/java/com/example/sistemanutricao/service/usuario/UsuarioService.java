@@ -189,7 +189,10 @@ public class UsuarioService {
             usuario.setSenha(passwordEncoder.encode(dto.novaSenha()));
         }
 
-        if (dto.caminhoImagem() != null && !dto.caminhoImagem().isEmpty()) {
+        if (dto.caminhoImagem() != null && !dto.caminhoImagem().isEmpty() && !dto.caminhoImagem().equals(usuario.getCaminhoImagem())) {
+            if (usuario.getCaminhoImagem() != null && !usuario.getCaminhoImagem().isEmpty()) {
+                imageStorage.removerImagemPerfil(usuario.getCaminhoImagem());
+            }
             usuario.setCaminhoImagem(dto.caminhoImagem());
         }
 

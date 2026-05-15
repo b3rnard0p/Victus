@@ -5,12 +5,13 @@
     <title>Ficha Técnica - PDF</title>
     <style>
         @page { size: A4; margin: 0.5cm; }
+        html, body { width: 100%; height: 100%; }
         body { font-family: 'Helvetica', 'Arial', sans-serif; color: #1a1a1a; margin: 0; padding: 0; font-size: 11px; line-height: 1.3; background-color: #fff; }
-        
-        .container { width: 100%; border: 1px solid #4A6E18; padding: 15px; border-radius: 8px; box-sizing: border-box; }
-        
+
+        .container { width: 100%; max-width: 100%; border: 1px solid #4A6E18; padding: 12px 10px; border-radius: 6px; box-sizing: border-box; }
+
         /* Tables general */
-        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; table-layout: fixed; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 12px; table-layout: auto; }
         th, td { padding: 5px; text-align: left; vertical-align: top; word-wrap: break-word; }
         .border-table th, .border-table td { border: 1px solid #ccc; }
         .bg-gray-header { background-color: #f3f4f6; }
@@ -48,6 +49,10 @@
         .col-med { width: 15%; }
         .col-num { width: 10%; }
         .col-cost { width: 15%; }
+        /* Quebra de palavras para PDF: evita reticências e força wrap para a linha seguinte */
+        .break-word { word-break: break-all !important; overflow-wrap: anywhere !important; white-space: normal !important; display: block; }
+        /* Forçar quebra em todo o conteúdo interno do container PDF (override de classes como truncate/nowrap usadas na UI) */
+        .container, .container * { white-space: normal !important; word-break: break-all !important; overflow-wrap: anywhere !important; }
     </style>
 </head>
 <body>
@@ -56,9 +61,18 @@
         
         <table class="header-table">
             <tr>
-                <td width="45%"><span class="font-semibold">Nome da preparação:</span> <span th:text="${ficha.preparacao != null ? ficha.preparacao.nome : 'N/A'}"></span></td>
-                <td width="35%" style="text-align: center;"><span class="font-semibold">Categoria:</span> <span th:text="${ficha.preparacao != null and ficha.preparacao.categoria != null ? ficha.preparacao.categoria.getLabel() : 'N/A'}"></span></td>
-                <td width="20%" style="text-align: right;"><span class="font-semibold">N°:</span> <span th:text="${ficha.preparacao != null ? ficha.preparacao.numero : '0'}"></span></td>
+                                <td width="45%">
+                                    <span class="font-semibold">Nome da preparação:</span>
+                                    <span class="break-word" th:text="${ficha.preparacao != null ? ficha.preparacao.nome : 'N/A'}"></span>
+                                </td>
+                                <td width="35%" style="text-align: center;">
+                                    <span class="font-semibold">Categoria:</span>
+                                    <span class="break-word" th:text="${ficha.preparacao != null and ficha.preparacao.categoria != null ? ficha.preparacao.categoria.getLabel() : 'N/A'}"></span>
+                                </td>
+                                <td width="20%" style="text-align: right;">
+                                    <span class="font-semibold">N°:</span>
+                                    <span class="break-word" th:text="${ficha.preparacao != null ? ficha.preparacao.numero : '0'}"></span>
+                                </td>
             </tr>
         </table>
 
@@ -77,8 +91,12 @@
             <tbody>
                 <th:block th:if="${ficha.ingredientes != null}">
                     <tr th:each="ingItem : ${ficha.ingredientes}">
-                        <td th:text="${ingItem.ingrediente != null ? ingItem.ingrediente.nome : 'N/A'}"></td>
-                        <td th:text="${ingItem.medidaCaseira != null ? ingItem.medidaCaseira : '-'}"></td>
+                        <td>
+                            <span class="break-word" th:text="${ingItem.ingrediente != null ? ingItem.ingrediente.nome : 'N/A'}"></span>
+                        </td>
+                        <td>
+                            <span class="break-word" th:text="${ingItem.medidaCaseira != null ? ingItem.medidaCaseira : '-'}"></span>
+                        </td>
                         <td th:text="${ingItem.pb != null ? #numbers.formatDecimal(ingItem.pb, 1, 2) + ' g' : '0,00 g'}"></td>
                         <td th:text="${ingItem.pl != null ? #numbers.formatDecimal(ingItem.pl, 1, 2) + ' g' : '0,00 g'}"></td>
                         <td th:text="${ingItem.fc != null ? #numbers.formatDecimal(ingItem.fc, 1, 2) : '1,00'}"></td>
@@ -95,7 +113,8 @@
                     <div class="section-title">Equipamentos e utensílios utilizados:</div>
                     <th:block th:if="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.equipamentos)}">
                         <ol>
-                            <li th:each="equipItem : ${#strings.arraySplit(ficha.preparacao.equipamentos, '.')}" 
+                            <li th:each="equipItem : ${#strings.arraySplit(ficha.preparacao.equipamentos, '
+.')}" 
                                 th:if="${!#strings.isEmpty(#strings.trim(equipItem))}"
                                 th:text="${#strings.trim(equipItem)}"></li>
                         </ol>
@@ -117,7 +136,8 @@
                     <div class="section-title">Modo de preparo:</div>
                     <th:block th:if="${ficha.preparacao != null and !#strings.isEmpty(ficha.preparacao.modoPreparo)}">
                         <ol>
-                            <li th:each="passoItem : ${#strings.arraySplit(ficha.preparacao.modoPreparo, '.')}" 
+                            <li th:each="passoItem : ${#strings.arraySplit(ficha.preparacao.modoPreparo, '
+.')}" 
                                 th:if="${!#strings.isEmpty(#strings.trim(passoItem))}"
                                 th:text="${#strings.trim(passoItem)}"></li>
                         </ol>
@@ -136,10 +156,10 @@
         <div class="bg-grid">
             <table class="grid-table" style="margin-bottom: 0;">
                 <tr>
-                    <td width="25%"><span class="font-semibold">Tempo de preparo:</span><br/><span th:text="${ficha.preparacao != null ? ficha.preparacao.tempoPreparo : '-'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Tempo de preparo:</span><br/><span class="break-word" th:text="${ficha.preparacao != null ? ficha.preparacao.tempoPreparo : '-'}"></span></td>
                     <td width="25%"><span class="font-semibold">Peso da porção:</span><br/><span th:text="${(ficha.pesoPorcao != null ? ficha.pesoPorcao : '0') + ' g'}"></span></td>
                     <td width="25%"><span class="font-semibold">Rendimento:</span><br/><span th:text="${(ficha.preparacao != null ? ficha.preparacao.rendimento : '0') + ' g'}"></span></td>
-                    <td width="25%"><span class="font-semibold">Medida caseira:</span><br/><span th:text="${ficha.medidaCaseira != null ? ficha.medidaCaseira : '-'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Medida caseira:</span><br/><span class="break-word" th:text="${ficha.medidaCaseira != null ? ficha.medidaCaseira : '-'}"></span></td>
                 </tr>
                 <tr>
                     <td><span class="font-semibold">Número de porções:</span><br/><span th:text="${ficha.numeroPorcoes != null ? ficha.numeroPorcoes : '0'}"></span></td>
@@ -167,7 +187,7 @@
             <tbody>
                 <th:block th:if="${ficha.ingredientes != null}">
                     <tr th:each="nutriItem : ${ficha.ingredientes}">
-                        <td th:text="${nutriItem.ingrediente != null ? nutriItem.ingrediente.nome : 'N/A'}"></td>
+                        <td><span class="break-word" th:text="${nutriItem.ingrediente != null ? nutriItem.ingrediente.nome : 'N/A'}"></span></td>
                         <td th:text="${#numbers.formatDecimal((nutriItem.pl != null ? nutriItem.pl : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
                         <td th:text="${#numbers.formatDecimal((nutriItem.ptnCalculado != null ? nutriItem.ptnCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>
                         <td th:text="${#numbers.formatDecimal((nutriItem.choCalculado != null ? nutriItem.choCalculado : 0) / (ficha.numeroPorcoes != null and ficha.numeroPorcoes > 0 ? ficha.numeroPorcoes : 1), 1, 2) + ' g'}"></td>

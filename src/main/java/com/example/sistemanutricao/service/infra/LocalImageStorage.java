@@ -83,20 +83,31 @@ public class LocalImageStorage implements ImageStorage {
 
     @Override
     public void removerImagemPerfil(String caminhoImagem) {
-        if (caminhoImagem != null && !caminhoImagem.isEmpty()) {
-            try {
-                String nomeArquivo = caminhoImagem;
-                if (caminhoImagem.startsWith("imagens-perfil/")) {
-                    nomeArquivo = caminhoImagem.substring("imagens-perfil/".length());
-                }
-                
-                Path arquivo = rootLocation.resolve(nomeArquivo);
-                if (Files.exists(arquivo)) {
-                    Files.delete(arquivo);
-                }
-            } catch (IOException e) {
-                logger.error("Erro ao remover imagem", e);
+        if (caminhoImagem == null || caminhoImagem.isEmpty()) {
+            return;
+        }
+
+        try {
+            String nomeArquivo = caminhoImagem;
+
+            if (nomeArquivo.startsWith("/")) {
+                nomeArquivo = nomeArquivo.substring(1);
             }
+
+            if (nomeArquivo.startsWith("imagens-perfil/")) {
+                nomeArquivo = nomeArquivo.substring("imagens-perfil/".length());
+            }
+            
+            Path arquivo = this.rootLocation.resolve(nomeArquivo).normalize();
+
+            if (Files.exists(arquivo) && Files.isRegularFile(arquivo)) {
+                Files.delete(arquivo);
+                logger.info("Imagem de perfil antiga removida: {}", arquivo.getFileName());
+            } else {
+                logger.debug("Nenhum arquivo físico encontrado para remover em: {}", arquivo);
+            }
+        } catch (IOException e) {
+            logger.error("Falha ao tentar remover imagem de perfil: {}", caminhoImagem, e);
         }
     }
 }

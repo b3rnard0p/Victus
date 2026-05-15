@@ -85,35 +85,37 @@ window.adicionarIngrediente = function () {
     );
     return;
   }
-
-  if (
-    !validarCampoObrigatorio(document.getElementById("pb")?.value) ||
-    !validarNumeroComMaximoDigitos(document.getElementById("pb").value, 4, 2)
-  ) {
+  // Priorizar validação de campo obrigatório antes de validar formato/valor
+  const pbField = document.getElementById("pb")?.value;
+  if (!validarCampoObrigatorio(pbField)) {
+    dispararErroFicha("O PB do ingrediente é obrigatório.");
+    return;
+  }
+  if (!validarNumeroComMaximoDigitos(pbField, 4, 2)) {
     dispararErroFicha(
       "O PB do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
     );
     return;
   }
 
-  if (
-    !validarCampoObrigatorio(document.getElementById("pl")?.value) ||
-    !validarNumeroComMaximoDigitos(document.getElementById("pl").value, 4, 2)
-  ) {
+  const plField = document.getElementById("pl")?.value;
+  if (!validarCampoObrigatorio(plField)) {
+    dispararErroFicha("O PL do ingrediente é obrigatório.");
+    return;
+  }
+  if (!validarNumeroComMaximoDigitos(plField, 4, 2)) {
     dispararErroFicha(
       "O PL do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
     );
     return;
   }
 
-  if (
-    !validarCampoObrigatorio(document.getElementById("custoKg")?.value) ||
-    !validarNumeroComMaximoDigitos(
-      document.getElementById("custoKg").value,
-      4,
-      2,
-    )
-  ) {
+  const custoKgField = document.getElementById("custoKg")?.value;
+  if (!validarCampoObrigatorio(custoKgField)) {
+    dispararErroFicha("O custo por kg do ingrediente é obrigatório.");
+    return;
+  }
+  if (!validarNumeroComMaximoDigitos(custoKgField, 4, 2)) {
     dispararErroFicha(
       "O custo por kg do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
     );
@@ -210,6 +212,7 @@ window.adicionarIngrediente = function () {
 
   notificarMudancaDeIngredientes("ingredienteAdicionado");
 };
+
 function initEventDelegationTabela() {
   const tbody = document.getElementById("ingredientesAdicionados");
   if (!tbody) return;
@@ -529,6 +532,64 @@ window.validarFormFicha = function () {
   const qntdAgua = parseFloat(qntdAguaVal);
   const porcentAgua = parseFloat(porcentAguaVal);
 
+   if (!nome) {
+    dispararErroFicha("O nome da preparação é obrigatório.");
+    return false;
+  }
+
+  if (!categoria) {
+    dispararErroFicha("A categoria da preparação é obrigatória.");
+    return false;
+  }
+
+  if (!numeroPreparacao) {
+    dispararErroFicha("O número da preparação é obrigatório.");
+    return false;
+  }
+
+  if (ingredientes.length === 0) {
+    dispararErroFicha("Adicione pelo menos um ingrediente à ficha técnica.");
+    return false;
+  }
+
+  if (!modoPreparo) {
+    dispararErroFicha("O modo de preparo é obrigatório.");
+    return false;
+  }
+
+  if (!tempoPreparo) {
+    dispararErroFicha("O tempo de preparo é obrigatório.");
+    return false;
+  }
+
+  if (!rendimentoVal || rendimento <= 0) {
+    dispararErroFicha("O rendimento é obrigatório e deve ser maior que zero.");
+    return false;
+  }
+
+  if (!pesoPorcaoVal || pesoPorcao <= 0) {
+    dispararErroFicha(
+      "O peso da porção é obrigatório e deve ser maior que zero.",
+    );
+    return false;
+  }
+
+  if (!medidaCaseiraFicha) {
+    dispararErroFicha("A medida caseira final é obrigatória.");
+    return false;
+  }
+
+  if (aguaCheckbox && aguaCheckbox.checked) {
+    if (qntdAguaVal === "" || Number.isNaN(qntdAgua) || qntdAgua <= 0) {
+      dispararErroFicha("Informe a quantidade de água utilizada.");
+      return false;
+    }
+    if (porcentAguaVal === "" || Number.isNaN(porcentAgua)) {
+      dispararErroFicha("Informe a porcentagem de água que sobrou.");
+      return false;
+    }
+  }
+
   if (!validarTextoMaximo(nome, 100)) {
     dispararErroFicha(
       "O nome da preparação deve ter no máximo 100 caracteres.",
@@ -590,10 +651,20 @@ window.validarFormFicha = function () {
       row.querySelector("td:first-of-type")?.textContent?.trim() ||
       "Ingrediente";
 
+    
+    // Priorizar mensagem de campo obrigatório
+    if (!validarCampoObrigatorio(pbInput?.value)) {
+      dispararErroFicha(`O PB do ingrediente "${nomeIngrediente}" é obrigatório.`);
+      return false;
+    }
     if (!validarNumeroComMaximoDigitos(pbInput?.value, 4, 2)) {
       dispararErroFicha(
         `O PB do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
       );
+      return false;
+    }
+    if (!validarCampoObrigatorio(plInput?.value)) {
+      dispararErroFicha(`O PL do ingrediente "${nomeIngrediente}" é obrigatório.`);
       return false;
     }
     if (!validarNumeroComMaximoDigitos(plInput?.value, 4, 2)) {
@@ -602,68 +673,14 @@ window.validarFormFicha = function () {
       );
       return false;
     }
+    if (!validarCampoObrigatorio(custoKgInput?.value)) {
+      dispararErroFicha(`O custo por kg do ingrediente "${nomeIngrediente}" é obrigatório.`);
+      return false;
+    }
     if (!validarNumeroComMaximoDigitos(custoKgInput?.value, 4, 2)) {
       dispararErroFicha(
         `O custo por kg do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
       );
-      return false;
-    }
-  }
-
-  if (!nome) {
-    dispararErroFicha("O nome da preparação é obrigatório.");
-    return false;
-  }
-
-  if (!categoria) {
-    dispararErroFicha("A categoria da preparação é obrigatória.");
-    return false;
-  }
-
-  if (!numeroPreparacao) {
-    dispararErroFicha("O número da preparação é obrigatório.");
-    return false;
-  }
-
-  if (ingredientes.length === 0) {
-    dispararErroFicha("Adicione pelo menos um ingrediente à ficha técnica.");
-    return false;
-  }
-
-  if (!modoPreparo) {
-    dispararErroFicha("O modo de preparo é obrigatório.");
-    return false;
-  }
-
-  if (!tempoPreparo) {
-    dispararErroFicha("O tempo de preparo é obrigatório.");
-    return false;
-  }
-
-  if (!rendimentoVal || rendimento <= 0) {
-    dispararErroFicha("O rendimento é obrigatório e deve ser maior que zero.");
-    return false;
-  }
-
-  if (!pesoPorcaoVal || pesoPorcao <= 0) {
-    dispararErroFicha(
-      "O peso da porção é obrigatório e deve ser maior que zero.",
-    );
-    return false;
-  }
-
-  if (!medidaCaseiraFicha) {
-    dispararErroFicha("A medida caseira final é obrigatória.");
-    return false;
-  }
-
-  if (aguaCheckbox && aguaCheckbox.checked) {
-    if (qntdAguaVal === "" || Number.isNaN(qntdAgua) || qntdAgua <= 0) {
-      dispararErroFicha("Informe a quantidade de água utilizada.");
-      return false;
-    }
-    if (porcentAguaVal === "" || Number.isNaN(porcentAgua)) {
-      dispararErroFicha("Informe a porcentagem de água que sobrou.");
       return false;
     }
   }
