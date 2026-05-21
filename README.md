@@ -18,6 +18,7 @@ Com uma interface moderna e funcional, o Victus utiliza tecnologias como Spring 
 * [Frontend (Arquitetura da Interface)](#frontend-arquitetura-da-interface)
 * [Tecnologias & Dependências](#tecnologias--dependências)
 * [Comandos Úteis](#comandos-úteis)
+* [deploy](#deploy)
 
 <h2 align="center">Controllers</h2>
 
@@ -456,6 +457,229 @@ Caso o wrapper não tenha permissão de execução:
 ```bash
 chmod +x mvnw
 ```
+
+<h2 align="center">Deploy</h2>
+Foi utilizado Docker e Docker-Compose para subir o servidor, além de nginx para ser o proxy
+
+### Passo 1 (configure a imagem docker)
+
+```bash
+# Usar a imagem base do Eclipse Temurin
+FROM eclipse-temurin:17-jdk-jammy
+
+# Definir o diretório de trabalho
+WORKDIR /app
+
+# Variável para o nome do arquivo JAR
+ARG JAR_FILE=target/SistemaNutricao-0.0.1-SNAPSHOT.jar
+
+# 1. Copiar o JAR mantendo o nome consistente
+COPY ${JAR_FILE} app.jar
+
+COPY src/main/resources/bootstrap/Acidos.xlsx src/main/resources/bootstrap/Taco.xlsx ./bootstrap/
+
+# 2. Verificar integridade do JAR
+RUN apt-get update && \
+    apt-get install -y file && \
+    file app.jar | grep 'Java archive' && \
+    jar tf app.jar > /dev/null && \
+    jar tf app.jar | grep -q 'BOOT-INF/classes/templates/pages/general/Home.html' && \
+    echo "Verificação do JAR bem-sucedida" || (echo "ERRO: JAR corrompido ou incompleto" && exit 1)
+
+# 3. Criar diretório para uploads com permissões adequadas
+RUN mkdir -p /app/uploads && \
+    chmod -R 775 /app/uploads && \
+    chown -R 1000:1000 /app/uploads
+
+# 4. Configurar usuário não-root
+RUN useradd -ms /bin/bash springuser && \
+    chown -R springuser:springuser /app
+USER springuser
+
+# Expor a porta 8080
+EXPOSE 8080
+
+# Comando para executar a aplicação
+ENTRYPOINT ["java", "-jar", "app.jar"]
+```
+
+### Passo 2 (gere o executável do sistema)
+
+```bash
+mvn clean package
+```
+
+### Passo 3 (crie a imagem docker)
+
+```bash
+docker build -t <seu username>/<nome da imagem>:<versão> .
+```
+
+### Passo 4 (suba a imagem para o docker hub)
+
+```bash
+docker push <seu username>/<nome da imagem>:<versão>
+```
+### Passo 5 (acesse o servidor)
+
+```bash
+ssh <user>@<alias ou ip>
+```
+
+### Passo 6 (instale docker no servidor)
+
+```bash
+sudo apt update && sudo apt install -y docker.io docker-compose-v2
+```
+
+### Passo 7 (crie uma pasta para o seu projeto)
+
+```bash
+mkdir -p ~/<nome do seu projeto>/
+```
+
+### Passo 8 (entre na pasta e crie o default.conf(nginx))
+
+```bash
+nano nginx/default.conf
+```
+
+### Passo 9 (coloque a sua config dentro do arquivo)
+
+OBS: Esse default.conf é do meu projeto, para o seu ele vai ser ligeiramente diferente
+
+```bash
+upstream backend_app {
+    server app:8080;
+}
+
+server {
+    listen 80;
+    server_name <seu dominio>.duckdns.org localhost;
+
+    client_max_body_size 4m;
+
+    location / {
+        proxy_pass http://backend_app;
+        proxy_http_version 1.1;
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+    }
+}
+```
+
+### Passo 10 (crie agora o docker-compose)
+
+```bash
+nano docker-compose.yml
+```
+
+### Passo 11 (coloque o compose dentro do arquivo)
+
+OBS: Esse compose é do meu projeto, para o seu ele vai ser ligeiramente diferente
+
+```bash
+services:
+  mysql:
+    image: mysql:8.0-oracle
+    container_name: nutricao-mysql
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 350M
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-<sua senha>}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-<nome do seu banco>}
+    command:
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - nutricao_net
+
+  app:
+    image: <seu usuario>/<sua imagem>:<versão>
+    container_name: nutricao-app
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 800M
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SERVER_ADDRESS: 0.0.0.0
+      SPRING_DATASOURCE_URL: jdbc:p6spy:mysql://mysql:3306/${MYSQL_DATABASE:-FichaPreparacao}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Cabo090705.}
+      JAVA_OPTS: "-Xmx350m -Xms256m"
+    volumes:
+      - app_uploads:/app/uploads
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8080/login || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+    networks:
+      - nutricao_net
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: nutricao-nginx
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - nutricao_net
+
+networks:
+  nutricao_net:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  app_uploads:
+```
+
+### Passo 12 (suba o compose)
+
+```bash
+docker compose up -d
+```
+
+### Passo 13 (verifique se rodou)
+
+```bash
+docker compose ps
+```
+
+### Extra
+
+Eu utilizei um dominio gratuito do https://www.duckdns.org/domains, basta colocar o ip do servidor la e configurar o dominio de la no default.conf
 
 ---
 <p align="center">Este código é de propriedade exclusiva de <b>@b3rnard0p</b></p>
