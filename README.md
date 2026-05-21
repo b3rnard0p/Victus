@@ -627,9 +627,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_ADDRESS: 0.0.0.0
-      SPRING_DATASOURCE_URL: jdbc:p6spy:mysql://mysql:3306/${MYSQL_DATABASE:-FichaPreparacao}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:p6spy:mysql://mysql:3306/${MYSQL_DATABASE:-<nome do seu banco>}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-Cabo090705.}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-<sua senha>}
       JAVA_OPTS: "-Xmx350m -Xms256m"
     volumes:
       - app_uploads:/app/uploads
