@@ -529,7 +529,7 @@ ssh <user>@<alias ou ip>
 ### Passo 6 (instale docker no servidor)
 
 ```bash
-sudo apt update && sudo apt install -y docker.io docker-compose-v2
+sudo apt install -y docker.io docker-compose
 ```
 
 ### Passo 7 (crie uma pasta para o seu projeto)
@@ -668,7 +668,7 @@ volumes:
 ### Passo 12 (suba o compose)
 
 ```bash
-docker compose up -d
+docker-compose up -d
 ```
 
 ### Passo 13 (verifique se rodou)
