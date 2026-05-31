@@ -596,8 +596,8 @@ services:
         limits:
           memory: 350M
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-<sua senha>}
-      MYSQL_DATABASE: ${MYSQL_DATABASE:-<nome do seu banco>}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
     command:
       - --default-authentication-plugin=mysql_native_password
       - --character-set-server=utf8mb4
@@ -614,7 +614,7 @@ services:
       - nutricao_net
 
   app:
-    image: <seu usuario>/<sua imagem>:<versão>
+    image: ${APP_IMAGE}
     container_name: nutricao-app
     restart: unless-stopped
     deploy:
@@ -627,9 +627,9 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: prod
       SERVER_ADDRESS: 0.0.0.0
-      SPRING_DATASOURCE_URL: jdbc:p6spy:mysql://mysql:3306/${MYSQL_DATABASE:-<nome do seu banco>}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_URL: jdbc:p6spy:mysql://mysql:3306/${MYSQL_DATABASE}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-<sua senha>}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       JAVA_OPTS: "-Xmx350m -Xms256m"
     volumes:
       - app_uploads:/app/uploads
@@ -665,13 +665,21 @@ volumes:
   app_uploads:
 ```
 
-### Passo 12 (suba o compose)
+### Passo 12 (configure o .env)
+
+```bash
+MYSQL_ROOT_PASSWORD=sua senha
+MYSQL_DATABASE=seu banco
+APP_IMAGE=seu_usuario/sua_imagem:versao
+```
+
+### Passo 13 (suba o compose)
 
 ```bash
 docker-compose up -d
 ```
 
-### Passo 13 (verifique se rodou)
+### Passo 14 (verifique se rodou)
 
 ```bash
 docker compose ps
