@@ -215,12 +215,12 @@
                   <div
                     class="flex flex-col items-center justify-center gap-2 w-full min-w-0"
                   >
-                    <div class="flex items-center justify-center gap-2 w-full min-w-0 px-10 sm:px-14">
+                    <div class="flex items-center justify-center gap-2 w-full min-w-0 pl-10 pr-14 sm:px-24">
                       <h2
                         class="text-lg sm:text-xl md:text-2xl font-bold text-zinc-800 text-center w-full min-w-0 flex items-center justify-center overflow-hidden"
                         style="margin-left: 0; margin-right: 0"
                       >
-                        <span class="ingrediente-list-nome-truncate force-truncate" data-truncate="true" th:text="${ingrediente.nome}"></span>
+                        <span th:class="${viewMode == 'taco'} ? 'break-words whitespace-normal text-center tooltip-group' : 'truncate inline-block max-w-full tooltip-group'" th:title="${ingrediente.nome}" data-truncate="true" th:text="${ingrediente.nome}"></span>
                       </h2>
                     </div>
                   </div>
@@ -361,12 +361,14 @@
   <span class="bg-[#599e4a] hidden"></span>
   <span class="border-green-900 hidden"></span>
   <span class="text-green-950 hidden"></span>
+
   <span class="shadow hidden"></span>
   <span class="bg-white hidden"></span>
   <span class="border-gray-300 hidden"></span>
   <span class="text-gray-400 hidden"></span>
 
   <script
-    th:src="@{/Scripts/pages/ingredientes/ScriptListIngrediente.js(v='20260506-01')}"
+    th:src="@{/Scripts/pages/ingredientes/ScriptListIngrediente.js(v='20260531-03')}"
   ></script>
+  <div th:replace="~{components/PopUp :: popup}"></div>
 </div>

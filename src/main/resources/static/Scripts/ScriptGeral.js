@@ -208,6 +208,7 @@ if (typeof window.setComboValue !== "function") {
       document.getElementById(comboId);
     const display = document.getElementById(`${comboId}-display`);
     const menu = document.getElementById(`${comboId}-menu`);
+    const label = document.getElementById(`${comboId}-label`);
     if (!hidden || !menu) return;
 
     hidden.value = value || "";
@@ -222,6 +223,16 @@ if (typeof window.setComboValue !== "function") {
 
     if (display) {
       display.textContent = selected ? selected.getAttribute("data-label") : "";
+    }
+
+    if (label) {
+      if (hidden.value !== "") {
+        label.classList.remove("top-1/2", "-translate-y-1/2", "text-base");
+        label.classList.add("-top-[11px]", "translate-y-0", "text-xs");
+      } else {
+        label.classList.add("top-1/2", "-translate-y-1/2", "text-base");
+        label.classList.remove("-top-[11px]", "translate-y-0", "text-xs");
+      }
     }
 
     hidden.dispatchEvent(new Event("change", { bubbles: true }));

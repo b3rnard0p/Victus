@@ -67,11 +67,45 @@
       }
     }
 
+    function salvarEstadoPesquisa(tipo, campo, valor) {
+      try {
+        sessionStorage.setItem("ingredientePesquisaEstado", JSON.stringify({ tipo, campo, valor }));
+      } catch (_) {}
+    }
+
+    function restaurarEstadoPesquisa() {
+      try {
+        const raw = sessionStorage.getItem("ingredientePesquisaEstado");
+        if (!raw) return false;
+        const estado = JSON.parse(raw);
+        if (!estado || !estado.tipo) return false;
+
+        if (tipoPesquisa) tipoPesquisa.value = estado.tipo;
+        aplicarModo(estado.tipo);
+
+        if (estado.campo && window.setComboValue) {
+          window.setComboValue("campoPesquisa", estado.campo);
+        }
+
+        if (estado.tipo === "tags" && estado.valor && window.setComboValue) {
+          window.setComboValue("tagPesquisa", String(estado.valor).toLowerCase());
+        } else if (estado.tipo === "especifico" && valorPesquisa && estado.valor) {
+          valorPesquisa.value = estado.valor;
+          if (window.sincronizarLabelFlutuanteInput) {
+            window.sincronizarLabelFlutuanteInput("valorPesquisa");
+          }
+        }
+        return true;
+      } catch (_) { return false; }
+    }
+
     if (btnPesquisaEspecifica)
       btnPesquisaEspecifica.onclick = () => aplicarModo("especifico");
     if (btnPesquisaTag) btnPesquisaTag.onclick = () => aplicarModo("tags");
 
-    if (tipoPesquisa) aplicarModo(tipoPesquisa.value || "especifico");
+    if (!restaurarEstadoPesquisa()) {
+      if (tipoPesquisa) aplicarModo(tipoPesquisa.value || "especifico");
+    }
 
     if (btnPesquisar && campoPesquisa) {
       btnPesquisar.onclick = function () {
@@ -106,6 +140,10 @@
             ? "/ingrediente/taco/pesquisar"
             : "/ingrediente/pesquisar";
         const url = `${baseUrl}?campo=${encodeURIComponent(campo)}&valorPesquisa=${encodeURIComponent(valor)}&tipoPesquisa=${encodeURIComponent(tipo)}`;
+        
+        salvarEstadoPesquisa(tipo, campo, valor);
+        if (btnLimparFiltro) btnLimparFiltro.classList.remove("hidden");
+
         if (typeof htmx !== "undefined") {
           htmx.ajax("GET", url, {
             target: "#slot-conteudo",
@@ -117,11 +155,16 @@
 
     if (btnLimparFiltro) {
       const params = new URLSearchParams(window.location.search);
+      const rawState = sessionStorage.getItem("ingredientePesquisaEstado");
       const temFiltro =
-        params.has("campo") || params.has("valorPesquisa") || params.has("tag");
+        rawState !== null || params.has("campo") || params.has("valorPesquisa") || params.has("tag");
       btnLimparFiltro.classList.toggle("hidden", !temFiltro);
 
       btnLimparFiltro.onclick = function () {
+        try {
+          sessionStorage.removeItem("ingredientePesquisaEstado");
+        } catch (_) {}
+
         const currentViewType =
           document.getElementById("viewType")?.value || "meus";
         const urlOriginal =
@@ -177,14 +220,19 @@
   }
 
   inicializarControlesListagem();
-
-  if (!window.__ingredienteSwapInit) {
-    window.__ingredienteSwapInit = true;
-    document.body.addEventListener("htmx:afterSwap", function (e) {
-      if (e.detail.target.id === "slot-conteudo") {
-        inicializarControlesListagem();
-        if (typeof lucide !== "undefined") lucide.createIcons();
-      }
-    });
+  
+  if (window.sincronizarLabelFlutuanteInput) {
+    window.sincronizarLabelFlutuanteInput("valorPesquisa");
   }
+
+  requestAnimationFrame(() => {
+    if (typeof inicializarControlesListagem === "function") {
+      inicializarControlesListagem();
+    }
+    setTimeout(() => {
+      if (typeof inicializarControlesListagem === "function") {
+        inicializarControlesListagem();
+      }
+    }, 50);
+  });
 })();

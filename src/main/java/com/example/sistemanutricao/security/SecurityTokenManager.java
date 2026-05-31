@@ -49,17 +49,28 @@ public class SecurityTokenManager {
         return signingKey;
     }
 
-    // JWT LOGIC
+    private static final long REMEMBER_ME_EXPIRATION_MS = 30L * 24 * 60 * 60 * 1000;
+    private static final int REMEMBER_ME_DURATION_SEC = 30 * 24 * 60 * 60;
 
     public String generateAccessToken(String username) {
-        return generateTokenFromUsername(username, jwtExpirationMs);
+        return generateAccessToken(username, false);
+    }
+
+    public String generateAccessToken(String username, boolean rememberMe) {
+        long expiration = rememberMe ? REMEMBER_ME_EXPIRATION_MS : jwtExpirationMs;
+        return generateTokenFromUsername(username, expiration);
     }
 
     public String generateRefreshToken(String username) {
-        return generateTokenFromUsername(username, refreshExpirationMs);
+        return generateRefreshToken(username, false);
     }
 
-    private String generateTokenFromUsername(String username, int expiration) {
+    public String generateRefreshToken(String username, boolean rememberMe) {
+        long expiration = rememberMe ? REMEMBER_ME_EXPIRATION_MS : refreshExpirationMs;
+        return generateTokenFromUsername(username, expiration);
+    }
+
+    private String generateTokenFromUsername(String username, long expiration) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -83,14 +94,22 @@ public class SecurityTokenManager {
         return false;
     }
 
-    // COOKIE LOGIC
-
     public ResponseCookie generateAccessTokenCookie(String token) {
-        return generateCookie("access_token", token, accessTokenDuration);
+        return generateAccessTokenCookie(token, false);
+    }
+
+    public ResponseCookie generateAccessTokenCookie(String token, boolean rememberMe) {
+        int duration = rememberMe ? REMEMBER_ME_DURATION_SEC : accessTokenDuration;
+        return generateCookie("access_token", token, duration);
     }
 
     public ResponseCookie generateRefreshTokenCookie(String token) {
-        return generateCookie("refresh_token", token, refreshTokenDuration);
+        return generateRefreshTokenCookie(token, false);
+    }
+
+    public ResponseCookie generateRefreshTokenCookie(String token, boolean rememberMe) {
+        int duration = rememberMe ? REMEMBER_ME_DURATION_SEC : refreshTokenDuration;
+        return generateCookie("refresh_token", token, duration);
     }
 
     public ResponseCookie getCleanAccessTokenCookie() {

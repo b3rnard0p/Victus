@@ -1,3 +1,33 @@
+// Injetor de CSS para garantir que as classes existam mesmo se o HTML estiver em cache do Spring Boot
+(function() {
+  if (!document.getElementById('victus-ficha-styles')) {
+    const style = document.createElement('style');
+    style.id = 'victus-ficha-styles';
+    style.innerHTML = `
+      @media (min-width: 950px) {
+        .ficha-table-fixed { table-layout: fixed !important; }
+        .ficha-col-ingred { width: 30% !important; }
+        .ficha-col-medida { width: 12% !important; }
+        .ficha-col-pb { width: 9% !important; }
+        .ficha-col-pl { width: 9% !important; }
+        .ficha-col-fc { width: 8% !important; }
+        .ficha-col-custo { width: 11% !important; }
+        .ficha-col-acoes { width: 10% !important; }
+        .ficha-cell-truncate { max-width: 0 !important; width: 100% !important; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  // Garantir que a tabela tenha a classe
+  window.addEventListener('DOMContentLoaded', () => {
+    const table = document.querySelector('#ingredientesAdicionados')?.closest('table');
+    if (table) {
+      table.classList.add('ficha-table-fixed');
+    }
+  });
+})();
+
 function atualizarTotaisDaFicha() {
   atualizarCustoTotal();
   calcularPerfilNutricional();
@@ -141,10 +171,8 @@ window.adicionarIngrediente = function () {
       <input type="hidden" class="ingrediente-saturada" value="${parseFloat(selectedOption.dataset.saturada) || 0}">
       <input type="hidden" name="ingredientes[${idx}].ingredienteId" value="${ingredienteId}">
 
-      <td class="ingrediente-nome-cell col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
-        <div class="min-w-0 text-left" style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-          <span style="display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" data-truncate="true">${selectedOption.text}</span>
-        </div>
+      <td class="ficha-cell-truncate col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center 950:text-left text-sm font-bold 950:font-normal bg-[#f3ffe5] 950:bg-transparent rounded-md 950:rounded-none">
+        <div class="truncate tooltip-group" data-force-tooltip="true" data-fullname="${selectedOption.text}">${selectedOption.text}</div>
       </td>
       
       <td class="col-span-6 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
@@ -192,6 +220,9 @@ window.adicionarIngrediente = function () {
   `;
 
   document.getElementById("ingredientesAdicionados").appendChild(row);
+  const table = row.closest('table');
+  if (table) table.classList.add('ficha-table-fixed');
+
   if (window.renderLucideIcons) {
     window.renderLucideIcons(row);
   }
@@ -364,7 +395,7 @@ function adicionarLinhaNutricional(tabela, data, divisor = 1) {
   const row = document.createElement("tr");
   row.className = "border border-black text-sm";
   row.innerHTML = `
-            <td class="px-2 py-2 border border-black">${data.nome}</td>
+            <td class="px-2 py-2 border border-black max-w-[150px] sm:max-w-[200px]"><div class="truncate tooltip-group" data-fullname="${data.nome}">${data.nome}</div></td>
             <td class="px-2 py-2 border border-black text-center">${(data.pl / divisor).toFixed(2)}</td>
             <td class="px-2 py-2 border border-black text-center">${(data.gramasPTN / divisor).toFixed(2)}</td>
             <td class="px-2 py-2 border border-black text-center">${(data.gramasCHO / divisor).toFixed(2)}</td>

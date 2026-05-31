@@ -144,9 +144,11 @@
     <div
       th:replace="~{pages/ingredientes/FormIngrediente :: form-ingrediente}"
     ></div>
+    
+    <div th:replace="~{components/PopUp}"></div>
   </div>
 
-  <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaCore.js}"></script>
+  <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaCore.js?v=2}"></script>
   <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaControls.js}"></script>
   <script th:src="@{/Scripts/pages/fichas/ScriptFormFichaDraft.js}"></script>
   <script th:src="@{/Scripts/pages/fichas/ScriptFormFicha.js}"></script>

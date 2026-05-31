@@ -25,7 +25,7 @@ public class AuthSessionService {
         this.tokenManager = tokenManager;
     }
 
-    public LoginStatus login(String email, String password, HttpServletResponse response) {
+    public LoginStatus login(String email, String password, boolean rememberMe, HttpServletResponse response) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(email, password)
@@ -33,11 +33,11 @@ public class AuthSessionService {
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
-            String accessToken = tokenManager.generateAccessToken(email);
-            String refreshToken = tokenManager.generateRefreshToken(email);
+            String accessToken = tokenManager.generateAccessToken(email, rememberMe);
+            String refreshToken = tokenManager.generateRefreshToken(email, rememberMe);
 
-            response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateAccessTokenCookie(accessToken).toString());
-            response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateRefreshTokenCookie(refreshToken).toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateAccessTokenCookie(accessToken, rememberMe).toString());
+            response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateRefreshTokenCookie(refreshToken, rememberMe).toString());
             return LoginStatus.SUCCESS;
         } catch (AuthenticationException exception) {
             if (exception instanceof DisabledException || exception instanceof UsuarioSemCargoException) {

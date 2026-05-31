@@ -48,12 +48,33 @@ class AuthSessionServiceTest {
 
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("ana@exemplo.com", "senha123")))
                 .thenReturn(authentication);
-        when(tokenManager.generateAccessToken("ana@exemplo.com")).thenReturn("access");
-        when(tokenManager.generateRefreshToken("ana@exemplo.com")).thenReturn("refresh");
-        when(tokenManager.generateAccessTokenCookie("access")).thenReturn(accessCookie);
-        when(tokenManager.generateRefreshTokenCookie("refresh")).thenReturn(refreshCookie);
+        when(tokenManager.generateAccessToken("ana@exemplo.com", false)).thenReturn("access");
+        when(tokenManager.generateRefreshToken("ana@exemplo.com", false)).thenReturn("refresh");
+        when(tokenManager.generateAccessTokenCookie("access", false)).thenReturn(accessCookie);
+        when(tokenManager.generateRefreshTokenCookie("refresh", false)).thenReturn(refreshCookie);
 
-        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", response);
+        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", false, response);
+
+        assertThat(status).isEqualTo(LoginStatus.SUCCESS);
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isSameAs(authentication);
+        assertThat(response.getHeaders(HttpHeaders.SET_COOKIE))
+                .containsExactly(accessCookie.toString(), refreshCookie.toString());
+    }
+
+    @Test
+    void shouldAuthenticateAndWriteCookiesOnRememberMeLogin() {
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", "access").path("/").maxAge(2592000).build();
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "refresh").path("/").maxAge(2592000).build();
+
+        when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("ana@exemplo.com", "senha123")))
+                .thenReturn(authentication);
+        when(tokenManager.generateAccessToken("ana@exemplo.com", true)).thenReturn("access");
+        when(tokenManager.generateRefreshToken("ana@exemplo.com", true)).thenReturn("refresh");
+        when(tokenManager.generateAccessTokenCookie("access", true)).thenReturn(accessCookie);
+        when(tokenManager.generateRefreshTokenCookie("refresh", true)).thenReturn(refreshCookie);
+
+        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", true, response);
 
         assertThat(status).isEqualTo(LoginStatus.SUCCESS);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isSameAs(authentication);
@@ -68,7 +89,7 @@ class AuthSessionServiceTest {
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("ana@exemplo.com", "senha123")))
                 .thenThrow(new DisabledException("disabled"));
 
-        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", response);
+        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", false, response);
 
         assertThat(status).isEqualTo(LoginStatus.ACCESS_DENIED);
         assertThat(response.getHeaders(HttpHeaders.SET_COOKIE)).isEmpty();
@@ -81,7 +102,7 @@ class AuthSessionServiceTest {
         when(authenticationManager.authenticate(new UsernamePasswordAuthenticationToken("ana@exemplo.com", "senha123")))
                 .thenThrow(new BadCredentialsException("bad credentials"));
 
-        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", response);
+        LoginStatus status = authSessionService.login("ana@exemplo.com", "senha123", false, response);
 
         assertThat(status).isEqualTo(LoginStatus.INVALID_CREDENTIALS);
         assertThat(response.getHeaders(HttpHeaders.SET_COOKIE)).isEmpty();

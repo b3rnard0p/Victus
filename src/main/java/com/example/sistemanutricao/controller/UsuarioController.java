@@ -41,8 +41,8 @@ public class UsuarioController {
     private final PasswordValidationService passwordValidationService;
 
     public UsuarioController(UsuarioService usuarioService,
-                             AuthSessionService authSessionService,
-                             PasswordValidationService passwordValidationService) {
+            AuthSessionService authSessionService,
+            PasswordValidationService passwordValidationService) {
         this.usuarioService = usuarioService;
         this.authSessionService = authSessionService;
         this.passwordValidationService = passwordValidationService;
@@ -55,7 +55,7 @@ public class UsuarioController {
         return "pages/general/Home";
     }
 
-    @GetMapping({"/", "/login"})
+    @GetMapping({ "/", "/login" })
     public String loginPage() {
         return "pages/general/Login";
     }
@@ -70,16 +70,18 @@ public class UsuarioController {
         return "pages/general/Registrado";
     }
 
-    // AUTENTICAÇÃO
-
     @PostMapping("/login")
     public String realizarLogin(@RequestParam String email,
-                                @RequestParam String password,
-                                jakarta.servlet.http.HttpServletResponse response,
-                                RedirectAttributes redirectAttributes) {
-        LoginStatus loginStatus = authSessionService.login(email, password, response);
-        if (loginStatus == LoginStatus.SUCCESS) return "redirect:/home";
-        if (loginStatus == LoginStatus.ACCESS_DENIED) return "redirect:/acesso-negado";
+            @RequestParam String password,
+            @RequestParam(name = "remember-me", required = false) String rememberMeParam,
+            jakarta.servlet.http.HttpServletResponse response,
+            RedirectAttributes redirectAttributes) {
+        boolean rememberMe = "on".equals(rememberMeParam);
+        LoginStatus loginStatus = authSessionService.login(email, password, rememberMe, response);
+        if (loginStatus == LoginStatus.SUCCESS)
+            return "redirect:/home";
+        if (loginStatus == LoginStatus.ACCESS_DENIED)
+            return "redirect:/acesso-negado";
         redirectAttributes.addAttribute("error", "true");
         return "redirect:/";
     }
@@ -108,7 +110,7 @@ public class UsuarioController {
 
     @PostMapping("/usuario/registrar")
     public String registrarUsuario(@Valid @ModelAttribute("usuario") UsuarioDTO registroDto,
-                                   BindingResult result) {
+            BindingResult result) {
         if (result.hasErrors()) {
             throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
         }
@@ -125,7 +127,7 @@ public class UsuarioController {
 
     @GetMapping("/usuario/perfil/modal")
     public String mostrarPerfilModal(@AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
-                                     Model model) {
+            Model model) {
         GetUsuarioDTO usuarioDTO = usuarioService.findById(usuarioPrincipal.getId());
         model.addAttribute("usuario", usuarioDTO);
         return "fragments/Perfil";
@@ -133,18 +135,18 @@ public class UsuarioController {
 
     @PostMapping("/usuario/editar")
     public Object editarPerfil(@Valid @ModelAttribute("usuario") UsuarioDTO usuarioDTO,
-                               BindingResult result,
-                               @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
-                               @RequestParam(value = "imagemPerfil", required = false) MultipartFile arquivoImagem,
-                               RedirectAttributes redirectAttributes,
-                               jakarta.servlet.http.HttpServletRequest request) {
+            BindingResult result,
+            @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
+            @RequestParam(value = "imagemPerfil", required = false) MultipartFile arquivoImagem,
+            RedirectAttributes redirectAttributes,
+            jakarta.servlet.http.HttpServletRequest request) {
 
         passwordValidationService.validar(
                 usuarioDTO.senhaAtual(),
                 usuarioDTO.novaSenha(),
                 usuarioDTO.confirmarNovaSenha(),
-                usuarioPrincipal.getPassword()
-        ).ifPresent(erro -> result.rejectValue("senhaAtual", "error.usuario", erro));
+                usuarioPrincipal.getPassword())
+                .ifPresent(erro -> result.rejectValue("senhaAtual", "error.usuario", erro));
 
         String htmxRequest = request.getHeader("HX-Request");
 
@@ -158,11 +160,11 @@ public class UsuarioController {
 
         try {
             usuarioService.atualizarPerfilComImagem(usuarioPrincipal.getId(), usuarioDTO, arquivoImagem);
-            
+
             if ("true".equals(htmxRequest)) {
                 return ResponseEntity.ok().body("Perfil atualizado com sucesso!");
             }
-            
+
             redirectAttributes.addFlashAttribute("success", "Perfil atualizado com sucesso!");
             String referer = request.getHeader("Referer");
             return "redirect:" + (referer != null && !referer.contains("/editar") ? referer : "/home");

@@ -72,7 +72,7 @@ public class FichaTecnica {
     @JoinColumn(name = "perfil_nutricional_id", nullable = false)
     private PerfilNutricional perfilNutricional;
 
-    @OneToMany(mappedBy = "fichaTecnica", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "fichaTecnica", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<IngredientesPorFicha> ingredientesPorFicha;
 
     public FichaTecnica() {

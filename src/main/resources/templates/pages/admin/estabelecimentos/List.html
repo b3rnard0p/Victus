@@ -26,7 +26,7 @@
             class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] overflow-hidden p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center"
           >
             <div
-              class="text-2xl font-medium text-zinc-800 truncate text-center sm:text-left"
+              class="text-2xl font-medium text-zinc-800 truncate text-center sm:text-left tooltip-group"
               th:text="${estabelecimento.nome}"
             ></div>
 
@@ -105,4 +105,5 @@
       </div>
     </div>
   </main>
+  <div th:replace="~{components/PopUp :: popup}"></div>
 </div>
