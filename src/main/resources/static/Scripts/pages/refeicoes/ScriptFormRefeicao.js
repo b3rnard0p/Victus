@@ -69,8 +69,8 @@ function renderizarFicha(ficha) {
 
   const el = document.createElement("div");
   el.className =
-    "flex items-center justify-between p-2 rounded border border-[#4A6E18] text-black";
-  el.innerHTML = `<span>${ficha.nomePreparacao} (${parseFloat(ficha.vct).toFixed(2)} kcal)</span>`;
+    "flex items-center justify-between gap-2 p-2 rounded border border-[#4A6E18] text-black w-full min-w-0";
+  el.innerHTML = `<span class="flex-1 break-words min-w-0">${ficha.nomePreparacao} (${parseFloat(ficha.vct).toFixed(2)} kcal)</span>`;
 
   const btn = document.createElement("button");
   btn.type = "button";

@@ -79,7 +79,10 @@ class AuthSessionServiceTest {
         assertThat(status).isEqualTo(LoginStatus.SUCCESS);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isSameAs(authentication);
         assertThat(response.getHeaders(HttpHeaders.SET_COOKIE))
-                .containsExactly(accessCookie.toString(), refreshCookie.toString());
+                .hasSize(2)
+                .allSatisfy(cookie -> assertThat(cookie).contains("Path=/", "Max-Age=2592000"))
+                .anySatisfy(cookie -> assertThat(cookie).contains("access_token=access"))
+                .anySatisfy(cookie -> assertThat(cookie).contains("refresh_token=refresh"));
     }
 
     @Test

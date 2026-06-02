@@ -149,13 +149,17 @@ public class UsuarioService {
 
     @CacheEvict(value = "usuarios", allEntries = true)
     @Transactional(rollbackFor = Exception.class)
-    public void atualizarEstabelecimento(@NonNull Long usuarioId, @NonNull Long estabelecimentoId) {
+    public void atualizarEstabelecimento(@NonNull Long usuarioId, Long estabelecimentoId) {
         Usuario usuario = findUsuarioById(usuarioId);
 
-        Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
-                .orElseThrow(() -> new EstabelecimentoNotFoundException("Estabelecimento não encontrado"));
+        if (estabelecimentoId == null) {
+            usuario.setEstabelecimento(null);
+        } else {
+            Estabelecimento estabelecimento = estabelecimentoRepository.findById(estabelecimentoId)
+                    .orElseThrow(() -> new EstabelecimentoNotFoundException("Estabelecimento não encontrado"));
+            usuario.setEstabelecimento(estabelecimento);
+        }
 
-        usuario.setEstabelecimento(estabelecimento);
         usuarioRepository.save(usuario);
     }
 

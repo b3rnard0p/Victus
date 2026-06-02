@@ -277,7 +277,9 @@
             <i data-lucide="history" class="text-[#4A6E18] shrink-0"></i>
             <span>Rascunho restaurado</span>
             <button type="button" onclick="document.getElementById('banner-rascunho')?.remove(); window.limparRascunhoComFormulario();"
-                class="ml-2 text-[#4A6E18] hover:text-red-600 transition-colors font-bold text-base leading-none">✕</button>
+                class="ml-2 text-[#4A6E18] hover:text-red-600 transition-colors">
+                <i data-lucide="eraser" class="w-5 h-5"></i>
+            </button>
         `;
     document.body.appendChild(banner);
     if (window.renderLucideIcons) window.renderLucideIcons(banner);
