@@ -75,8 +75,10 @@
 
         <div id="refeicoes-lista" class="pt-4">
           <th:block th:fragment="itens">
-            <div th:each="refeicao : ${refeicoes}"
-                 class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] relative overflow-hidden mb-4 sm:mb-6 last:mb-0">
+            <th:block th:each="refeicao : ${refeicoes}">
+              <div th:id="'refeicao-row-' + ${refeicao.id}"
+                   th:fragment="refeicao-item"
+                   class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] relative overflow-hidden mb-4 sm:mb-6 last:mb-0">
 
                       <div class="px-6 py-4 flex justify-center items-center cursor-pointer relative" onclick="toggleCard(this)">
                         <div class="flex flex-grid w-full relative min-w-0">
@@ -165,7 +167,7 @@
                           </div>
                         </div>
                       </div>
-                    </div>
+                    </th:block>
 
             <div th:if="${temMaisResultados}" class="load-more-container text-center">
               <div th:attr="hx-get=${proximaPaginaUrl}"

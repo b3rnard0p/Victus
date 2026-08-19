@@ -47,6 +47,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping({"/ficha"})
@@ -225,13 +226,28 @@ public class FichaController {
             BindingResult result,
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
             Model model,
+            HttpServletResponse response,
             @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         
         if (result.hasErrors()) {
+            if ("true".equals(htmxRequest)) {
+                response.setHeader("HX-Retarget", "closest main");
+                response.setHeader("HX-Reswap", "outerHTML");
+            }
             throw new FormValidationException(result.getFieldError().getDefaultMessage());
         }
 
         fichaTecnicaService.update(id, dto);
+
+        if ("true".equals(htmxRequest)) {
+            FichaTecnicaGetDTO atualizada = fichaTecnicaService.getFichaById(id);
+            model.addAttribute("fichas", java.util.List.of(atualizada));
+            return "pages/fichas/List :: ficha-item";
+        }
+
+        if (dto.statusCriacao() == StatusCriacao.INCOMPLETA) {
+            return "redirect:/ficha/por-statusCriacao?statusCriacao=INCOMPLETA";
+        }
         return "redirect:/ficha";
     }
 
@@ -257,12 +273,12 @@ public class FichaController {
     }
 
     @PostMapping
-    public String salvarFichaTecnica(
+    public void salvarFichaTecnica(
             @Valid @ModelAttribute("ficha") FichaTecnicaCreateDTO fichaTecnicaDTO,
             BindingResult result,
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
-            Model model,
-            @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
+            HttpServletResponse response,
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest) throws java.io.IOException {
         
         if (result.hasErrors()) {
             throw new FormValidationException(result.getFieldError().getDefaultMessage());
@@ -270,7 +286,12 @@ public class FichaController {
 
         Long usuarioId = usuarioPrincipal.getId();
         fichaTecnicaService.create(fichaTecnicaDTO, usuarioId);
-        return "redirect:/ficha";
+
+        if ("true".equals(htmxRequest)) {
+            response.setHeader("HX-Redirect", "/ficha");
+        } else {
+            response.sendRedirect("/ficha");
+        }
     }
 
     @GetMapping("/exportar-pdf/{id}")

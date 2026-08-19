@@ -27,6 +27,13 @@ window.abrirModalIngrediente = function (ingrediente) {
   if (form) {
     form.action = action;
     form.setAttribute("hx-post", action);
+    if (ingrediente && ingrediente.id) {
+        form.setAttribute("hx-target", "#ingrediente-row-" + ingrediente.id);
+        form.setAttribute("hx-swap", "outerHTML");
+    } else {
+        form.setAttribute("hx-target", "#slot-conteudo");
+        form.setAttribute("hx-swap", "innerHTML");
+    }
     if (window.htmx) htmx.process(form);
   }
 
@@ -164,8 +171,9 @@ function dispararErro(msg) {
           if (window.mostrarToastSucesso) {
             window.mostrarToastSucesso("Ingrediente salvo!");
           }
+          const isUpdate = elt.getAttribute("hx-target") !== "#slot-conteudo";
           document.dispatchEvent(
-            new CustomEvent("ingrediente:salvo", { detail: {} }),
+            new CustomEvent("ingrediente:salvo", { detail: { isUpdate: isUpdate } }),
           );
         }
       }

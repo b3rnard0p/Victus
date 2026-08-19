@@ -7,8 +7,10 @@
 
       <div id="usuarios-lista" class="space-y-4">
         <th:block th:fragment="itens">
-          <div th:each="usuario : ${usuarios}"
-            class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative">
+          <th:block th:each="usuario : ${usuarios}">
+            <div th:id="'usuario-row-' + ${usuario.id}"
+              th:fragment="usuario-item"
+              class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative">
             <div class="grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr] gap-2 sm:gap-4 items-center w-full h-full">
               <div class="flex flex-col min-w-0 justify-center h-full items-center sm:items-start">
                 <div
@@ -22,7 +24,7 @@
               <div class="flex justify-center gap-2">
                 <th:block th:unless="${usuario.id == adminId}">
                   <form th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" method="post"
-                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" data-hx-target="#slot-conteudo"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML"
                     class="m-0">
                     <input type="hidden" name="cargo" value="" />
 
@@ -40,7 +42,7 @@
                   </form>
 
                   <form th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" method="post"
-                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" data-hx-target="#slot-conteudo"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML"
                     class="m-0">
                     <input type="hidden" name="cargo" value="NUTRICIONISTA" />
 
@@ -57,7 +59,7 @@
                   </form>
 
                   <form th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" method="post"
-                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" data-hx-target="#slot-conteudo"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML"
                     class="m-0">
                     <input type="hidden" name="cargo" value="PRODUCAO" />
 
@@ -74,7 +76,7 @@
                   </form>
 
                   <form th:action="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" method="post"
-                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" data-hx-target="#slot-conteudo"
+                    th:data-hx-post="@{/admin/usuarios/{id}/cargo(id=${usuario.id})}" th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML"
                     class="m-0">
                     <input type="hidden" name="cargo" value="ADMIN" />
 
@@ -107,7 +109,7 @@
                   </div>
                   <form th:action="@{/admin/usuarios/{id}/toggle-ativo(id=${usuario.id})}" method="post"
                     th:data-hx-post="@{/admin/usuarios/{id}/toggle-ativo(id=${usuario.id})}"
-                    data-hx-target="#slot-conteudo" class="flex justify-center m-0">
+                    th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML" class="flex justify-center m-0">
                     <button type="submit" th:title="${usuario.ativo ? 'Inativar Usuário' : 'Ativar Usuário'}"
                       class="group w-10 h-10 rounded-full flex items-center justify-center bg-transparent border-none focus:outline-none cursor-pointer">
                       <i th:attr="data-lucide=${usuario.ativo ? 'toggle-right' : 'toggle-left'}"
@@ -117,7 +119,8 @@
                 </div>
               </div>
             </div>
-          </div>
+            </div>
+          </th:block>
 
           <div th:if="${temMaisResultados}" class="load-more-container pt-2 text-center">
             <div th:attr="hx-get=${proximaPaginaUrl}" hx-target="closest .load-more-container" hx-swap="outerHTML"

@@ -75,6 +75,10 @@ public class FichaTecnicaService {
         validarDuplicidadeFichaCreate(dto, nutricionistaId);
         validarCamposAgua(dto.preparacao());
 
+        if (dto.status() == Status.INATIVA && dto.statusCriacao() == StatusCriacao.INCOMPLETA) {
+            throw new IllegalArgumentException("Não é permitido salvar uma ficha como incompleta e arquivada simultaneamente.");
+        }
+
         Preparacao preparacao = fichaTecnicaMapper.toPreparacao(dto.preparacao());
         int numeroPorcoes = calcularNumeroPorcoes(preparacao.getRendimento(), dto.pesoPorcao());
         BigDecimal custoTotal = normalizar(dto.custoTotal());
@@ -112,6 +116,13 @@ public class FichaTecnicaService {
             : null;
         validarDuplicidadeFichaUpdate(id, dto, nutricionistaId);
         validarCamposAgua(dto.preparacao());
+
+        Status novoStatus = dto.status() != null ? dto.status() : fichaExistente.getStatus();
+        StatusCriacao novoStatusCriacao = dto.statusCriacao() != null ? dto.statusCriacao() : fichaExistente.getStatusCriacao();
+
+        if (novoStatus == Status.INATIVA && novoStatusCriacao == StatusCriacao.INCOMPLETA) {
+            throw new IllegalArgumentException("Não é permitido salvar uma ficha como incompleta e arquivada simultaneamente.");
+        }
 
         fichaTecnicaMapper.updatePreparacao(fichaExistente.getPreparacao(), dto.preparacao());
         int numeroPorcoes = calcularNumeroPorcoes(fichaExistente.getPreparacao().getRendimento(), dto.pesoPorcao());
@@ -308,6 +319,10 @@ public class FichaTecnicaService {
 
     public void atualizaStatus(@NonNull Long id) {
         FichaTecnica ficha = findFichaById(id);
+
+        if (ficha.getStatus() == Status.ATIVA && ficha.getStatusCriacao() == StatusCriacao.INCOMPLETA) {
+            throw new IllegalArgumentException("Não é permitido arquivar uma ficha incompleta.");
+        }
 
         ficha.setStatus(
                 ficha.getStatus() == Status.ATIVA ?

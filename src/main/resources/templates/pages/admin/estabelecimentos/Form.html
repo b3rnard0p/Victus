@@ -14,7 +14,8 @@
     <form th:action="${estabelecimento.id != null} ? @{/admin/estabelecimentos/{id}(id=${estabelecimento.id})} : @{/admin/estabelecimentos}"
           method="post"
           th:data-hx-post="${estabelecimento.id != null} ? @{/admin/estabelecimentos/{id}(id=${estabelecimento.id})} : @{/admin/estabelecimentos}"
-          data-hx-target="#slot-conteudo"
+          th:data-hx-target="${estabelecimento.id != null} ? '#estabelecimento-row-' + ${estabelecimento.id} : '#slot-conteudo'"
+          th:data-hx-swap="${estabelecimento.id != null} ? 'outerHTML' : 'innerHTML'"
           hx-on::after-request="if(event.detail.successful) document.getElementById('modal-estabelecimento').remove()">
 
       <div class="mb-4 mt-8">

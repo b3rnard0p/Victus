@@ -209,7 +209,8 @@
 
   if (!window.__ingredienteSalvoReload) {
     window.__ingredienteSalvoReload = true;
-    document.addEventListener("ingrediente:salvo", function () {
+    document.addEventListener("ingrediente:salvo", function (e) {
+      if (e.detail && e.detail.isUpdate) return;
       if (typeof htmx !== "undefined") {
         htmx.ajax("GET", window.location.pathname + window.location.search, {
           target: "#slot-conteudo",

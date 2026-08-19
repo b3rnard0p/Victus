@@ -19,6 +19,8 @@ function abrirModalNovo() {
   if (form) {
     form.action = novaUrl;
     form.setAttribute("hx-post", novaUrl);
+    form.setAttribute("hx-target", "#slot-conteudo");
+    form.setAttribute("hx-swap", "innerHTML");
     if (typeof htmx !== "undefined") {
       htmx.process(form);
     }
@@ -118,6 +120,8 @@ async function editarRefeicao(id) {
     if (form) {
       form.action = urlEditar;
       form.setAttribute("hx-post", urlEditar);
+      form.setAttribute("hx-target", "#refeicao-row-" + id);
+      form.setAttribute("hx-swap", "outerHTML");
       if (typeof htmx !== "undefined") {
         htmx.process(form);
       }
@@ -217,7 +221,7 @@ if (!window.refeicaoScriptInitialized) {
     const status = event.detail.xhr?.status;
     const isSuccess = !status || (status >= 200 && status < 300);
 
-    if (isSuccess && event.detail.target.id === "slot-conteudo") {
+    if (isSuccess && (event.detail.target.id === "slot-conteudo" || event.detail.target.id.startsWith("refeicao-row-"))) {
       const modal = document.getElementById("modal-nova-refeicao");
       if (modal && !modal.classList.contains("hidden")) {
         fecharModalRefeicao();
