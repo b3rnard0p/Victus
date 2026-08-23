@@ -112,7 +112,7 @@ public class UsuarioController {
     public String registrarUsuario(@Valid @ModelAttribute("usuario") UsuarioDTO registroDto,
             BindingResult result) {
         if (result.hasErrors()) {
-            throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
+            throw new IllegalArgumentException(result.getAllErrors().get(0).getDefaultMessage());
         }
         usuarioService.create(registroDto);
         return "pages/general/Registrado";
@@ -153,7 +153,7 @@ public class UsuarioController {
         if (result.hasErrors()) {
             if ("true".equals(htmxRequest)) {
                 return ResponseEntity.badRequest()
-                        .body(result.getFieldError().getDefaultMessage());
+                        .body(result.getAllErrors().get(0).getDefaultMessage());
             }
             return "fragments/Perfil";
         }

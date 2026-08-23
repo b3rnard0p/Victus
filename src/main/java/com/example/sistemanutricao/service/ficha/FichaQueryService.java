@@ -68,8 +68,8 @@ public class FichaQueryService {
             return buscarPorTag(campo, valor, usuario, pageable);
         }
 
-        Long nutricionistaId = isProducao(usuario) ? null : usuario.getId();
-        Long estabelecimentoId = (isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
+        Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
+        Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
         Object valorObjeto = valor;
         if ("por-numero".equalsIgnoreCase(campo)) {
@@ -95,7 +95,7 @@ public class FichaQueryService {
     public List<FichaTecnicaComTagDTO> buscarPorTag(String campo, String tag, Usuario usuario) {
         if (campo == null || tag == null || usuario == null) return new ArrayList<>();
 
-        Long nutricionistaId = isProducao(usuario) ? null : usuario.getId();
+        Long nutricionistaId = (!isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
         Specification<FichaTecnica> spec = FichaTecnicaSpecification.filter(
@@ -111,8 +111,8 @@ public class FichaQueryService {
     }
 
     public Page<FichaTecnicaComTagDTO> buscarPorTag(String campo, String tag, Usuario usuario, Pageable pageable) {
-        Long nutricionistaId = isProducao(usuario) ? null : usuario.getId();
-        Long estabelecimentoId = (isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
+        Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
+        Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
         Specification<FichaTecnica> spec = FichaTecnicaSpecification.filter(
                 Status.ATIVA, StatusCriacao.COMPLETA, nutricionistaId, estabelecimentoId, null, null)

@@ -234,7 +234,7 @@ public class FichaController {
                 response.setHeader("HX-Retarget", "closest main");
                 response.setHeader("HX-Reswap", "outerHTML");
             }
-            throw new FormValidationException(result.getFieldError().getDefaultMessage());
+            throw new FormValidationException(result.getAllErrors().get(0).getDefaultMessage());
         }
 
         fichaTecnicaService.update(id, dto);
@@ -281,7 +281,7 @@ public class FichaController {
             @RequestHeader(value = "HX-Request", required = false) String htmxRequest) throws java.io.IOException {
         
         if (result.hasErrors()) {
-            throw new FormValidationException(result.getFieldError().getDefaultMessage());
+            throw new FormValidationException(result.getAllErrors().get(0).getDefaultMessage());
         }
 
         Long usuarioId = usuarioPrincipal.getId();

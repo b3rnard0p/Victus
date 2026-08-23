@@ -42,7 +42,7 @@ public class UsuarioService {
     @Value("${app.admin.username:admin}")
     private String adminUsername;
 
-    @Value("${app.admin.email:admin@gmail.com}")
+    @Value("${app.admin.email}")
     private String adminEmail;
 
     @Value("${app.admin.password:1234567}")

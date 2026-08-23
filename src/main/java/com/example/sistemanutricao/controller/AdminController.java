@@ -174,7 +174,7 @@ public class AdminController {
     @PostMapping("/estabelecimentos")
     public String create(@Valid @ModelAttribute EstabelecimentoDTO dto, BindingResult result) {
         if (result.hasErrors()) {
-            throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
+            throw new IllegalArgumentException(result.getAllErrors().get(0).getDefaultMessage());
         }
         estabelecimentoService.create(dto);
         return "redirect:/admin/estabelecimentos";
@@ -195,7 +195,7 @@ public class AdminController {
     @PostMapping("/estabelecimentos/{id}")
     public String update(@PathVariable Long id, @Valid @ModelAttribute EstabelecimentoDTO dto, BindingResult result, Model model, @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         if (result.hasErrors()) {
-            throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
+            throw new IllegalArgumentException(result.getAllErrors().get(0).getDefaultMessage());
         }
         estabelecimentoService.update(id, dto);
         if (htmxRequest != null) {

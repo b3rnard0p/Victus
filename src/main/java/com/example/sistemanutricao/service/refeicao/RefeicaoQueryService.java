@@ -36,8 +36,8 @@ public class RefeicaoQueryService {
     }
 
     public Page<RefeicaoResponseDTO> buscarPorStatus(Status status, Usuario usuario, Pageable pageable) {
-        Long nutricionistaId = isProducao(usuario) ? null : usuario.getId();
-        Long estabelecimentoId = isProducao(usuario) ? usuario.getEstabelecimento().getId() : null;
+        Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
+        Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
         Specification<Refeicao> spec = RefeicaoSpecification.filter(status, nutricionistaId, estabelecimentoId, null, null);
         return refeicaoRepository.findAll(spec, pageable).map(refeicaoMapper::toResponseDTO);
@@ -48,8 +48,8 @@ public class RefeicaoQueryService {
     }
 
     public Page<RefeicaoResponseDTO> buscarPorNome(String nome, Usuario usuario, Pageable pageable) {
-        Long nutricionistaId = isProducao(usuario) ? null : usuario.getId();
-        Long estabelecimentoId = isProducao(usuario) ? usuario.getEstabelecimento().getId() : null;
+        Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
+        Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
         Specification<Refeicao> spec = RefeicaoSpecification.filter(Status.ATIVA, nutricionistaId, estabelecimentoId, "nome", nome);
         return refeicaoRepository.findAll(spec, pageable).map(refeicaoMapper::toResponseDTO);
