@@ -364,14 +364,41 @@ Atualmente, o projeto conta com **128 testes automatizados**, divididos em duas 
 - **Mockito:** Biblioteca para criação de objetos simulados (Mocks).
 - **MockMvc:** Utilizado para simular requisições HTTP e validar o comportamento da camada Web.
 - **Spring Security Test:** Ferramenta específica para testar cenários de autenticação, perfis de acesso e proteção CSRF.
+- **Jacoco:** Plugin integrado ao Maven para geração de relatórios de cobertura de testes.
+- **SonarQube:** Servidor de análise estática contínua (configurado localmente via Docker) para inspecionar métricas de qualidade de código (Bugs, Vulnerabilidades e Code Smells).
+- **Locust:** Ferramenta de testes de carga baseada em Python utilizada para simular concorrência massiva de usuários, validando a estabilidade e a latência do sistema sob estresse (os testes de carga ficam no diretório `load_tests`).
 
-### Garantia de Integridade
+### Garantia de Integridade e Desempenho
 
-A suíte de testes é executada a cada alteração significativa no código, garantindo que:
+A suíte de testes e qualidade é executada a cada alteração significativa no código, garantindo que:
 
-- Cálculos nutricionais permaneçam precisos.
-- Regras de segurança (RBAC) impeçam acessos indevidos.
-- Fluxos de importação de dados (como a TACO) funcionem corretamente em ambientes limpos.
+- Cálculos nutricionais permaneçam precisos através de testes unitários.
+- A segurança do sistema impeça acessos indevidos e reforce o papel de cada usuário.
+- O código mantenha um padrão alto de legibilidade e seja livre de code smells (verificado pelo SonarQube).
+- O backend continue estável e não apresente gargalos em picos de acesso (validado pelo Locust).
+
+### Como rodar a Análise de Qualidade (SonarQube + Jacoco)
+
+Para gerar os relatórios de cobertura de testes e validar a qualidade do código com o SonarQube:
+
+1. **Suba o contêiner do SonarQube localmente:**
+   ```bash
+   docker-compose -f docker-compose-sonar.yml up -d
+   ```
+2. **Acesse o SonarQube e troque a senha:**
+   - Acesse `http://localhost:9000`
+   - O login e senha padrão são `admin` / `admin`. Troque para uma senha da sua preferência.
+3. **Execute a análise pelo Maven:**
+   - No terminal, rode o comando abaixo substituindo pela sua nova senha:
+   ```bash
+   ./mvnw clean verify sonar:sonar -Dsonar.login=admin -Dsonar.password=SUA_NOVA_SENHA
+   ```
+4. **Visualize o resultado:** Acesse novamente `http://localhost:9000` para ver as métricas do projeto.
+
+### Como rodar os Testes de Carga (Locust)
+
+Os scripts e configurações para simular concorrência massiva estão localizados no diretório `load_tests/`.
+Para ver o passo a passo detalhado de como preparar os dados e rodar os testes, **[leia o README do Locust na pasta correspondente](load_tests/README.md)**.
 
 <h2 align="center">Frontend (Arquitetura da Interface)</h2>
 
