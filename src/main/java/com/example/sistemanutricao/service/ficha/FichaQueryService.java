@@ -141,7 +141,7 @@ public class FichaQueryService {
     }
 
     private Page<FichaTecnica> fichasStatus(Status status, StatusCriacao sc, Usuario u, Pageable p) {
-        Long nutricionistaId = isProducao(u) ? null : u.getId();
+        Long nutricionistaId = (u == null || isProducao(u)) ? null : u.getId();
         Long estabelecimentoId = (isProducao(u) && u.getEstabelecimento() != null) ? u.getEstabelecimento().getId() : null;
         
         Specification<FichaTecnica> spec = FichaTecnicaSpecification.filter(status, sc, nutricionistaId, estabelecimentoId, null, null);
@@ -149,7 +149,7 @@ public class FichaQueryService {
     }
 
     private Page<FichaTecnica> fichasStatusSimples(Status status, Usuario u, Pageable p) {
-        Long nutricionistaId = isProducao(u) ? null : u.getId();
+        Long nutricionistaId = (u == null || isProducao(u)) ? null : u.getId();
         Long estabelecimentoId = (isProducao(u) && u.getEstabelecimento() != null) ? u.getEstabelecimento().getId() : null;
 
         Specification<FichaTecnica> spec = FichaTecnicaSpecification.filter(status, StatusCriacao.COMPLETA, nutricionistaId, estabelecimentoId, null, null);

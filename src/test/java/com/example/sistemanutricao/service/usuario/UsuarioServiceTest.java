@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
 
 import java.util.Optional;
 
@@ -23,6 +24,14 @@ import com.example.sistemanutricao.record.UsuarioDTO.UsuarioDTO;
 import com.example.sistemanutricao.repository.EstabelecimentoRepository;
 import com.example.sistemanutricao.repository.UsuarioRepository;
 import com.example.sistemanutricao.service.port.ImageStorage;
+import com.example.sistemanutricao.exception.DuplicateNomeException;
+import com.example.sistemanutricao.model.enuns.Cargo;
+import com.example.sistemanutricao.model.Estabelecimento;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.mock.web.MockMultipartFile;
+import java.util.List;
 import org.mapstruct.factory.Mappers;
 
 @ExtendWith(MockitoExtension.class)
@@ -116,5 +125,96 @@ class UsuarioServiceTest {
         assertThat(atualizado.email()).isEqualTo("maria.nova@exemplo.com");
         verify(passwordEncoder).encode("novaSenha123");
         verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void create_Success() {
+        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "senha", "senha", "senha", null, null);
+        when(usuarioRepository.findByEmail("user@test.com")).thenReturn(Optional.empty());
+        when(passwordEncoder.encode("senha")).thenReturn("hash");
+
+        Usuario saved = new Usuario();
+        saved.setId(1L);
+        when(usuarioRepository.save(any())).thenReturn(saved);
+
+        Usuario result = usuarioService.create(dto);
+        assertThat(result).isNotNull();
+        verify(usuarioRepository).save(any());
+    }
+
+    @Test
+    void create_DuplicateEmail() {
+        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "senha", "senha", "senha", null, null);
+        when(usuarioRepository.findByEmail("user@test.com")).thenReturn(Optional.of(new Usuario()));
+
+        assertThatThrownBy(() -> usuarioService.create(dto))
+            .isInstanceOf(DuplicateNomeException.class);
+    }
+
+    @Test
+    void toggleAtivo_Success() {
+        Usuario usuario = new Usuario();
+        usuario.setAtivo(false);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        usuarioService.toggleAtivo(1L);
+
+        assertThat(usuario.isAtivo()).isTrue();
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void updateCargo_Success() {
+        Usuario usuario = new Usuario();
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        usuarioService.updateCargo(1L, Cargo.ADMIN);
+
+        assertThat(usuario.getCargo()).isEqualTo(Cargo.ADMIN);
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void atualizarEstabelecimento_Success() {
+        Usuario usuario = new Usuario();
+        Estabelecimento est = new Estabelecimento();
+        est.setId(10L);
+
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(estabelecimentoRepository.findById(10L)).thenReturn(Optional.of(est));
+
+        usuarioService.atualizarEstabelecimento(1L, 10L);
+
+        assertThat(usuario.getEstabelecimento()).isEqualTo(est);
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void atualizarEstabelecimento_NullId() {
+        Usuario usuario = new Usuario();
+        usuario.setEstabelecimento(new Estabelecimento());
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+
+        usuarioService.atualizarEstabelecimento(1L, null);
+
+        assertThat(usuario.getEstabelecimento()).isNull();
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void inicializarAdminPadrao_Creation() {
+        when(usuarioRepository.findByCargo(Cargo.ADMIN)).thenReturn(List.of());
+        when(usuarioRepository.findByEmailIgnoreCase(any())).thenReturn(Optional.empty());
+
+        usuarioService.inicializarAdminPadrao();
+
+        verify(usuarioRepository).save(any(Usuario.class));
+    }
+
+    @Test
+    void listAll_Success() {
+        when(usuarioRepository.findAdministradoresComuns(any(), any(), any())).thenReturn(new PageImpl<>(List.of(new Usuario())));
+        List<GetUsuarioDTO> result = usuarioService.listAll();
+        assertThat(result).hasSize(1);
     }
 }

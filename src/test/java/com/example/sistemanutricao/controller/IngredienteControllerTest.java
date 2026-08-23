@@ -10,6 +10,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -40,6 +43,8 @@ import com.example.sistemanutricao.record.IngredienteDTO.IngredienteGetDTO;
 import com.example.sistemanutricao.security.UsuarioSecurity;
 import com.example.sistemanutricao.service.ingrediente.IngredienteQueryService;
 import com.example.sistemanutricao.service.ingrediente.IngredienteService;
+import com.example.sistemanutricao.record.IngredienteDTO.IngredienteDTO;
+import org.springframework.http.MediaType;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("IngredienteController - Unitário com MockMvc")
@@ -118,6 +123,117 @@ class IngredienteControllerTest {
 
         verify(ingredienteQueryService).pesquisar(eq("nome"), eq("arroz"), eq("nome"), eq(1L), any(Pageable.class));
     }
+
+    @Test
+    @DisplayName("Deve redirecionar buscas antigas")
+    void deveRedirecionarBuscas() throws Exception {
+        mockMvc.perform(get("/ingrediente/por-nome?campo=nome"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/ingrediente?campo=nome"));
+                
+        mockMvc.perform(get("/ingrediente/taco/por-nome?campo=nome"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/ingrediente/taco?campo=nome"));
+    }
+
+    @Test
+    @DisplayName("Deve pesquisar ingrediente Taco")
+    void devePesquisarTaco() throws Exception {
+        Page<IngredienteGetDTO> page = new PageImpl<>(List.of(ingredienteDto()));
+        when((Page) ingredienteQueryService.pesquisarTaco(eq("nome"), eq("arroz"), eq("nome"), any(Pageable.class)))
+                .thenReturn(page);
+        when(ingredienteService.buscarUsuarioTacoId()).thenReturn(2L);
+        when(paginacaoViewSupport.renderizarView(anyString(), any(), any(), anyBoolean()))
+                .thenReturn("pages/ingredientes/List");
+
+        mockMvc.perform(get("/ingrediente/taco/pesquisar")
+                .param("campo", "nome")
+                .param("valorPesquisa", "arroz")
+                .param("tipoPesquisa", "nome"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("pages/ingredientes/List"));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar status")
+    void deveAtualizarStatus() throws Exception {
+        mockMvc.perform(post("/ingrediente/atualiza-status/1"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/ingrediente"));
+        verify(ingredienteService).atualizaStatus(1L);
+    }
+
+    @Test
+    @DisplayName("Deve criar novo ingrediente")
+    void deveCriarIngrediente() throws Exception {
+        when(ingredienteService.create(any(IngredienteDTO.class), eq(1L))).thenReturn(ingredienteDto());
+
+        mockMvc.perform(post("/ingrediente/novo")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("nome", "Arroz")
+                .param("ptn", "1")
+                .param("cho", "2")
+                .param("lip", "3")
+                .param("sodio", "4")
+                .param("gorduraSaturada", "5")
+                .param("status", "ATIVA")
+                .header("HX-Request", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+
+        verify(ingredienteService).create(any(IngredienteDTO.class), eq(1L));
+    }
+
+    @Test
+    @DisplayName("Deve mostrar formulário de edição")
+    void deveMostrarFormularioEdicao() throws Exception {
+        when(ingredienteService.getIngredienteById(1L)).thenReturn(ingredienteDto());
+
+        mockMvc.perform(get("/ingrediente/editar/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1));
+    }
+
+    @Test
+    @DisplayName("Deve atualizar ingrediente")
+    void deveAtualizarIngrediente() throws Exception {
+        when(ingredienteService.getIngredienteById(1L)).thenReturn(ingredienteDto());
+
+        mockMvc.perform(post("/ingrediente/editar/1")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("nome", "Arroz Atualizado")
+                .param("ptn", "1")
+                .param("cho", "2")
+                .param("lip", "3")
+                .param("sodio", "4")
+                .param("gorduraSaturada", "5")
+                .param("status", "ATIVA")
+                .header("HX-Request", "true"))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("ingrediente"))
+                .andExpect(view().name("pages/ingredientes/List :: ingrediente-item"));
+
+        verify(ingredienteService).update(eq(1L), any(IngredienteDTO.class));
+    }
+
+    @Test
+    @DisplayName("Deve buscar na API")
+    void deveBuscarApi() throws Exception {
+        Page<IngredienteGetDTO> pageUsuario = new PageImpl<>(List.of(ingredienteDto()));
+        Page<IngredienteGetDTO> pageTaco = new PageImpl<>(List.of(ingredienteDto()));
+        
+        when((Page) ingredienteQueryService.pesquisar(eq("nome"), eq("arroz"), eq("especifico"), eq(1L), any(Pageable.class)))
+                .thenReturn(pageUsuario);
+        when((Page) ingredienteQueryService.pesquisarTaco(eq("nome"), eq("arroz"), eq("especifico"), any(Pageable.class)))
+                .thenReturn(pageTaco);
+
+        mockMvc.perform(get("/ingrediente/api/buscar")
+                .param("q", "arroz"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[1].id").value(1));
+    }
+
 
     private UsuarioSecurity usuarioNutricionista() {
         Usuario usuario = new Usuario();

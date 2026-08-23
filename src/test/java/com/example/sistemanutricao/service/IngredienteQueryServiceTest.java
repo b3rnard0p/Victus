@@ -161,6 +161,139 @@ class IngredienteQueryServiceTest {
     }
 
     // =========================================================================
+    // MULTIPLE USERS
+    // =========================================================================
+
+    @Test
+    void shouldReturnIngredientesByStatusAndMultipleUsuarios() {
+        Ingrediente ingrediente1 = criarIngrediente(1L, "Arroz", criarUsuario(1L));
+        Ingrediente ingrediente2 = criarIngrediente(2L, "Feijao", criarUsuario(2L));
+        
+        when(ingredienteRepository.findByStatusAndUsuarioIdIn(eq(Status.ATIVA), any())).thenReturn(List.of(ingrediente1, ingrediente2));
+        
+        List<IngredienteGetDTO> result = queryService.buscarPorStatusEUsuarios(Status.ATIVA, 1L, 2L);
+        assertThat(result).hasSize(2);
+    }
+
+    // =========================================================================
+    // TACO SEARCHES
+    // =========================================================================
+
+    @Test
+    void shouldReturnIngredientesDoUsuarioTaco() {
+        Usuario tacoUser = criarUsuario(99L);
+        when(usuarioRepository.findByUsernameIgnoreCase("TACO")).thenReturn(java.util.Optional.of(tacoUser));
+        
+        Pageable pageable = PageRequest.of(0, 6);
+        Page<Ingrediente> page = new PageImpl<>(List.of(criarIngrediente(100L, "Taco Ing", tacoUser)), pageable, 1);
+        when(ingredienteRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
+        
+        Page<IngredienteGetDTO> result = queryService.buscarIngredientesDoUsuarioTaco(pageable);
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void shouldThrowExceptionWhenTacoUserNotFound() {
+        when(usuarioRepository.findByUsernameIgnoreCase("TACO")).thenReturn(java.util.Optional.empty());
+        
+        org.junit.jupiter.api.Assertions.assertThrows(
+            com.example.sistemanutricao.exception.UsuarioNotFoundException.class, 
+            () -> queryService.buscarIngredientesDoUsuarioTaco(PageRequest.of(0, 10))
+        );
+    }
+
+    @Test
+    void shouldSearchTacoByNome() {
+        Usuario tacoUser = criarUsuario(99L);
+        when(usuarioRepository.findByUsernameIgnoreCase("TACO")).thenReturn(java.util.Optional.of(tacoUser));
+        
+        Pageable pageable = PageRequest.of(0, 6);
+        Page<Ingrediente> page = new PageImpl<>(List.of(criarIngrediente(100L, "Maca", tacoUser)), pageable, 1);
+        when(ingredienteRepository.findAll(any(Specification.class), eq(pageable))).thenReturn(page);
+        
+        @SuppressWarnings("unchecked")
+        Page<IngredienteGetDTO> result = (Page<IngredienteGetDTO>) queryService.pesquisarTaco("nome", "Maca", "especifico", pageable);
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void shouldSearchTacoInvalidNumber() {
+        Usuario tacoUser = criarUsuario(99L);
+        when(usuarioRepository.findByUsernameIgnoreCase("TACO")).thenReturn(java.util.Optional.of(tacoUser));
+        
+        Pageable pageable = PageRequest.of(0, 6);
+        Page<?> result = queryService.pesquisarTaco("ptn", "abc", "especifico", pageable);
+        assertThat(result.getContent()).isEmpty();
+    }
+
+    // =========================================================================
+    // TAG SEARCHES
+    // =========================================================================
+
+    @Test
+    void shouldSearchByTags() {
+        Usuario usuario = criarUsuario(5L);
+        Ingrediente ing1 = criarIngrediente(1L, "Arroz", usuario);
+        Ingrediente ing2 = criarIngrediente(2L, "Feijao", usuario);
+        
+        Pageable pageable = PageRequest.of(0, 10);
+        when(ingredienteRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(ing1, ing2)));
+        when(ingredienteTagClassifier.determinarTag(ing1, "nome")).thenReturn("A");
+        when(ingredienteTagClassifier.determinarTag(ing2, "nome")).thenReturn("B");
+        
+        @SuppressWarnings("unchecked")
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> result = 
+            (Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO>) queryService.pesquisar("nome", "A", "tags", 5L, pageable);
+        
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).tag()).isEqualTo("A");
+    }
+
+    @Test
+    void shouldSearchTacoByTags() {
+        Usuario tacoUser = criarUsuario(99L);
+        when(usuarioRepository.findByUsernameIgnoreCase("TACO")).thenReturn(java.util.Optional.of(tacoUser));
+        
+        Ingrediente ing1 = criarIngrediente(1L, "Arroz", tacoUser);
+        
+        Pageable pageable = PageRequest.of(0, 10);
+        when(ingredienteRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(ing1)));
+        when(ingredienteTagClassifier.determinarTag(ing1, "nome")).thenReturn("A");
+        
+        @SuppressWarnings("unchecked")
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> result = 
+            (Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO>) queryService.pesquisarTaco("nome", "A", "tags", pageable);
+        
+        assertThat(result.getContent()).hasSize(1);
+    }
+
+    @Test
+    void shouldPaginateListCorrectly() {
+        Usuario usuario = criarUsuario(5L);
+        Ingrediente ing1 = criarIngrediente(1L, "Arroz", usuario);
+        Ingrediente ing2 = criarIngrediente(2L, "Feijao", usuario);
+        
+        when(ingredienteRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(new PageImpl<>(List.of(ing1, ing2)));
+        when(ingredienteTagClassifier.determinarTag(any(), any())).thenReturn("A");
+        
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> paged1 = queryService.buscarPorTag("nome", "A", 5L, PageRequest.of(0, 1));
+        assertThat(paged1.getContent()).hasSize(1);
+        assertThat(paged1.getTotalElements()).isEqualTo(2);
+        
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> paged2 = queryService.buscarPorTag("nome", "A", 5L, PageRequest.of(1, 1));
+        assertThat(paged2.getContent()).hasSize(1);
+        
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> outOfBounds = queryService.buscarPorTag("nome", "A", 5L, PageRequest.of(5, 1));
+        assertThat(outOfBounds.getContent()).isEmpty();
+        
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> unpaged = queryService.buscarPorTag("nome", "A", 5L, Pageable.unpaged());
+        assertThat(unpaged.getContent()).hasSize(2);
+        
+        Page<com.example.sistemanutricao.record.IngredienteDTO.IngredienteComTagDTO> nullPage = queryService.buscarPorTag("nome", "A", 5L, null);
+        assertThat(nullPage.getContent()).hasSize(2);
+    }
+
+    // =========================================================================
     // HELPERS
     // =========================================================================
 
