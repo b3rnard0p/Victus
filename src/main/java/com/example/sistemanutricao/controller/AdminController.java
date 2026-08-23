@@ -39,8 +39,8 @@ public class AdminController {
     private final PaginacaoViewSupport paginacaoViewSupport;
 
     public AdminController(UsuarioService usuarioService,
-                           EstabelecimentoService estabelecimentoService,
-                           PaginacaoViewSupport paginacaoViewSupport) {
+            EstabelecimentoService estabelecimentoService,
+            PaginacaoViewSupport paginacaoViewSupport) {
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.paginacaoViewSupport = paginacaoViewSupport;
@@ -68,8 +68,16 @@ public class AdminController {
     }
 
     @PostMapping("/usuarios/{id}/toggle-ativo")
-    public String toggleAtivo(@PathVariable Long id) {
+    public String toggleAtivo(@PathVariable Long id, Model model,
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest,
+            @AuthenticationPrincipal UsuarioSecurity adminLogado) {
         usuarioService.toggleAtivo(id);
+        if (htmxRequest != null) {
+            GetUsuarioDTO usuario = usuarioService.findById(id);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("adminId", adminLogado != null ? adminLogado.getId() : -1L);
+            return "pages/admin/usuarios/List :: usuario-item";
+        }
         return "redirect:/admin/usuarios";
     }
 
@@ -93,9 +101,8 @@ public class AdminController {
         estabelecimentoOptions.add(Map.of("value", "", "label", "Sem vínculo"));
         for (GetEstabelecimentoDTO estabelecimento : estabelecimentos) {
             estabelecimentoOptions.add(Map.of(
-                "value", String.valueOf(estabelecimento.id()),
-                "label", estabelecimento.nome()
-            ));
+                    "value", String.valueOf(estabelecimento.id()),
+                    "label", estabelecimento.nome()));
         }
         model.addAttribute("estabelecimentoOptions", estabelecimentoOptions);
 
@@ -105,9 +112,17 @@ public class AdminController {
     @PostMapping("/usuarios/{id}/estabelecimento")
     public String atualizarVinculoEstabelecimento(
             @PathVariable Long id,
-            @RequestParam(required = false) Long estabelecimentoId) {
+            @RequestParam(required = false) Long estabelecimentoId,
+            Model model, @RequestHeader(value = "HX-Request", required = false) String htmxRequest,
+            @AuthenticationPrincipal UsuarioSecurity adminLogado) {
 
         usuarioService.atualizarEstabelecimento(id, estabelecimentoId);
+        if (htmxRequest != null) {
+            GetUsuarioDTO usuario = usuarioService.findById(id);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("adminId", adminLogado != null ? adminLogado.getId() : -1L);
+            return "pages/admin/usuarios/List :: usuario-item";
+        }
         return "redirect:/admin/usuarios";
     }
 
@@ -115,11 +130,18 @@ public class AdminController {
     public String updateCargo(
             @PathVariable Long id,
             @RequestParam(required = false) Cargo cargo,
-            @AuthenticationPrincipal UsuarioSecurity adminLogado) {
+            @AuthenticationPrincipal UsuarioSecurity adminLogado,
+            Model model, @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         if (adminLogado != null && adminLogado.getId().equals(id)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar o próprio cargo.");
         }
         usuarioService.updateCargo(id, cargo);
+        if (htmxRequest != null) {
+            GetUsuarioDTO usuario = usuarioService.findById(id);
+            model.addAttribute("usuario", usuario);
+            model.addAttribute("adminId", adminLogado != null ? adminLogado.getId() : -1L);
+            return "pages/admin/usuarios/List :: usuario-item";
+        }
         return "redirect:/admin/usuarios";
     }
 
@@ -158,7 +180,6 @@ public class AdminController {
         return "redirect:/admin/estabelecimentos";
     }
 
-
     @GetMapping("/estabelecimentos/{id}/editar")
     public String updateForm(
             @PathVariable Long id,
@@ -172,11 +193,16 @@ public class AdminController {
     }
 
     @PostMapping("/estabelecimentos/{id}")
-    public String update(@PathVariable Long id, @Valid @ModelAttribute EstabelecimentoDTO dto, BindingResult result) {
+    public String update(@PathVariable Long id, @Valid @ModelAttribute EstabelecimentoDTO dto, BindingResult result, Model model, @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         if (result.hasErrors()) {
             throw new IllegalArgumentException(result.getFieldError().getDefaultMessage());
         }
         estabelecimentoService.update(id, dto);
+        if (htmxRequest != null) {
+            GetEstabelecimentoDTO estabelecimento = estabelecimentoService.findById(id);
+            model.addAttribute("estabelecimento", estabelecimento);
+            return "pages/admin/estabelecimentos/List :: estabelecimento-item";
+        }
         return "redirect:/admin/estabelecimentos";
     }
 }

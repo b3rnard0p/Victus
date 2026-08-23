@@ -14,7 +14,7 @@
     <form th:action="@{/admin/usuarios/{id}/estabelecimento(id=${usuario.id})}"
           method="post"
           th:data-hx-post="@{/admin/usuarios/{id}/estabelecimento(id=${usuario.id})}"
-          data-hx-target="#slot-conteudo"
+          th:data-hx-target="'#usuario-row-' + ${usuario.id}" data-hx-swap="outerHTML"
           hx-on::after-request="if(event.detail.successful) document.getElementById('modal-vinculo').remove()"
           class="space-y-6">
 

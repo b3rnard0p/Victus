@@ -201,7 +201,8 @@ public class IngredienteController {
     public Object atualizarIngrediente(@PathVariable Long id,
                                        @Valid @ModelAttribute("ingrediente") IngredienteDTO dto,
                                        BindingResult result,
-                                       HttpServletRequest request) {
+                                       HttpServletRequest request,
+                                       Model model) {
         if (result.hasErrors()) {
             var fieldError = result.getFieldError();
             throw new IllegalArgumentException(fieldError != null ? fieldError.getDefaultMessage() : "Erro de validação");
@@ -212,7 +213,9 @@ public class IngredienteController {
 
         String htmxRequest = request.getHeader("HX-Request");
         if ("true".equals(htmxRequest)) {
-            return ResponseEntity.ok(atualizado);
+            model.addAttribute("ingrediente", atualizado);
+            model.addAttribute("viewMode", "meus");
+            return "pages/ingredientes/List :: ingrediente-item";
         }
 
         return "redirect:/ingrediente";

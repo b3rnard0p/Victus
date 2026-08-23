@@ -146,7 +146,9 @@ public class RefeicaoController {
     public String atualizarRefeicao(
             @PathVariable("id") @NonNull Long id,
             @Valid @ModelAttribute("dto") RefeicaoDTO dto,
-            BindingResult result) {
+            BindingResult result,
+            Model model,
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
 
         if (result.hasErrors()) {
             var fieldError = result.getFieldError();
@@ -154,6 +156,13 @@ public class RefeicaoController {
         }
 
         refeicaoService.update(id, dto);
+
+        if ("true".equals(htmxRequest)) {
+            RefeicaoResponseDTO atualizada = refeicaoService.buscarPorId(id);
+            model.addAttribute("refeicao", atualizada);
+            return "pages/refeicoes/List :: refeicao-item";
+        }
+
         return "redirect:/refeicao";
     }
 

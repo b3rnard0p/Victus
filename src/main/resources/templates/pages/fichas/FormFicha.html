@@ -7,9 +7,7 @@
     >
       <div class="w-full flex items-center justify-between mb-4 md:mb-6">
         <button
-          data-hx-get="/ficha"
-          data-hx-target="#slot-conteudo"
-          data-hx-push-url="true"
+          onclick="fecharViewFicha()"
           type="button"
           class="flex items-center p-2 rounded-full transition-colors duration-200 bg-transparent border-none cursor-pointer text-zinc-800 hover:text-[#7AB648]"
         >
@@ -28,7 +26,8 @@
         method="post"
         th:data-hx-post="@{${ficha.id != null ? '/ficha/editar/' + ficha.id : '/ficha'}}"
         hx-on:htmx:before-request="if(!validarFormFicha()) event.preventDefault()"
-        data-hx-target="#slot-conteudo"
+        th:data-hx-target="${ficha.id != null ? '#ficha-row-' + ficha.id : '#slot-conteudo'}"
+        th:data-hx-swap="${ficha.id != null ? 'outerHTML' : 'innerHTML'}"
         class="p-0.5 rounded-lg relative w-full max-w-full"
         id="form-ficha"
       >
