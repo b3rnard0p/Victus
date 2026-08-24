@@ -220,14 +220,14 @@ public class FichaController {
     }
 
     @PostMapping("/editar/{id}")
-    public String updateFichaTecnica(
+    public void updateFichaTecnica(
             @PathVariable Long id,
             @Valid @ModelAttribute("ficha") FichaTecnicaUpdateDTO dto,
             BindingResult result,
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
             Model model,
             HttpServletResponse response,
-            @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest) throws java.io.IOException {
         
         if (result.hasErrors()) {
             if ("true".equals(htmxRequest)) {
@@ -240,15 +240,14 @@ public class FichaController {
         fichaTecnicaService.update(id, dto);
 
         if ("true".equals(htmxRequest)) {
-            FichaTecnicaGetDTO atualizada = fichaTecnicaService.getFichaById(id);
-            model.addAttribute("fichas", java.util.List.of(atualizada));
-            return "pages/fichas/List :: ficha-item";
+            response.setHeader("HX-Redirect", "/ficha");
+        } else {
+            if (dto.statusCriacao() == StatusCriacao.INCOMPLETA) {
+                response.sendRedirect("/ficha/por-statusCriacao?statusCriacao=INCOMPLETA");
+            } else {
+                response.sendRedirect("/ficha");
+            }
         }
-
-        if (dto.statusCriacao() == StatusCriacao.INCOMPLETA) {
-            return "redirect:/ficha/por-statusCriacao?statusCriacao=INCOMPLETA";
-        }
-        return "redirect:/ficha";
     }
 
     @GetMapping("/nova")

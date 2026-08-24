@@ -334,7 +334,7 @@ class FichaControllerTest {
                 .param("ingredientes[0].ingredienteId", "1")
                 .param("ingredientes[0].pesoBruto", "100.0"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("pages/fichas/List :: ficha-item"));
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("HX-Redirect", "/ficha"));
     }
 
     @Test

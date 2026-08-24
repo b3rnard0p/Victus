@@ -73,7 +73,10 @@ public class FichaQueryService {
 
         Object valorObjeto = valor;
         if ("por-numero".equalsIgnoreCase(campo)) {
-            try { valorObjeto = Integer.valueOf(valor); } catch (NumberFormatException e) { return Page.empty(); }
+            try { 
+                String cleanValor = valor.replaceAll("[^\\d-]", "");
+                valorObjeto = Integer.valueOf(cleanValor); 
+            } catch (NumberFormatException e) { return Page.empty(); }
         } else if ("por-categoria".equalsIgnoreCase(campo)) {
             valorObjeto = Arrays.stream(Categoria.values())
                     .filter(c -> c.getNome().equalsIgnoreCase(valor))
@@ -81,7 +84,10 @@ public class FichaQueryService {
                     .orElse(null);
             if (valorObjeto == null) return Page.empty();
         } else if (!"por-nome".equalsIgnoreCase(campo)) {
-            try { valorObjeto = new BigDecimal(valor); } catch (NumberFormatException e) { return Page.empty(); }
+            try { 
+                String cleanValor = valor.replaceAll("[^\\d.,-]", "").replace(",", ".");
+                valorObjeto = new BigDecimal(cleanValor); 
+            } catch (NumberFormatException e) { return Page.empty(); }
         }
 
         Specification<FichaTecnica> spec = FichaTecnicaSpecification.filter(

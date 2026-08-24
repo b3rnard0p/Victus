@@ -73,7 +73,10 @@ public class IngredienteQueryService {
 
         Object valorObjeto = valor;
         if (!"nome".equalsIgnoreCase(campo)) {
-            try { valorObjeto = new BigDecimal(valor); } catch (NumberFormatException e) { return Page.empty(pageable); }
+            try { 
+                String cleanValor = valor.replaceAll("[^\\d.,-]", "").replace(",", ".");
+                valorObjeto = new BigDecimal(cleanValor); 
+            } catch (NumberFormatException e) { return Page.empty(pageable); }
         }
 
         Specification<Ingrediente> spec = IngredienteSpecification.filter(Status.ATIVA, usuarioId, campo, valorObjeto);
@@ -88,7 +91,10 @@ public class IngredienteQueryService {
         Long tacoId = buscarUsuarioTacoId();
         Object valorObjeto = valor;
         if (!"nome".equalsIgnoreCase(campo)) {
-            try { valorObjeto = new BigDecimal(valor); } catch (NumberFormatException e) { return Page.empty(pageable); }
+            try { 
+                String cleanValor = valor.replaceAll("[^\\d.,-]", "").replace(",", ".");
+                valorObjeto = new BigDecimal(cleanValor); 
+            } catch (NumberFormatException e) { return Page.empty(pageable); }
         }
 
         Specification<Ingrediente> spec = IngredienteSpecification.filter(Status.ATIVA, tacoId, campo, valorObjeto);

@@ -305,9 +305,12 @@
         }
       } else {
         const numericFields = ["custoPerCapita", "custoTotal", "por-rendimento", "por-numero", "vtc", "gramasPTN", "gramasCHO", "gramasLIP", "gramasSodio", "gramasSaturada"];
-        if (numericFields.includes(campo) && isNaN(valor)) {
-          mostrarToastErro("Por favor, insira um valor numérico válido.");
-          return;
+        if (numericFields.includes(campo)) {
+          valor = String(valor).replace(/[^0-9.,-]/g, '').replace(',', '.');
+          if (valor === "" || isNaN(valor)) {
+            mostrarToastErro("Por favor, insira um valor numérico válido.");
+            return;
+          }
         }
       }
 

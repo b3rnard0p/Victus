@@ -26,8 +26,8 @@
         method="post"
         th:data-hx-post="@{${ficha.id != null ? '/ficha/editar/' + ficha.id : '/ficha'}}"
         hx-on:htmx:before-request="if(!validarFormFicha()) event.preventDefault()"
-        th:data-hx-target="${ficha.id != null ? '#ficha-row-' + ficha.id : '#slot-conteudo'}"
-        th:data-hx-swap="${ficha.id != null ? 'outerHTML' : 'innerHTML'}"
+        th:data-hx-target="'#slot-conteudo'"
+        th:data-hx-swap="'innerHTML'"
         class="p-0.5 rounded-lg relative w-full max-w-full"
         id="form-ficha"
       >
