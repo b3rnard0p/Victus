@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.sistemanutricao.mapper.IngredienteMapper;
+import com.example.sistemanutricao.aop.RegistrarAcao;
+import com.example.sistemanutricao.model.enuns.TipoAcao;
 import com.example.sistemanutricao.model.Ingrediente;
 import com.example.sistemanutricao.model.enuns.Status;
 import com.example.sistemanutricao.model.Usuario;
@@ -58,6 +60,7 @@ public class IngredienteService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.CRIOU_INGREDIENTE)
     public IngredienteGetDTO create(IngredienteDTO dto, Long usuarioId) {
         validarCamposObrigatorios(dto);
         validarDuplicidadeIngredienteCreate(dto.nome(), usuarioId);
@@ -69,6 +72,7 @@ public class IngredienteService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_INGREDIENTE)
     public IngredienteGetDTO update(Long id, IngredienteDTO dto) {
         Ingrediente ingrediente = buscarIngredienteOuFalhar(id);
 
@@ -96,6 +100,8 @@ public class IngredienteService {
         return buscarUsuarioTaco().getId();
     }
 
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_INGREDIENTE)
     public void atualizaStatus(Long id) {
         Ingrediente ingrediente = buscarIngredienteOuFalhar(id);
 

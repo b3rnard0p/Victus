@@ -34,6 +34,8 @@ import com.example.sistemanutricao.record.IngredientePorFichaDTO;
 import com.example.sistemanutricao.record.PerfilNutricionalDTO.PerfilNutricionalDTO;
 import com.example.sistemanutricao.record.RefeicaoDTO.FichaTecnicaRefeicaoDTO;
 import com.example.sistemanutricao.mapper.FichaTecnicaMapper;
+import com.example.sistemanutricao.aop.RegistrarAcao;
+import com.example.sistemanutricao.model.enuns.TipoAcao;
 import com.example.sistemanutricao.repository.FichaTecnicaRepository;
 import com.example.sistemanutricao.repository.IngredienteRepository;
 import com.example.sistemanutricao.repository.UsuarioRepository;
@@ -65,6 +67,7 @@ public class FichaTecnicaService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.CRIOU_FICHA)
     public FichaTecnicaGetDTO create(
             FichaTecnicaCreateDTO dto,
             @NonNull Long nutricionistaId
@@ -108,6 +111,7 @@ public class FichaTecnicaService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_FICHA)
     public FichaTecnicaGetDTO update(@NonNull Long id, FichaTecnicaUpdateDTO dto) {
         FichaTecnica fichaExistente = findFichaById(id);
 
@@ -317,6 +321,8 @@ public class FichaTecnicaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_FICHA)
     public void atualizaStatus(@NonNull Long id) {
         FichaTecnica ficha = findFichaById(id);
 

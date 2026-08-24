@@ -25,6 +25,8 @@ import com.example.sistemanutricao.repository.FichaTecnicaRepository;
 import com.example.sistemanutricao.repository.RefeicaoRepository;
 import com.example.sistemanutricao.repository.UsuarioRepository;
 import com.example.sistemanutricao.mapper.RefeicaoMapper;
+import com.example.sistemanutricao.aop.RegistrarAcao;
+import com.example.sistemanutricao.model.enuns.TipoAcao;
 
 @Service
 public class RefeicaoService {
@@ -71,6 +73,7 @@ public class RefeicaoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.CRIOU_REFEICAO)
     public RefeicaoResponseDTO create(RefeicaoDTO dto, @NonNull Long nutricionistaId) {
         List<Long> fichasIds = normalizarFichasIds(dto.fichasTecnicasIds());
         validarFichasObrigatorias(fichasIds);
@@ -94,6 +97,7 @@ public class RefeicaoService {
     }
 
     @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_REFEICAO)
     public RefeicaoResponseDTO update(@NonNull Long id, RefeicaoDTO dto) {
         List<Long> fichasIds = normalizarFichasIds(dto.fichasTecnicasIds());
         validarFichasObrigatorias(fichasIds);
@@ -174,6 +178,8 @@ public class RefeicaoService {
         return refeicaoMapper.toResponseDTO(findRefeicaoById(id));
     }
 
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_REFEICAO)
     public void atualizaStatus(@NonNull Long id) {
         Refeicao refeicao = findRefeicaoById(id);
         refeicao.setStatus(refeicao.getStatus() == Status.ATIVA ? Status.INATIVA : Status.ATIVA);

@@ -441,13 +441,18 @@ O Victus é construído sobre o ecossistema Java moderno, utilizando as bibliote
 ### Bibliotecas Principais
 
 - **Spring Data JPA:** Abstração de persistência.
+- **Spring Boot Starter AOP:** Programação orientada a aspectos (Audit Trail e Logs).
+- **Spring Boot Starter Validation:** Validação declarativa e robusta de DTOs e formulários.
+- **Spring Boot Starter Actuator:** Endpoints para monitoramento, métricas e health checks.
+- **Spring Boot Starter Cache:** Abstração e gerenciamento de cache para ganho de performance.
 - **MySQL Connector:** Driver para o banco de dados de produção.
 - **H2 Database:** Banco de dados em memória para testes rápidos.
 - **Spring Security + JJWT (0.11.5):** Camada de segurança e tokens JWT.
-- **MapStruct (1.6.3):** Mapeamento de objetos com alta performance.
+- **MapStruct (1.6.3):** Mapeamento de objetos (Entity <-> DTO) com alta performance.
 - **iText (7.2.3):** Geração de relatórios técnicos em PDF.
 - **Apache POI (5.4.1):** Processamento de arquivos Excel (Tabela TACO).
 - **P6Spy:** Monitoramento e log de queries SQL em tempo de desenvolvimento.
+- **JaCoCo:** Ferramenta de cobertura de código para os testes automatizados.
 
 <h2 align="center">Comandos Úteis</h2>
 

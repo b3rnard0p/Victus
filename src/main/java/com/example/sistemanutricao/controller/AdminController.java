@@ -7,6 +7,8 @@ import com.example.sistemanutricao.record.EstabelecimentoDTO.GetEstabelecimentoD
 import com.example.sistemanutricao.record.UsuarioDTO.GetUsuarioDTO;
 import com.example.sistemanutricao.security.UsuarioSecurity;
 import com.example.sistemanutricao.service.EstabelecimentoService;
+import com.example.sistemanutricao.service.log.AtividadeLogService;
+import com.example.sistemanutricao.model.AtividadeLog;
 import com.example.sistemanutricao.service.usuario.UsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
@@ -37,13 +39,16 @@ public class AdminController {
     private final UsuarioService usuarioService;
     private final EstabelecimentoService estabelecimentoService;
     private final PaginacaoViewSupport paginacaoViewSupport;
+    private final AtividadeLogService atividadeLogService;
 
     public AdminController(UsuarioService usuarioService,
             EstabelecimentoService estabelecimentoService,
-            PaginacaoViewSupport paginacaoViewSupport) {
+            PaginacaoViewSupport paginacaoViewSupport,
+            AtividadeLogService atividadeLogService) {
         this.usuarioService = usuarioService;
         this.estabelecimentoService = estabelecimentoService;
         this.paginacaoViewSupport = paginacaoViewSupport;
+        this.atividadeLogService = atividadeLogService;
     }
 
     // USUÁRIOS
@@ -209,5 +214,28 @@ public class AdminController {
             return "pages/admin/estabelecimentos/List :: estabelecimento-item";
         }
         return "redirect:/admin/estabelecimentos";
+    }
+
+    @GetMapping("/usuarios/{id}/atividades")
+    public String listarAtividades(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            HttpServletRequest request,
+            @RequestHeader(value = "HX-Request", required = false) String htmxRequest,
+            Model model) {
+        Page<AtividadeLog> atividades = atividadeLogService.buscarAtividadesPorUsuario(id, PageRequest.of(page, size));
+        GetUsuarioDTO usuario = usuarioService.findById(id);
+        
+        model.addAttribute("atividades", atividades.getContent());
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", atividades.getTotalPages());
+        model.addAttribute("hasPrevious", atividades.hasPrevious());
+        model.addAttribute("hasNext", atividades.hasNext());
+        model.addAttribute("size", size);
+        model.addAttribute("baseUrl", "/admin/usuarios/" + id + "/atividades");
+        
+        return paginacaoViewSupport.renderizarView("pages/admin/atividades/List", htmxRequest, model);
     }
 }

@@ -13,10 +13,15 @@
               class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative">
             <div class="grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr] gap-2 sm:gap-4 items-center w-full h-full">
               <div class="flex flex-col min-w-0 justify-center h-full items-center sm:items-start">
-                <div
-                  class="text-2xl font-medium text-zinc-800 truncate w-full text-center sm:text-left tooltip-group"
-                  data-tooltip-trigger="click"
-                  th:data-fullname="${usuario.username}" th:text="${usuario.username}"></div>
+                  <a th:if="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'NUTRICIONISTA'}" 
+                     th:href="@{/admin/usuarios/{id}/atividades(id=${usuario.id})}"
+                     class="text-2xl font-medium text-zinc-800 truncate w-full text-center sm:text-left tooltip-group hover:text-[#4A6E18] transition-colors hover:underline"
+                     data-tooltip-trigger="click"
+                     th:data-fullname="${usuario.username}" th:text="${usuario.username}"></a>
+                  <div th:unless="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'NUTRICIONISTA'}"
+                     class="text-2xl font-medium text-zinc-800 truncate w-full text-center sm:text-left tooltip-group"
+                     data-tooltip-trigger="click"
+                     th:data-fullname="${usuario.username}" th:text="${usuario.username}"></div>
                 <div class="text-sm text-zinc-800 truncate w-full text-center sm:text-left tooltip-group" th:title="${usuario.email}" th:text="${usuario.email}">
                 </div>
               </div>
