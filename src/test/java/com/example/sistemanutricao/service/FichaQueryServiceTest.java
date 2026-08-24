@@ -265,6 +265,52 @@ class FichaQueryServiceTest {
     }
 
     @Test
+    void buscarPorTag_Page() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+
+        FichaTecnica f1 = new FichaTecnica();
+        f1.setId(10L);
+        f1.setPreparacao(new com.example.sistemanutricao.model.Preparacao());
+        f1.setPerfilNutricional(new com.example.sistemanutricao.model.PerfilNutricional());
+        f1.setNutricionista(usuario);
+
+        PageRequest page = PageRequest.of(0, 10);
+        when(fichaRepository.findAll(any(Specification.class), eq(page)))
+                .thenReturn(new PageImpl<>(List.of(f1)));
+        when(tagClassifier.determinarTag(eq(f1), anyString())).thenReturn("Alta");
+
+        Page<com.example.sistemanutricao.record.FichaTecnicaDTO.FichaTecnicaComTagDTO> res = fichaQueryService.buscarPorTag("ptn", "Alta", usuario, page);
+        assertEquals(1, res.getTotalElements());
+    }
+
+    @Test
+    void buscarPorTag_Page_Producao() {
+        Usuario usuario = new Usuario();
+        usuario.setId(2L);
+        usuario.setCargo(com.example.sistemanutricao.model.enuns.Cargo.PRODUCAO);
+        com.example.sistemanutricao.model.Estabelecimento est = new com.example.sistemanutricao.model.Estabelecimento();
+        est.setId(99L);
+        usuario.setEstabelecimento(est);
+
+        FichaTecnica f1 = new FichaTecnica();
+        f1.setId(10L);
+        f1.setPreparacao(new com.example.sistemanutricao.model.Preparacao());
+        f1.setPerfilNutricional(new com.example.sistemanutricao.model.PerfilNutricional());
+        
+        Usuario nutri = new Usuario(); nutri.setId(1L);
+        f1.setNutricionista(nutri);
+
+        PageRequest page = PageRequest.of(0, 10);
+        when(fichaRepository.findAll(any(Specification.class), eq(page)))
+                .thenReturn(new PageImpl<>(List.of(f1)));
+        when(tagClassifier.determinarTag(eq(f1), anyString())).thenReturn("Alta");
+
+        Page<com.example.sistemanutricao.record.FichaTecnicaDTO.FichaTecnicaComTagDTO> res = fichaQueryService.buscarPorTag("ptn", "Alta", usuario, page);
+        assertEquals(1, res.getTotalElements());
+    }
+
+    @Test
     void exceptionInToComTagDTO() {
         Usuario usuario = new Usuario();
         usuario.setId(1L);
@@ -278,5 +324,37 @@ class FichaQueryServiceTest {
 
         List<com.example.sistemanutricao.record.FichaTecnicaDTO.FichaTecnicaComTagDTO> res = fichaQueryService.buscarPorTag("ptn", "Alta", usuario);
         assertEquals(0, res.size());
+    }
+
+    @Test
+    void buscarPorStatus_NullUsuario() {
+        when(fichaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        Page<?> res = fichaQueryService.buscarPorStatus(Status.ATIVA, StatusCriacao.COMPLETA, null, PageRequest.of(0, 10));
+        assertNotNull(res);
+    }
+
+    @Test
+    void buscarPorStatusSimples_NullUsuario() {
+        when(fichaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        Page<?> res = fichaQueryService.buscarPorStatusSimples(Status.ATIVA, null, PageRequest.of(0, 10));
+        assertNotNull(res);
+    }
+
+    @Test
+    void pesquisar_NullUsuario() {
+        when(fichaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        Page<?> res = fichaQueryService.pesquisar("por-nome", "Teste", "especifico", null, PageRequest.of(0, 10));
+        assertNotNull(res);
+    }
+
+    @Test
+    void buscarPorTag_NullUsuario() {
+        when(fichaRepository.findAll(any(Specification.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of()));
+        Page<?> res = fichaQueryService.buscarPorTag("ptn", "Alta", null, PageRequest.of(0, 10));
+        assertNotNull(res);
     }
 }

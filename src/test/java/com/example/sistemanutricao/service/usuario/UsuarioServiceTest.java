@@ -49,6 +49,15 @@ class UsuarioServiceTest {
     @Mock
     private ImageStorage imageStorage;
 
+    @Mock
+    private com.example.sistemanutricao.repository.FichaTecnicaRepository fichaTecnicaRepository;
+
+    @Mock
+    private com.example.sistemanutricao.repository.RefeicaoRepository refeicaoRepository;
+
+    @Mock
+    private com.example.sistemanutricao.repository.IngredienteRepository ingredienteRepository;
+
     private UsuarioMapper usuarioMapper = Mappers.getMapper(UsuarioMapper.class);
 
     private UsuarioService usuarioService;
@@ -60,7 +69,10 @@ class UsuarioServiceTest {
                 estabelecimentoRepository,
                 passwordEncoder,
                 imageStorage,
-                usuarioMapper
+                usuarioMapper,
+                fichaTecnicaRepository,
+                refeicaoRepository,
+                ingredienteRepository
         );
     }
 
@@ -166,12 +178,58 @@ class UsuarioServiceTest {
     @Test
     void updateCargo_Success() {
         Usuario usuario = new Usuario();
+        usuario.setCargo(Cargo.PRODUCAO);
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
 
         usuarioService.updateCargo(1L, Cargo.ADMIN);
 
         assertThat(usuario.getCargo()).isEqualTo(Cargo.ADMIN);
         verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void updateCargo_RemoverNutricionistaComFichas_LancaExcecao() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setCargo(Cargo.NUTRICIONISTA);
+        
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(fichaTecnicaRepository.existsByNutricionistaId(1L)).thenReturn(true);
+        
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.updateCargo(1L, Cargo.PRODUCAO);
+        });
+    }
+
+    @Test
+    void updateCargo_RemoverNutricionistaComRefeicoes_LancaExcecao() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setCargo(Cargo.NUTRICIONISTA);
+        
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(fichaTecnicaRepository.existsByNutricionistaId(1L)).thenReturn(false);
+        when(refeicaoRepository.existsByNutricionistaId(1L)).thenReturn(true);
+        
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.updateCargo(1L, Cargo.ADMIN);
+        });
+    }
+
+    @Test
+    void updateCargo_RemoverNutricionistaComIngredientes_LancaExcecao() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setCargo(Cargo.NUTRICIONISTA);
+        
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(fichaTecnicaRepository.existsByNutricionistaId(1L)).thenReturn(false);
+        when(refeicaoRepository.existsByNutricionistaId(1L)).thenReturn(false);
+        when(ingredienteRepository.existsByUsuario_Id(1L)).thenReturn(true);
+        
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class, () -> {
+            usuarioService.updateCargo(1L, Cargo.PRODUCAO);
+        });
     }
 
     @Test

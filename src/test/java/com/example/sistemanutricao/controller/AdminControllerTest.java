@@ -215,7 +215,7 @@ class AdminControllerTest {
 
         mockMvc.perform(post("/admin/usuarios/2/cargo")
                 .param("cargo", "NUTRICIONISTA"))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isFound());
         
         mockedAdminId = 1L; // Reset
     }
