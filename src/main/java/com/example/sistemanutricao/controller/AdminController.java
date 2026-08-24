@@ -134,11 +134,11 @@ public class AdminController {
             Model model, @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         
         if (cargo == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O cargo não pode ser nulo.");
+            throw new IllegalArgumentException("Não é possivel retirar o cargo de um usuário");
         }
         
         if (adminLogado != null && adminLogado.getId().equals(id)) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Você não pode alterar o próprio cargo.");
+            throw new IllegalArgumentException("Você não pode alterar o próprio cargo.");
         }
         usuarioService.updateCargo(id, cargo);
         if (htmxRequest != null) {

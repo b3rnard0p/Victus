@@ -27,4 +27,5 @@ public interface IngredienteRepository extends JpaRepository<Ingrediente, Long>,
     boolean existsByNomeIgnoreCaseAndUsuario_IdAndStatus(String nome, Long usuarioId, Status status);
 
     boolean existsByNomeIgnoreCaseAndUsuario_IdAndStatusAndIdNot(String nome, Long usuarioId, Status status, Long id);
+    boolean existsByUsuario_Id(Long usuarioId);
 }

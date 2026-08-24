@@ -17,4 +17,5 @@ public interface RefeicaoRepository extends JpaRepository<Refeicao, Long>, JpaSp
     boolean existsByNutricionistaIdAndNomeIgnoreCase(Long nutricionistaId, String nome);
 
     boolean existsByNutricionistaIdAndNomeIgnoreCaseAndIdNot(Long nutricionistaId, String nome, Long id);
+    boolean existsByNutricionistaId(Long nutricionistaId);
 }

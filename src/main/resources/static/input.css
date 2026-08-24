@@ -21,9 +21,11 @@ body {
 html {
   scrollbar-gutter: stable;
 }
+
 ::-webkit-scrollbar {
   background: #f3ffe5;
 }
+
 * {
   scrollbar-width: thin;
   scrollbar-color: #4a6e18 transparent;

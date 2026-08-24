@@ -26,4 +26,5 @@ public interface FichaTecnicaRepository extends JpaRepository<FichaTecnica, Long
     boolean existsByNutricionistaIdAndPreparacaoNumero(Long nutricionistaId, Integer numero);
 
     boolean existsByNutricionistaIdAndPreparacaoNumeroAndIdNot(Long nutricionistaId, Integer numero, Long id);
+    boolean existsByNutricionistaId(Long nutricionistaId);
 }

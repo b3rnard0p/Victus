@@ -25,6 +25,9 @@ import com.example.sistemanutricao.model.Estabelecimento;
 import com.example.sistemanutricao.model.Usuario;
 import com.example.sistemanutricao.record.UsuarioDTO.GetUsuarioDTO;
 import com.example.sistemanutricao.record.UsuarioDTO.UsuarioDTO;
+import com.example.sistemanutricao.repository.FichaTecnicaRepository;
+import com.example.sistemanutricao.repository.IngredienteRepository;
+import com.example.sistemanutricao.repository.RefeicaoRepository;
 import com.example.sistemanutricao.repository.EstabelecimentoRepository;
 import com.example.sistemanutricao.repository.UsuarioRepository;
 import com.example.sistemanutricao.service.port.ImageStorage;
@@ -38,6 +41,9 @@ public class UsuarioService {
     private final PasswordEncoder passwordEncoder;
     private final ImageStorage imageStorage;
     private final UsuarioMapper usuarioMapper;
+    private final FichaTecnicaRepository fichaTecnicaRepository;
+    private final RefeicaoRepository refeicaoRepository;
+    private final IngredienteRepository ingredienteRepository;
 
     @Value("${app.admin.username:admin}")
     private String adminUsername;
@@ -52,12 +58,18 @@ public class UsuarioService {
                           EstabelecimentoRepository estabelecimentoRepository,
                           PasswordEncoder passwordEncoder,
                           ImageStorage imageStorage,
-                          UsuarioMapper usuarioMapper) {
+                          UsuarioMapper usuarioMapper,
+                          FichaTecnicaRepository fichaTecnicaRepository,
+                          RefeicaoRepository refeicaoRepository,
+                          IngredienteRepository ingredienteRepository) {
         this.usuarioRepository = usuarioRepository;
         this.estabelecimentoRepository = estabelecimentoRepository;
         this.passwordEncoder = passwordEncoder;
         this.imageStorage = imageStorage;
         this.usuarioMapper = usuarioMapper;
+        this.fichaTecnicaRepository = fichaTecnicaRepository;
+        this.refeicaoRepository = refeicaoRepository;
+        this.ingredienteRepository = ingredienteRepository;
     }
 
     // PERFIL
@@ -209,6 +221,17 @@ public class UsuarioService {
     @Transactional
     public void updateCargo(@NonNull Long id, Cargo novoCargo) {
         Usuario usuario = findUsuarioById(id);
+        
+        if (usuario.getCargo() == Cargo.NUTRICIONISTA && novoCargo != Cargo.NUTRICIONISTA) {
+            boolean hasFichas = fichaTecnicaRepository.existsByNutricionistaId(id);
+            boolean hasRefeicoes = refeicaoRepository.existsByNutricionistaId(id);
+            boolean hasIngredientes = ingredienteRepository.existsByUsuario_Id(id);
+            
+            if (hasFichas || hasRefeicoes || hasIngredientes) {
+                throw new IllegalArgumentException("Não é possível alterar o cargo deste nutricionista, pois ele possui fichas, ingredientes ou refeições vinculadas.");
+            }
+        }
+        
         usuario.setCargo(novoCargo);
         usuarioRepository.save(usuario);
     }
