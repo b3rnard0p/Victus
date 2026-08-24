@@ -229,13 +229,9 @@ public class AdminController {
         
         model.addAttribute("atividades", atividades.getContent());
         model.addAttribute("usuario", usuario);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", atividades.getTotalPages());
-        model.addAttribute("hasPrevious", atividades.hasPrevious());
-        model.addAttribute("hasNext", atividades.hasNext());
-        model.addAttribute("size", size);
-        model.addAttribute("baseUrl", "/admin/usuarios/" + id + "/atividades");
         
-        return paginacaoViewSupport.renderizarView("pages/admin/atividades/List", htmxRequest, model);
+        paginacaoViewSupport.configurarPaginacao(model, request, page, atividades);
+        
+        return paginacaoViewSupport.renderizarView("pages/admin/atividades/List", htmxRequest, model, page > 0);
     }
 }

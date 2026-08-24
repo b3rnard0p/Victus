@@ -39,61 +39,49 @@
         <p class="text-zinc-600 text-center">Histórico de ações realizadas por este usuário.</p>
       </div>
 
-      <div class="space-y-3 sm:space-y-4 pt-4">
-        <th:block th:if="${#lists.isEmpty(atividades)}">
-          <div class="p-8 text-center">
-            <i data-lucide="inbox" class="w-12 h-12 mx-auto text-gray-800 mb-4"></i>
-            <h3 class="text-lg font-medium text-gray-900">Nenhuma atividade registrada</h3>
-          </div>
-        </th:block>
-
-        <th:block th:unless="${#lists.isEmpty(atividades)}">
-          <div th:each="atividade : ${atividades}"
-            class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden">
-
-            <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between relative gap-4">
-              <div class="flex items-start gap-4">
-                <div class="p-3 bg-[#4A6E18]/10 rounded-full text-[#4A6E18]">
-                  <i data-lucide="activity" class="w-6 h-6"></i>
+      <div id="atividades-lista" class="space-y-3 sm:space-y-4 pt-4">
+        <th:block th:fragment="itens">
+          <th:block th:each="atividade : ${atividades}">
+            <div class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden">
+              <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between relative gap-4">
+                <div class="flex items-start gap-4">
+                  <div class="p-3 bg-[#4A6E18]/10 rounded-full text-[#4A6E18]">
+                    <i data-lucide="activity" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-medium text-zinc-800" th:text="${atividade.tipoAcao.descricao}">Ação</h3>
+                    <p class="text-sm text-zinc-600" th:text="${atividade.detalhes}">Detalhes da ação</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 class="text-lg font-medium text-zinc-800" th:text="${atividade.tipoAcao.descricao}">Ação</h3>
-                  <p class="text-sm text-zinc-600" th:text="${atividade.detalhes}">Detalhes da ação</p>
+
+                <div class="flex flex-col items-center sm:items-end text-sm text-zinc-500 whitespace-nowrap mt-2 sm:mt-0">
+                  <span class="font-medium text-zinc-700"
+                    th:text="${#temporals.format(atividade.dataHora, 'dd/MM/yyyy')}">01/01/2026</span>
+                  <span th:text="${#temporals.format(atividade.dataHora, 'HH:mm')}">12:00</span>
                 </div>
               </div>
+            </div>
+          </th:block>
 
-              <div class="flex flex-col items-center sm:items-end text-sm text-zinc-500 whitespace-nowrap mt-2 sm:mt-0">
-                <span class="font-medium text-zinc-700"
-                  th:text="${#temporals.format(atividade.dataHora, 'dd/MM/yyyy')}">01/01/2026</span>
-                <span th:text="${#temporals.format(atividade.dataHora, 'HH:mm')}">12:00</span>
-              </div>
+          <div th:if="${temMaisResultados}" class="load-more-container pt-2 text-center">
+            <div th:attr="hx-get=${proximaPaginaUrl}"
+                 hx-target="closest .load-more-container"
+                 hx-swap="outerHTML"
+                 hx-trigger="click"
+                 title="Carregar mais"
+                 class="cursor-pointer inline-block transform duration-200 hover:scale-110">
+              <div th:replace="~{components/Buttom :: btn-icon(idBtn='btn-load-more-atividades', iconeCss='plus', tipo='button')}"></div>
             </div>
           </div>
         </th:block>
       </div>
 
-      <!-- Paginação -->
-      <div th:if="${totalPages > 1}" class="flex justify-center mt-8 gap-2">
-        <button th:if="${hasPrevious}" th:data-hx-get="${baseUrl + '?page=' + (currentPage - 1) + '&size=' + size}"
-          data-hx-target="#slot-conteudo"
-          class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors text-zinc-700">
-          <i data-lucide="chevron-left" class="w-5 h-5"></i>
-        </button>
-
-        <div class="flex items-center gap-1">
-          <button th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}"
-            th:data-hx-get="${baseUrl + '?page=' + pageNumber + '&size=' + size}" data-hx-target="#slot-conteudo"
-            th:class="${pageNumber == currentPage ? 'w-10 h-10 rounded-lg bg-[#4A6E18] text-white font-medium flex items-center justify-center transition-colors' : 'w-10 h-10 rounded-lg bg-white border border-gray-200 text-zinc-700 hover:bg-gray-50 font-medium flex items-center justify-center transition-colors'}"
-            th:text="${pageNumber + 1}">
-          </button>
+      <th:block th:if="${paginaAtual == 0 and #lists.isEmpty(atividades)}">
+        <div class="p-8 text-center">
+          <i data-lucide="inbox" class="w-12 h-12 mx-auto text-gray-800 mb-4"></i>
+          <h3 class="text-lg font-medium text-gray-900">Nenhuma atividade registrada</h3>
         </div>
-
-        <button th:if="${hasNext}" th:data-hx-get="${baseUrl + '?page=' + (currentPage + 1) + '&size=' + size}"
-          data-hx-target="#slot-conteudo"
-          class="p-2 rounded-lg bg-white border border-gray-200 hover:bg-gray-50 transition-colors text-zinc-700">
-          <i data-lucide="chevron-right" class="w-5 h-5"></i>
-        </button>
-      </div>
+      </th:block>
 
     </div>
   </main>

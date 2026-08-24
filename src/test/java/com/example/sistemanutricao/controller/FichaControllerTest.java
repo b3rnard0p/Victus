@@ -321,8 +321,6 @@ class FichaControllerTest {
     @Test
     @DisplayName("Deve atualizar ficha tecnica com htmx")
     void deveAtualizarFichaTecnicaHtmx() throws Exception {
-        FichaTecnicaGetDTO ficha = new FichaTecnicaGetDTO(1L, null, null, null, null, null, Status.ATIVA, StatusCriacao.COMPLETA, null, null, null);
-        when(fichaTecnicaService.getFichaById(1L)).thenReturn(ficha);
 
         mockMvc.perform(post("/ficha/editar/1")
                 .header("HX-Request", "true")
