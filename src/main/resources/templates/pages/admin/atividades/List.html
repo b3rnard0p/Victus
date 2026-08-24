@@ -41,8 +41,9 @@
 
       <div id="atividades-lista" class="space-y-3 sm:space-y-4 pt-4">
         <th:block th:fragment="itens">
-          <th:block th:each="atividade : ${atividades}">
-            <div class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden">
+          <th:block th:each="atividade, stat : ${atividades}">
+            <div class="animate-slide-down-fade bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden"
+                 th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'">
               <div class="px-6 py-4 flex flex-col sm:flex-row items-center justify-between relative gap-4">
                 <div class="flex items-start gap-4">
                   <div class="p-3 bg-[#4A6E18]/10 rounded-full text-[#4A6E18]">

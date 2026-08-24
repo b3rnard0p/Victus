@@ -7,10 +7,11 @@
 
       <div id="usuarios-lista" class="space-y-4">
         <th:block th:fragment="itens">
-          <th:block th:each="usuario : ${usuarios}">
+          <th:block th:each="usuario, stat : ${usuarios}">
             <div th:id="'usuario-row-' + ${usuario.id}"
               th:fragment="usuario-item"
-              class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative">
+              class="animate-slide-down-fade bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] p-4 h-full relative"
+              th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'">
             <div class="grid grid-cols-1 sm:grid-cols-[2fr_2fr_2fr] gap-2 sm:gap-4 items-center w-full h-full">
               <div class="flex flex-col min-w-0 justify-center h-full items-center sm:items-start">
                   <a th:if="${usuario.cargo != null and #strings.toUpperCase(usuario.cargo) == 'NUTRICIONISTA'}" 

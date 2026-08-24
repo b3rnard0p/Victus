@@ -21,11 +21,12 @@
 
       <div id="estabelecimentos-lista" class="space-y-4">
         <th:block th:fragment="itens">
-          <th:block th:each="estabelecimento : ${estabelecimentos}">
+          <th:block th:each="estabelecimento, stat : ${estabelecimentos}">
             <div
               th:id="'estabelecimento-row-' + ${estabelecimento.id}"
               th:fragment="estabelecimento-item"
-              class="bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] overflow-hidden p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center"
+              class="animate-slide-down-fade bg-[#f3ffe5] rounded-[2rem] shadow-xl border border-[#4A6E18] overflow-hidden p-4 grid grid-cols-1 sm:grid-cols-3 gap-4 items-center"
+              th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'"
             >
             <div
               class="text-2xl font-medium text-zinc-800 truncate text-center sm:text-left tooltip-group"

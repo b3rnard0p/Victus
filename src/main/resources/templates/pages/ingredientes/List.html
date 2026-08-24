@@ -167,11 +167,12 @@
 
         <div id="ingredientes-lista" class="space-y-3 sm:space-y-4 pt-4">
           <th:block th:fragment="itens">
-            <th:block th:each="ingrediente : ${ingredientes}">
+            <th:block th:each="ingrediente, stat : ${ingredientes}">
               <div
                 th:id="'ingrediente-row-' + ${ingrediente.id}"
                 th:fragment="ingrediente-item"
-                class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden"
+                class="animate-slide-down-fade bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] transition-all duration-300 relative overflow-hidden"
+                th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'"
               >
               <div
                 class="px-6 py-4 flex justify-center items-center cursor-pointer relative"

@@ -75,10 +75,11 @@
 
         <div id="refeicoes-lista" class="pt-4">
           <th:block th:fragment="itens">
-            <th:block th:each="refeicao : ${refeicoes}">
+            <th:block th:each="refeicao, stat : ${refeicoes}">
               <div th:id="'refeicao-row-' + ${refeicao.id}"
                    th:fragment="refeicao-item"
-                   class="bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] relative overflow-hidden mb-4 sm:mb-6 last:mb-0">
+                   class="animate-slide-down-fade bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] relative overflow-hidden mb-4 sm:mb-6 last:mb-0"
+                   th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'">
 
                       <div class="px-6 py-4 flex justify-center items-center cursor-pointer relative" onclick="toggleCard(this)">
                         <div class="flex flex-grid w-full relative min-w-0">
