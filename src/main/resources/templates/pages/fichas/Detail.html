@@ -21,7 +21,7 @@
           <div class="flex items-center justify-center gap-4">
             <th:block th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
               <a th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
-                data-hx-target="closest main" data-hx-push-url="false" title="Editar Ficha"
+                data-hx-target="#slot-conteudo" data-hx-push-url="false" title="Editar Ficha"
                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
                 <span
                   class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
@@ -30,7 +30,7 @@
               </a>
 
               <form th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}" method="post"
-                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}" data-hx-target="closest main"
+                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}" data-hx-target="#slot-conteudo"
                 class="inline m-0 flex items-center">
                 <div class="cursor-pointer inline-block transform duration-200 hover:scale-110"
                   th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'">
@@ -60,7 +60,7 @@
           <div class="flex-shrink-0 z-10 flex items-center gap-4 sm:gap-6">
             <th:block th:if="${usuarioLogado.cargo.name() == 'NUTRICIONISTA'}">
               <a th:data-hx-get="@{/ficha/editar/{id}(id=${ficha.id})}"
-                data-hx-target="closest main" data-hx-push-url="false" title="Editar Ficha"
+                data-hx-target="#slot-conteudo" data-hx-push-url="false" title="Editar Ficha"
                 class="relative group inline-flex items-center justify-center w-12 h-12 cursor-pointer transform duration-200 hover:scale-110">
                 <span
                   class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1"></span>
@@ -69,7 +69,7 @@
               </a>
 
               <form th:action="@{/ficha/toggle-status/{id}(id=${ficha.id})}" method="post"
-                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}" data-hx-target="closest main"
+                th:data-hx-post="@{/ficha/toggle-status/{id}(id=${ficha.id})}" data-hx-target="#slot-conteudo"
                 class="inline m-0 flex items-center">
                 <div class="cursor-pointer inline-block transform duration-200 hover:scale-110"
                   th:title="${ficha.status().name() == 'ATIVA'} ? 'Arquivar Ficha' : 'Desarquivar Ficha'">

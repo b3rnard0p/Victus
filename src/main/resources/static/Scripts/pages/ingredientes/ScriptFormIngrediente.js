@@ -31,8 +31,8 @@ window.abrirModalIngrediente = function (ingrediente) {
         form.setAttribute("hx-target", "#ingrediente-row-" + ingrediente.id);
         form.setAttribute("hx-swap", "outerHTML");
     } else {
-        form.setAttribute("hx-target", "#slot-conteudo");
-        form.setAttribute("hx-swap", "innerHTML");
+        form.removeAttribute("hx-target");
+        form.setAttribute("hx-swap", "none");
     }
     if (window.htmx) htmx.process(form);
   }
