@@ -193,7 +193,7 @@
 
             <button onclick="abrirModalPerfil()"
                 class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer"
-                style="width: 48px; height: 48px;">
+                style="width: 48px; height: 48px;" aria-label="Perfil">
                 <span
                     class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-[#f3ffe5] px-2 py-1 text-xs text-zinc-800 border border-[#4A6E18] opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Perfil</span>
                 <img th:if="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}"
@@ -207,7 +207,7 @@
                 onsubmit="localStorage.removeItem('rememberMe');">
                 <button type="submit"
                     class="group relative dock-item flex flex-col items-center justify-center rounded-full bg-transparent cursor-pointer border-none"
-                    style="width: 48px; height: 48px;">
+                    style="width: 48px; height: 48px;" aria-label="Sair">
                     <span
                         class="absolute left-full ml-4 whitespace-nowrap rounded-md bg-red-600 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 pointer-events-none z-50">Sair</span>
                     <i data-lucide="log-out"
@@ -221,7 +221,7 @@
             class="relative w-full xl:hidden z-50 bg-[#f3ffe5] transition-all duration-300 block">
             <div class="container mx-auto flex justify-between items-center py-2 px-4 relative z-[60] bg-[#f3ffe5]">
                 <a th:href="@{/home}" class="flex items-center">
-                    <img th:src="@{/imagens/Logo.avif}" alt="Logo" class="h-12 w-12 object-contain" />
+                    <img th:src="@{/imagens/Logo.avif}" alt="Logo" class="h-12 w-12 object-contain" srcset="/imagens/Logo.avif 1x" loading="lazy" width="1684" height="2528" />
                 </a>
 
                 <div class="flex items-center space-x-3">

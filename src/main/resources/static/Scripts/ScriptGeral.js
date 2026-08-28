@@ -48,7 +48,9 @@ window.mostrarToastSucesso = function (mensagem) {
 };
 
 document.addEventListener("DOMContentLoaded", function () {
-  atualizarMenuAtivo();
+  if (typeof atualizarMenuAtivo === 'function') {
+    atualizarMenuAtivo();
+  }
   verificarPaginaLogin();
 
   const menuToggle = document.getElementById("menu-toggle");
@@ -71,7 +73,9 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 document.addEventListener("htmx:afterSwap", function () {
-  atualizarMenuAtivo();
+  if (typeof atualizarMenuAtivo === 'function') {
+    atualizarMenuAtivo();
+  }
 });
 
 function inicializarComboBoxes(root) {

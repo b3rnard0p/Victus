@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html lang="pt_BR" xmlns:th="http://www.thymeleaf.org">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login</title>
+  <meta name="description" content="Victus - Sistema completo para gestão nutricional, controle de fichas técnicas e elaboração de cardápios com facilidade." />
   <link rel="icon" type="image/avif" th:href="@{/imagens/Logo.avif}" />
   <link rel="stylesheet" th:href="@{/output.css}" />
   <link rel="stylesheet" th:href="@{/input.css}" />
@@ -14,7 +15,7 @@
 <body
         class="bg-[#f3ffe5] min-h-screen flex items-center justify-center p-4 lg:p-8"
 >
-<div
+<main
         class="w-full max-w-7xl mx-auto flex flex-col lg:flex-row items-center justify-center gap-8 md:gap-16 lg:gap-28 xl:gap-44"
 >
   <div class="w-full max-w-sm lg:w-auto flex-1">
@@ -29,6 +30,7 @@
                   th:src="@{/imagens/Logo.avif}"
                   alt="Logo do Sistema"
                   class="h-16 md:h-20 w-auto object-contain"
+                  width="1684" height="2528"
           />
         </div>
         <div class="hidden lg:flex justify-center mb-6">
@@ -95,6 +97,7 @@
                   th:src="@{/imagens/Logo.avif}"
                   alt="Logo do Sistema"
                   class="h-16 md:h-20 w-auto object-contain"
+                  width="1684" height="2528"
           />
         </div>
 
@@ -156,6 +159,7 @@
             th:src="@{/imagens/Logo.avif}"
             alt="Logo do Sistema"
             class="w-auto h-64 xl:h-80 2xl:h-[28rem] object-contain transition-all duration-300"
+            width="1684" height="2528"
     />
     <h1
             class="text-3xl md:text-5xl lg:text-6xl xl:text-8xl text-[#4A6E18] font-bold text-center"
@@ -163,7 +167,7 @@
       Victus
     </h1>
   </div>
-</div>
+</main>
 <script th:src="@{/Scripts/pages/general/ScriptLogin.js}"></script>
 <div
       id="toast-container"

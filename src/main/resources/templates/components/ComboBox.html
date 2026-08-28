@@ -21,7 +21,7 @@
     <div th:id="${id + '-control'}"
          class="flex items-center justify-between gap-2 min-w-0 px-4 py-3 cursor-pointer select-none rounded-[10px]
                 transition-all duration-200"
-         role="combobox" aria-haspopup="listbox" aria-expanded="false">
+         role="combobox" aria-haspopup="listbox" aria-expanded="false" th:aria-labelledby="${id + '-label'}">
 
       <span th:id="${id + '-display'}"
         class="text-lg font-semibold text-zinc-800 min-h-[1.5rem] flex-1 min-w-0 overflow-hidden text-ellipsis whitespace-nowrap flex items-center gap-2">

@@ -26,7 +26,7 @@
               title="Cadastrar Ingrediente"
               class="cursor-pointer transform duration-200 hover:scale-110"
             >
-              <div
+              <div th:with="ariaLabel='Cadastrar Ingrediente'"
                 th:replace="~{components/Buttom :: btn-icon(idBtn='btn-novo-ingred', iconeCss='plus', tipo='button')}"
               ></div>
             </div>
@@ -37,7 +37,7 @@
               title="Ver Tabela TACO"
               class="cursor-pointer transform duration-200 hover:scale-110"
             >
-              <div
+              <div th:with="ariaLabel='Ver Tabela TACO'"
                 th:replace="~{components/Buttom :: btn-icon(idBtn='tacoButton', iconeCss='book', tipo='button')}"
               ></div>
             </div>
@@ -49,7 +49,7 @@
               title="Ver Seus Ingredientes"
               class="cursor-pointer transform duration-200 hover:scale-110"
             >
-              <div
+              <div th:with="ariaLabel='Ver Seus Ingredientes'"
                 th:replace="~{components/Buttom :: btn-icon(idBtn='tacoButtonMeus', iconeCss='list-checks', tipo='button')}"
               ></div>
             </div>
@@ -61,7 +61,7 @@
                 th:attr="hx-get=@{/ingrediente/por-status(status=${statusAtual != null && statusAtual.name() == 'ATIVA' ? 'INATIVA' : 'ATIVA'}, view=${viewMode})}"
                 hx-target="#slot-conteudo"
               >
-                <div
+                <div th:with="ariaLabel='Alternar Status'"
                   th:replace="~{components/Buttom :: btn-icon-status(idBtn='toggleStatusBtn2', iconeCss=${statusAtual != null && statusAtual.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='button', ds=${statusAtual != null ? statusAtual : 'INATIVA'})}"
                 ></div>
               </div>
@@ -97,7 +97,7 @@
                       type="button"
                       id="btnPesquisaEspecifica"
                       th:class="${tipoAtual == 'especifico'} ? 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#7AB648] border-[#4A6E18] text-green-950 shadow transition-all duration-200 focus:outline-none' : 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#f3ffe5] border-[#4A6E18] text-green-950 transition-all duration-200 focus:outline-none'"
-                      title="Pesquisa Específica"
+                      title="Pesquisa Específica" aria-label="Pesquisa Específica"
                     >
                       <i data-lucide="search" class="w-[10px] h-[10px]"></i>
                     </button>
@@ -106,7 +106,7 @@
                       type="button"
                       id="btnPesquisaTag"
                       th:class="${tipoAtual == 'tags'} ? 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#7AB648] border-[#4A6E18] text-green-950 shadow transition-all duration-200 focus:outline-none' : 'group relative flex items-center justify-center w-7 h-7 rounded-full border-2 bg-[#f3ffe5] border-[#4A6E18] text-green-950 transition-all duration-200 focus:outline-none'"
-                      title="Pesquisa por Tags"
+                      title="Pesquisa por Tags" aria-label="Pesquisa por Tags"
                     >
                       <i data-lucide="tag" class="w-[10px] h-[10px]"></i>
                     </button>
@@ -142,7 +142,7 @@
                     id="btnPesquisar"
                     class="cursor-pointer transform duration-200 hover:scale-110"
                   >
-                    <div
+                    <div th:with="ariaLabel='Pesquisar'"
                       th:replace="~{components/Buttom :: btn-icon(idBtn='btn-search', iconeCss='search', tipo='button')}"
                     ></div>
                   </div>
@@ -153,7 +153,7 @@
                   th:class="${pesquisaAtiva} ? 'pb-[2px] cursor-pointer transform duration-200 hover:scale-110' : 'hidden pb-[2px] cursor-pointer transform duration-200 hover:scale-110'"
                   title="Limpar Pesquisa"
                 >
-                  <div
+                  <div th:with="ariaLabel='Limpar Pesquisa'"
                     th:replace="~{components/Buttom :: btn-icon(idBtn='btn-clear', iconeCss='eraser text-red-600', tipo='button')}"
                   ></div>
                 </div>
@@ -187,7 +187,7 @@
                       <button
                       type="button"
                       class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full"
-                      title="Editar Ingrediente"
+                      title="Editar Ingrediente" aria-label="Editar Ingrediente"
                       th:attr="onclick=|editarIngrediente(${ingrediente.id})|"
                     >
                       <i
@@ -205,7 +205,7 @@
                       <button
                         type="submit"
                         class="text-[#4A6E18] hover:text-[#7AB648] transition-colors p-2 rounded-full"
-                        th:title="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}"
+                        th:title="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}" th:aria-label="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}"
                       >
                         <i
                           th:attr="data-lucide=${ingrediente.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}"
@@ -246,7 +246,7 @@
                     title="Editar Ingrediente"
                     th:attr="onclick=|editarIngrediente(${ingrediente.id})|"
                   >
-                    <div
+                    <div th:with="ariaLabel='Editar Ingrediente'"
                       th:replace="~{components/Buttom :: btn-icon(idBtn='btn-edit-ing-mob-' + ${ingrediente.id}, iconeCss='square-pen', tipo='button')}"
                     ></div>
                   </div>
@@ -259,7 +259,7 @@
                     class="m-0 p-0 cursor-pointer transform duration-200 hover:scale-110"
                     th:title="${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}"
                   >
-                    <div
+                    <div th:with="ariaLabel=${ingrediente.status.name() == 'ATIVA' ? 'Arquivar' : 'Desarquivar'}"
                       th:replace="~{components/Buttom :: btn-icon(idBtn='btn-status-ing-mob-' + ${ingrediente.id}, iconeCss=${ingrediente.status.name() == 'ATIVA' ? 'archive' : 'archive-restore'}, tipo='submit')}"
                     ></div>
                   </form>

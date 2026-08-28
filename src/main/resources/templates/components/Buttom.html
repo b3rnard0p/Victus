@@ -47,6 +47,7 @@
         th:fragment="btn-icon(idBtn, iconeCss, tipo)"
         th:id="${idBtn}"
         th:type="${tipo}"
+        th:aria-label="${ariaLabel != null ? ariaLabel : idBtn}"
         class="relative group inline-block font-medium w-12 h-12"
 >
     <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
@@ -62,6 +63,7 @@
         th:fragment="btn-icon-sm(idBtn, iconeCss, tipo)"
         th:id="${idBtn}"
         th:type="${tipo}"
+        th:aria-label="${ariaLabel != null ? ariaLabel : idBtn}"
         class="relative group inline-block font-medium w-6 h-6"
 >
     <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
@@ -78,6 +80,7 @@
         th:id="${idBtn}"
         th:type="${tipo}"
         th:attr="data-current-status=${ds}"
+        th:aria-label="${ariaLabel != null ? ariaLabel : idBtn}"
         class="relative group inline-block font-medium w-12 h-12"
 >
     <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>
@@ -94,6 +97,7 @@
         th:id="${idBtn}"
         th:type="${tipo}"
         th:attr="data-current-status-criacao=${dsc}"
+        th:aria-label="${ariaLabel != null ? ariaLabel : idBtn}"
         class="relative group inline-block font-medium w-12 h-12"
 >
     <span class="absolute inset-0 rounded-full border-2 border-[#7AB648] transition-all duration-300 ease-out group-hover:-inset-1 group-active:inset-0"></span>

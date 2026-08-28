@@ -37,17 +37,17 @@
         class="w-full relative z-50 flex items-center justify-between py-4 px-8 md:px-16 lg:px-24 text-white overflow-visible">
         <div class="flex items-center space-x-4">
             <a th:href="@{/home}">
-                <img src="/imagens/Logo.avif" alt="Logo" class="w-20 h-24 md:w-20 md:h-20" />
+                <img src="/imagens/Logo.avif" alt="Logo" class="w-20 h-24 md:w-20 md:h-20 object-contain" />
             </a>
         </div>
         <div class="relative">
             <button id="userBtn" class="text-white focus:outline-none">
                 <img th:if="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}"
                     th:src="@{'/' + ${usuarioLogado.caminhoImagem}}" alt="Usuário"
-                    class="w-20 h-20 rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform" />
+                    class="w-20 h-20 aspect-square rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform" />
                 <img th:unless="${usuarioLogado != null && usuarioLogado.caminhoImagem != null}"
                     th:src="@{/imagens/UserIcon.png}" alt="Usuário"
-                    class="w-20 h-20 rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform" />
+                    class="w-20 h-20 aspect-square rounded-full object-cover border-4 border-[#7AB648] shadow-lg hover:scale-105 transition-transform" />
             </button>
 
             <div id="userDropdown"

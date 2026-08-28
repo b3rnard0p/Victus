@@ -156,10 +156,10 @@
                     </div>
 
                     <div class="flex gap-2 w-full sm:w-1/3 justify-center sm:justify-end">
-                      <a style="cursor: pointer;" th:data-hx-get="@{/ficha/{id}(id=${ficha.id})}"
+                      <a style="cursor: pointer;" th:href="@{/ficha/{id}(id=${ficha.id})}" th:data-hx-get="@{/ficha/{id}(id=${ficha.id})}"
                         data-hx-target="#fichas-detail-view" data-hx-swap="innerHTML"
                         class="text-[#7AB648] hover:text-[#4A6E18] transition-colors p-2 rounded-full"
-                        title="Ver Ficha">
+                        title="Ver Ficha" aria-label="Ver Ficha">
                         <i data-lucide="eye" class="text-xl"></i>
                       </a>
 
