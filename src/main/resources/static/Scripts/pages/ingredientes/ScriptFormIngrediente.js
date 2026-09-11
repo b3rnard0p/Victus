@@ -28,11 +28,11 @@ window.abrirModalIngrediente = function (ingrediente) {
     form.action = action;
     form.setAttribute("hx-post", action);
     if (ingrediente && ingrediente.id) {
-        form.setAttribute("hx-target", "#ingrediente-row-" + ingrediente.id);
-        form.setAttribute("hx-swap", "outerHTML");
+      form.setAttribute("hx-target", "#ingrediente-row-" + ingrediente.id);
+      form.setAttribute("hx-swap", "outerHTML");
     } else {
-        form.removeAttribute("hx-target");
-        form.setAttribute("hx-swap", "none");
+      form.removeAttribute("hx-target");
+      form.setAttribute("hx-swap", "none");
     }
     if (window.htmx) htmx.process(form);
   }
@@ -64,7 +64,7 @@ window.editarIngrediente = async function (id) {
       const json = await resp.json();
       window.abrirModalIngrediente(json);
     }
-  } catch (e) {}
+  } catch (e) { }
 };
 
 window.validarFormIngrediente = function (form) {

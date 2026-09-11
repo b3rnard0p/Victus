@@ -440,7 +440,7 @@ window.abrirModalCustoConfig = function () {
     document.getElementById("modalCustoQtd").value = "";
     document.getElementById("modalCustoPreco").value = "";
     document.getElementById("modalCustoPesoUnidade").value = "";
-    
+
     // Animação de entrada
     setTimeout(() => {
       modal.classList.remove("opacity-0");
@@ -490,7 +490,7 @@ window.toggleCustoConfigInputs = function () {
 window.aplicarCustoConfig = function () {
   const tipoPeso = document.getElementById("tipo_peso").checked;
   const precoPago = parseFloat(document.getElementById("modalCustoPreco").value);
-  
+
   if (isNaN(precoPago) || precoPago <= 0) {
     if (typeof dispararErroFicha === "function") dispararErroFicha("O preço pago deve ser maior que zero.");
     else alert("O preço pago deve ser maior que zero.");
@@ -511,7 +511,7 @@ window.aplicarCustoConfig = function () {
   } else {
     const qtdComprada = parseFloat(document.getElementById("modalCustoQtd").value);
     const pesoPorUnidade = parseFloat(document.getElementById("modalCustoPesoUnidade").value);
-    
+
     if (isNaN(qtdComprada) || qtdComprada <= 0) {
       if (typeof dispararErroFicha === "function") dispararErroFicha("A quantidade comprada deve ser maior que zero.");
       else alert("A quantidade comprada deve ser maior que zero.");
@@ -522,7 +522,7 @@ window.aplicarCustoConfig = function () {
       else alert("O peso por unidade deve ser maior que zero.");
       return;
     }
-    
+
     // Peso total = qtd * pesoPorUnidade
     const pesoTotal = qtdComprada * pesoPorUnidade;
     // Preço por grama * 1000 = Preço por Kg

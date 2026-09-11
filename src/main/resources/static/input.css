@@ -17,13 +17,10 @@ body {
   font-synthesis: none;
 }
 
-/* Scroll */
-html {
-  scrollbar-gutter: stable;
-}
+
 
 ::-webkit-scrollbar {
-  background: #f3ffe5;
+  background: transparent;
 }
 
 * {

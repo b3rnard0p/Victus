@@ -33,6 +33,14 @@ window.abrirModalPerfil = function () {
     .catch((err) => console.error("Erro ao abrir perfil:", err));
 };
 
+window.fecharModalPerfil = function () {
+  const modal = document.getElementById("perfil-modal");
+  if (modal) {
+    modal.remove();
+  }
+  document.body.classList.remove("overflow-hidden");
+};
+
 function previewImagem(input) {
   if (input.files && input.files[0]) {
     const reader = new FileReader();
