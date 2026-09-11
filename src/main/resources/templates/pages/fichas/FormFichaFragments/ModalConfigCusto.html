@@ -1,0 +1,54 @@
+<div th:fragment="modal-config-custo" id="modal-config-custo" 
+     class="hidden opacity-0 fixed inset-0 bg-black/60 flex items-center justify-center z-[100] transition-opacity duration-300"
+     onclick="fecharModalCustoConfig()">
+
+    <div class="bg-[#f3ffe5] rounded-3xl p-4 md:p-6 lg:p-10 px-4 w-[90%] sm:w-full max-w-xl flex flex-col relative max-h-[90vh] overflow-y-auto"
+         onclick="event.stopPropagation()" id="modal-config-custo-content">
+
+        <button type="button"
+            class="absolute top-4 right-6 text-zinc-800 text-3xl font-bold hover:text-red-600 transition-colors z-[110]"
+            onclick="fecharModalCustoConfig()">×
+        </button>
+
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 md:mb-6 text-center text-zinc-800 w-full">Calculadora de Custo</h2>
+
+        <form id="form-config-custo" class="rounded-lg w-full text-zinc-800 space-y-6">
+            
+            <div class="flex justify-center gap-8 mb-4">
+                <div class="flex items-center cursor-pointer">
+                    <input id="tipo_peso" type="radio" value="peso" name="custo_tipo" class="w-4 h-4 text-[#4A6E18] border-neutral-300 focus:ring-[#4A6E18] focus:ring-2 accent-[#4A6E18] cursor-pointer" checked onchange="toggleCustoConfigInputs()">
+                    <label for="tipo_peso" class="ml-2 text-sm text-zinc-800 cursor-pointer">Por Peso (g, kg)</label>
+                </div>
+                <div class="flex items-center cursor-pointer">
+                    <input id="tipo_unidade" type="radio" value="unidade" name="custo_tipo" class="w-4 h-4 text-[#4A6E18] border-neutral-300 focus:ring-[#4A6E18] focus:ring-2 accent-[#4A6E18] cursor-pointer" onchange="toggleCustoConfigInputs()">
+                    <label for="tipo_unidade" class="ml-2 text-sm text-zinc-800 cursor-pointer">Por Unidade</label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div id="container_peso_comprado">
+                    <div th:replace="~{components/Input :: flutuante(id='modalCustoPeso', name='modalCustoPeso', type='number', label='Peso Comprado (g)', value='', required=false)}"></div>
+                </div>
+                
+                <div id="container_qtd_comprada" class="hidden">
+                    <div th:replace="~{components/Input :: flutuante(id='modalCustoQtd', name='modalCustoQtd', type='number', label='Unidades Compradas', value='', required=false)}"></div>
+                </div>
+
+                <div>
+                    <div th:replace="~{components/Input :: flutuante(id='modalCustoPreco', name='modalCustoPreco', type='number', label='Preço Pago (R$)', value='', required=false)}"></div>
+                </div>
+            </div>
+
+            <div id="container_peso_unidade" class="hidden">
+                <div th:replace="~{components/Input :: flutuante(id='modalCustoPesoUnidade', name='modalCustoPesoUnidade', type='number', label='Peso por Unidade (g)', value='', required=false)}"></div>
+            </div>
+
+            <!-- Rodapé / Botão -->
+            <div class="flex justify-center mt-4 pt-4 md:pt-6 w-full">
+                <div onclick="aplicarCustoConfig()" class="w-full sm:w-auto min-w-[200px]">
+                    <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-aplicar-custo', texto='Aplicar', tipo='button')}"></div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
