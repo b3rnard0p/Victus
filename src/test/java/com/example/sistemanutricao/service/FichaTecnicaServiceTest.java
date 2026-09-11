@@ -242,10 +242,10 @@ class FichaTecnicaServiceTest {
         ficha.setPreparacao(new com.example.sistemanutricao.model.Preparacao());
         ficha.setPerfilNutricional(new com.example.sistemanutricao.model.PerfilNutricional());
 
-        when(fichaRepository.findByStatusAndStatusCriacao(eq(Status.ATIVA), eq(StatusCriacao.COMPLETA), any()))
+        when(fichaRepository.findByStatusAndStatusCriacaoAndNutricionistaId(eq(Status.ATIVA), eq(StatusCriacao.COMPLETA), any(), any()))
             .thenReturn(new org.springframework.data.domain.PageImpl<>(List.of(ficha)));
 
-        List<?> resumo = fichaTecnicaService.listarResumo();
+        List<?> resumo = fichaTecnicaService.listarResumo(1L);
         assertEquals(1, resumo.size());
     }
 

@@ -105,7 +105,7 @@ class RefeicaoControllerTest {
     void deveBuscarComPaginacaoERenderizarView() throws Exception {
         Page<RefeicaoResponseDTO> page = new PageImpl<>(List.of());
         when(refeicaoQueryService.buscarPorStatus(eq(Status.ATIVA), any(), any())).thenReturn(page);
-        when(fichaTecnicaService.listarResumo()).thenReturn(List.of());
+        when(fichaTecnicaService.listarResumo(any())).thenReturn(List.of());
         when(paginacaoViewSupport.renderizarView(any(), any(), any(), eq(false)))
                 .thenReturn("pages/refeicoes/List");
 
@@ -120,7 +120,7 @@ class RefeicaoControllerTest {
     void devePesquisarPorNome() throws Exception {
         Page<RefeicaoResponseDTO> page = new PageImpl<>(List.of());
         when(refeicaoQueryService.buscarPorNome(eq("Café"), any(), any())).thenReturn(page);
-        when(fichaTecnicaService.listarResumo()).thenReturn(List.of());
+        when(fichaTecnicaService.listarResumo(any())).thenReturn(List.of());
         when(paginacaoViewSupport.renderizarView(any(), any(), any(), eq(false)))
                 .thenReturn("pages/refeicoes/List");
 

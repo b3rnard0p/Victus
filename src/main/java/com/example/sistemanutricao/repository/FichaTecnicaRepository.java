@@ -19,6 +19,9 @@ public interface FichaTecnicaRepository extends JpaRepository<FichaTecnica, Long
     @EntityGraph(attributePaths = {"preparacao", "perfilNutricional"})
     Page<FichaTecnica> findByStatusAndStatusCriacao(Status status, StatusCriacao statusCriacao, Pageable pageable);
 
+    @EntityGraph(attributePaths = {"preparacao", "perfilNutricional"})
+    Page<FichaTecnica> findByStatusAndStatusCriacaoAndNutricionistaId(Status status, StatusCriacao statusCriacao, Long nutricionistaId, Pageable pageable);
+
     boolean existsByNutricionistaIdAndPreparacaoNomeIgnoreCase(Long nutricionistaId, String nome);
 
     boolean existsByNutricionistaIdAndPreparacaoNomeIgnoreCaseAndIdNot(Long nutricionistaId, String nome, Long id);

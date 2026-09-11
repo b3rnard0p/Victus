@@ -309,8 +309,8 @@ public class FichaTecnicaService {
     }
 
     @Transactional(readOnly = true)
-    public List<FichaTecnicaRefeicaoDTO> listarResumo() {
-        return fichaRepository.findByStatusAndStatusCriacao(Status.ATIVA, StatusCriacao.COMPLETA, PageRequest.of(0, 500))
+    public List<FichaTecnicaRefeicaoDTO> listarResumo(Long nutricionistaId) {
+        return fichaRepository.findByStatusAndStatusCriacaoAndNutricionistaId(Status.ATIVA, StatusCriacao.COMPLETA, nutricionistaId, PageRequest.of(0, 500))
             .getContent()
             .stream()
                 .map(f -> new FichaTecnicaRefeicaoDTO(

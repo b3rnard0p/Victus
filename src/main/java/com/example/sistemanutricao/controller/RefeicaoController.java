@@ -92,7 +92,7 @@ public class RefeicaoController {
         }
         
         model.addAttribute("refeicoes", refeicoes.getContent());
-        model.addAttribute("fichasTecnicasLista", fichaTecnicaService.listarResumo());
+        model.addAttribute("fichasTecnicasLista", fichaTecnicaService.listarResumo(usuarioPrincipal.getId()));
         paginacaoViewSupport.configurarPaginacao(model, request, page, refeicoes);
         return paginacaoViewSupport.renderizarView("pages/refeicoes/List", htmxRequest, model, page > 0);
     }
