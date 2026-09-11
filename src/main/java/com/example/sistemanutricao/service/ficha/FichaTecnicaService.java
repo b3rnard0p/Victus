@@ -350,7 +350,7 @@ public class FichaTecnicaService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe rendimento e peso por porção para calcular o número de porções.");
         }
 
-        int numeroPorcoes = rendimento.divide(pesoPorcao, 0, RoundingMode.DOWN).intValue();
+        int numeroPorcoes = rendimento.divide(pesoPorcao, 0, RoundingMode.CEILING).intValue();
         if (numeroPorcoes < 1) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O rendimento precisa gerar ao menos uma porção.");
         }

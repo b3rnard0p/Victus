@@ -53,7 +53,7 @@ public class Preparacao {
     private BigDecimal fcc;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O rendimento deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 8, fraction = 2, message = "O rendimento deve ter no máximo 8 dígitos inteiros e 2 casas decimais.")
     private BigDecimal rendimento;
 
     public Preparacao() {

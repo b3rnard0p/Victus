@@ -109,7 +109,7 @@ public class PerfilNutricionalCalculator {
         if (total == null || total.compareTo(BigDecimal.ZERO) == 0) {
             return BigDecimal.ZERO;
         }
-        return valor.divide(total, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+        return valor.multiply(BigDecimal.valueOf(100)).divide(total, 0, RoundingMode.HALF_UP);
     }
 
     private BigDecimal dividir(BigDecimal valor, int divisor) {

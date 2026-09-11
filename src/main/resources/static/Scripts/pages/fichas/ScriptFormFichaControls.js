@@ -144,7 +144,7 @@ function initPesoPorcao() {
     const pesoPorcao = parseFloat(pesoPorcaoEl?.value) || 0;
 
     if (pesoPorcao > 0 && rendimento > 0 && numEl) {
-      numEl.value = Math.floor(rendimento / pesoPorcao).toString();
+      numEl.value = Math.ceil(rendimento / pesoPorcao).toString();
     } else if (numEl) {
       numEl.value = "";
     }

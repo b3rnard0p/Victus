@@ -1,5 +1,5 @@
 // Injetor de CSS para garantir que as classes existam mesmo se o HTML estiver em cache do Spring Boot
-(function() {
+(function () {
   if (!document.getElementById('victus-ficha-styles')) {
     const style = document.createElement('style');
     style.id = 'victus-ficha-styles';
@@ -18,7 +18,7 @@
     `;
     document.head.appendChild(style);
   }
-  
+
   // Garantir que a tabela tenha a classe
   window.addEventListener('DOMContentLoaded', () => {
     const table = document.querySelector('#ingredientesAdicionados')?.closest('table');
@@ -408,9 +408,9 @@ function adicionarLinhaNutricional(tabela, data, divisor = 1) {
 
 function calcularPorcentagensNutrientes(totalVTC, kcalPTN, kcalCHO, kcalLIP) {
   return {
-    porcentPTN: totalVTC === 0 ? 0 : (kcalPTN / totalVTC) * 100,
-    porcentCHO: totalVTC === 0 ? 0 : (kcalCHO / totalVTC) * 100,
-    porcentLIP: totalVTC === 0 ? 0 : (kcalLIP / totalVTC) * 100,
+    porcentPTN: totalVTC === 0 ? 0 : Math.round((kcalPTN / totalVTC) * 100),
+    porcentCHO: totalVTC === 0 ? 0 : Math.round((kcalCHO / totalVTC) * 100),
+    porcentLIP: totalVTC === 0 ? 0 : Math.round((kcalLIP / totalVTC) * 100),
   };
 }
 
@@ -453,6 +453,7 @@ function adicionarLinhaTotal(
   saturada = null,
   divisor = 1,
 ) {
+  const isPorcent = tipo === "%";
   const row = document.createElement("tr");
   row.className = "border border-black text-sm text-center";
   const cols =
@@ -462,9 +463,9 @@ function adicionarLinhaTotal(
   row.innerHTML = `
             <td class="px-2 py-2 border border-black text-left">${tipo}</td>
             <td class="px-2 py-2 border border-black"></td>
-            <td class="px-2 py-2 border border-black">${(ptn / divisor).toFixed(2)}</td>
-            <td class="px-2 py-2 border border-black">${(cho / divisor).toFixed(2)}</td>
-            <td class="px-2 py-2 border border-black">${(lip / divisor).toFixed(2)}</td>
+            <td class="px-2 py-2 border border-black">${(ptn / divisor).toFixed(isPorcent ? 0 : 2)}</td>
+            <td class="px-2 py-2 border border-black">${(cho / divisor).toFixed(isPorcent ? 0 : 2)}</td>
+            <td class="px-2 py-2 border border-black">${(lip / divisor).toFixed(isPorcent ? 0 : 2)}</td>
             ${cols}
         `;
   tabela.appendChild(row);
@@ -563,7 +564,7 @@ window.validarFormFicha = function () {
   const qntdAgua = parseFloat(qntdAguaVal);
   const porcentAgua = parseFloat(porcentAguaVal);
 
-   if (!nome) {
+  if (!nome) {
     dispararErroFicha("O nome da preparação é obrigatório.");
     return false;
   }
@@ -647,9 +648,9 @@ window.validarFormFicha = function () {
     return false;
   }
 
-  if (!validarNumeroComMaximoDigitos(rendimentoVal, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(rendimentoVal, 8, 2)) {
     dispararErroFicha(
-      "O rendimento deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O rendimento deve ter no máximo 8 dígitos inteiros e 2 casas decimais.",
     );
     return false;
   }
@@ -682,7 +683,7 @@ window.validarFormFicha = function () {
       row.querySelector("td:first-of-type")?.textContent?.trim() ||
       "Ingrediente";
 
-    
+
     // Priorizar mensagem de campo obrigatório
     if (!validarCampoObrigatorio(pbInput?.value)) {
       dispararErroFicha(`O PB do ingrediente "${nomeIngrediente}" é obrigatório.`);

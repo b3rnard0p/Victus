@@ -31,7 +31,7 @@ public record PreparacaoDTO(
         @NotNull(message = "O FCC é obrigatório.")
         @Digits(integer = 4, fraction = 2, message = "O FCC deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
         BigDecimal fcc,
-        @Digits(integer = 4, fraction = 2, message = "O rendimento deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+        @Digits(integer = 8, fraction = 2, message = "O rendimento deve ter no máximo 8 dígitos inteiros e 2 casas decimais.")
         BigDecimal rendimento,
         @NotNull(message = "A categoria é obrigatória.")
         Categoria categoria
