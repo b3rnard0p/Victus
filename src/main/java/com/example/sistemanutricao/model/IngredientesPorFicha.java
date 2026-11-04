@@ -20,11 +20,11 @@ public class IngredientesPorFicha {
     private String medidaCaseira;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O PB deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O PB deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal pb;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O PL deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O PL deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal pl;
 
     @NotNull
@@ -34,7 +34,7 @@ public class IngredientesPorFicha {
     private BigDecimal custoUsado;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O custo por kg deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O custo por kg deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal custoKG;
 
     private BigDecimal ptnCalculado;

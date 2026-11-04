@@ -27,11 +27,11 @@ public class Preparacao {
     private Categoria categoria;
 
     @NotNull
-    @Max(value = 9999, message = "O número deve ter no máximo 4 dígitos.")
+    @Max(value = 999999999L, message = "O número deve ter no máximo 9 dígitos.")
     private Integer numero;
 
     @NotBlank
-    @Size(max = 10, message = "O tempo de preparo pode ter no máximo 10 caracteres.")
+    @Size(max = 30, message = "O tempo de preparo pode ter no máximo 30 caracteres.")
     private String tempoPreparo;
 
     @Column(length = 1000)
@@ -42,18 +42,18 @@ public class Preparacao {
     @NotBlank
     private String modoPreparo;
 
-    @Digits(integer = 4, fraction = 2, message = "A quantidade de água deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "A quantidade de água deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal qntdAgua;
 
     @DecimalMax(value = "100", message = "A porcentagem de água deve ser menor ou igual a 100.")
     private BigDecimal porcentAgua;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O FCC deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O FCC deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal fcc;
 
     @NotNull
-    @Digits(integer = 8, fraction = 2, message = "O rendimento deve ter no máximo 8 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O rendimento deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal rendimento;
 
     public Preparacao() {

@@ -22,7 +22,7 @@ public record IngredienteDTO(
         @DecimalMax(value = "100", message = "O lipídio deve ser menor ou igual a 100.")
         BigDecimal lip,
         @NotNull(message = "O sódio é obrigatório.")
-        @DecimalMax(value = "100", message = "O sódio deve ser menor ou igual a 100.")
+        @DecimalMax(value = "100000", message = "O sódio deve ser menor ou igual a 100000 (mg).")
         BigDecimal sodio,
         Status status,
         @DecimalMax(value = "100", message = "A gordura saturada deve ser menor ou igual a 100.")

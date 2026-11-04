@@ -43,11 +43,11 @@ public class FichaTecnica {
     private BigDecimal custoTotal;
 
     @NotNull
-    @Max(value = 9999, message = "O número de porções deve ter no máximo 4 dígitos.")
+    @Max(value = 999999999L, message = "O número de porções deve ter no máximo 9 dígitos.")
     private Integer numeroPorcoes;
 
     @NotNull
-    @Digits(integer = 4, fraction = 2, message = "O peso da porção deve ter no máximo 4 dígitos inteiros e 2 casas decimais.")
+    @Digits(integer = 10, fraction = 5, message = "O peso da porção deve ter no máximo 10 dígitos inteiros e 5 casas decimais.")
     private BigDecimal pesoPorcao;
 
     @NotNull

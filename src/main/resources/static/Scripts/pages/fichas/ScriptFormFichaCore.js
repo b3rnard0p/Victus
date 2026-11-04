@@ -118,12 +118,12 @@ window.adicionarIngrediente = function () {
   // Priorizar validação de campo obrigatório antes de validar formato/valor
   const pbField = document.getElementById("pb")?.value;
   if (!validarCampoObrigatorio(pbField)) {
-    dispararErroFicha("O PB do ingrediente é obrigatório.");
+    dispararErroFicha("O PB do ingrediente é obrigatório (Caso não tenha, ponha 0).");
     return;
   }
-  if (!validarNumeroComMaximoDigitos(pbField, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(pbField, 10, 5)) {
     dispararErroFicha(
-      "O PB do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O PB do ingrediente deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
     );
     return;
   }
@@ -133,9 +133,9 @@ window.adicionarIngrediente = function () {
     dispararErroFicha("O PL do ingrediente é obrigatório.");
     return;
   }
-  if (!validarNumeroComMaximoDigitos(plField, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(plField, 10, 5)) {
     dispararErroFicha(
-      "O PL do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O PL do ingrediente deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
     );
     return;
   }
@@ -145,9 +145,9 @@ window.adicionarIngrediente = function () {
     dispararErroFicha("O custo por kg do ingrediente é obrigatório.");
     return;
   }
-  if (!validarNumeroComMaximoDigitos(custoKgField, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(custoKgField, 10, 5)) {
     dispararErroFicha(
-      "O custo por kg do ingrediente deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O custo por kg do ingrediente deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
     );
     return;
   }
@@ -183,31 +183,31 @@ window.adicionarIngrediente = function () {
       
       <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
          <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">PB (g)</span>
-        <input type="number" step="0.01" name="ingredientes[${idx}].pb" value="${pb}" 
+        <input type="text" inputmode="decimal" name="ingredientes[${idx}].pb" value="${pb}" 
            class="w-full 950:w-16 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
       </td>
       
       <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
          <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">PL (g)</span>
-        <input type="number" step="0.01" name="ingredientes[${idx}].pl" value="${pl}" 
+        <input type="text" inputmode="decimal" name="ingredientes[${idx}].pl" value="${pl}" 
            class="w-full 950:w-16 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
       </td>
       
       <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
          <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">FC</span>
-        <input type="number" step="0.01" name="ingredientes[${idx}].fc" value="${fcValue}" 
+        <input type="text" inputmode="decimal" name="ingredientes[${idx}].fc" value="${fcValue}" 
           class="w-full 950:w-14 950:mx-auto rounded p-1 fc-edit text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" readonly tabindex="-1" />
       </td>
       
       <td class="col-span-3 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
          <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">Custo/Kg (R$)</span>
-        <input type="number" step="0.01" name="ingredientes[${idx}].custoKg" value="${custoKg.toFixed(2)}" 
+        <input type="text" inputmode="decimal" name="ingredientes[${idx}].custoKg" value="${custoKg.toFixed(2)}" 
            class="w-full 950:w-20 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
       </td>
       
       <td class="col-span-3 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
          <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">Custo Usado</span>
-        <input type="number" step="0.01" name="ingredientes[${idx}].custoUsado" value="${custoUsadoVal}" 
+        <input type="text" inputmode="decimal" name="ingredientes[${idx}].custoUsado" value="${custoUsadoVal}" 
            class="w-full 950:w-20 rounded p-1 custo-usado-edit bg-[#f3ffe5] text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none" readonly tabindex="-1" />
       </td>
       
@@ -276,9 +276,10 @@ function initEventDelegationTabela() {
       }
       if (
         custoUsadoInput &&
-        (targetName.endsWith(".pb") || targetName.endsWith(".custoKg"))
+        (targetName.endsWith(".pb") || targetName.endsWith(".pl") || targetName.endsWith(".custoKg"))
       ) {
-        custoUsadoInput.value = ((custoKg * pb) / 1000).toFixed(2);
+        const pesoBase = pb > 0 ? pb : pl;
+        custoUsadoInput.value = ((custoKg * pesoBase) / 1000).toFixed(2);
       }
 
       atualizarCustoTotal();
@@ -629,8 +630,8 @@ window.validarFormFicha = function () {
     return false;
   }
 
-  if (!validarTextoMaximo(tempoPreparo, 10)) {
-    dispararErroFicha("O tempo de preparo deve ter no máximo 10 caracteres.");
+  if (!validarTextoMaximo(tempoPreparo, 30)) {
+    dispararErroFicha("O tempo de preparo deve ter no máximo 30 caracteres.");
     return false;
   }
 
@@ -641,30 +642,38 @@ window.validarFormFicha = function () {
     return false;
   }
 
-  if (!validarNumeroComMaximoDigitos(numeroPreparacao, 4, 0)) {
+  if (!validarNumeroComMaximoDigitos(numeroPreparacao, 9, 0)) {
     dispararErroFicha(
-      "O número da preparação deve ter no máximo 4 dígitos inteiros.",
+      "O número da preparação deve ter no máximo 9 dígitos inteiros.",
     );
     return false;
   }
 
-  if (!validarNumeroComMaximoDigitos(rendimentoVal, 8, 2)) {
+  const numeroPorcoesVal = document.getElementById("numeroPorcoes")?.value?.trim();
+  if (numeroPorcoesVal && !validarNumeroComMaximoDigitos(numeroPorcoesVal, 9, 0)) {
     dispararErroFicha(
-      "O rendimento deve ter no máximo 8 dígitos inteiros e 2 casas decimais.",
+      "O número de porções deve ter no máximo 9 dígitos inteiros.",
     );
     return false;
   }
 
-  if (!validarNumeroComMaximoDigitos(pesoPorcaoVal, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(rendimentoVal, 10, 5)) {
     dispararErroFicha(
-      "O peso da porção deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O rendimento deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
     );
     return false;
   }
 
-  if (qntdAguaVal !== "" && !validarNumeroComMaximoDigitos(qntdAguaVal, 4, 2)) {
+  if (!validarNumeroComMaximoDigitos(pesoPorcaoVal, 10, 5)) {
     dispararErroFicha(
-      "A quantidade de água deve ter no máximo 4 dígitos inteiros e 2 casas decimais.",
+      "O peso da porção deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
+    );
+    return false;
+  }
+
+  if (qntdAguaVal !== "" && !validarNumeroComMaximoDigitos(qntdAguaVal, 10, 5)) {
+    dispararErroFicha(
+      "A quantidade de água deve ter no máximo 10 dígitos inteiros e 5 casas decimais.",
     );
     return false;
   }
@@ -686,12 +695,12 @@ window.validarFormFicha = function () {
 
     // Priorizar mensagem de campo obrigatório
     if (!validarCampoObrigatorio(pbInput?.value)) {
-      dispararErroFicha(`O PB do ingrediente "${nomeIngrediente}" é obrigatório.`);
+      dispararErroFicha(`O PB do ingrediente "${nomeIngrediente}" é obrigatório (Caso não tenha, ponha 0).`);
       return false;
     }
-    if (!validarNumeroComMaximoDigitos(pbInput?.value, 4, 2)) {
+    if (!validarNumeroComMaximoDigitos(pbInput?.value, 10, 5)) {
       dispararErroFicha(
-        `O PB do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+        `O PB do ingrediente "${nomeIngrediente}" deve ter no máximo 10 dígitos inteiros e 5 casas decimais.`,
       );
       return false;
     }
@@ -699,9 +708,9 @@ window.validarFormFicha = function () {
       dispararErroFicha(`O PL do ingrediente "${nomeIngrediente}" é obrigatório.`);
       return false;
     }
-    if (!validarNumeroComMaximoDigitos(plInput?.value, 4, 2)) {
+    if (!validarNumeroComMaximoDigitos(plInput?.value, 10, 5)) {
       dispararErroFicha(
-        `O PL do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+        `O PL do ingrediente "${nomeIngrediente}" deve ter no máximo 10 dígitos inteiros e 5 casas decimais.`,
       );
       return false;
     }
@@ -709,9 +718,9 @@ window.validarFormFicha = function () {
       dispararErroFicha(`O custo por kg do ingrediente "${nomeIngrediente}" é obrigatório.`);
       return false;
     }
-    if (!validarNumeroComMaximoDigitos(custoKgInput?.value, 4, 2)) {
+    if (!validarNumeroComMaximoDigitos(custoKgInput?.value, 10, 5)) {
       dispararErroFicha(
-        `O custo por kg do ingrediente "${nomeIngrediente}" deve ter no máximo 4 dígitos inteiros e 2 casas decimais.`,
+        `O custo por kg do ingrediente "${nomeIngrediente}" deve ter no máximo 10 dígitos inteiros e 5 casas decimais.`,
       );
       return false;
     }

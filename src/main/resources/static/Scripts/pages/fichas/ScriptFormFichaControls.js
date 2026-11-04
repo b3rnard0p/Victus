@@ -18,6 +18,7 @@ function initCalculoFCFooter() {
 
 function initCalculoCustoUsadoFooter() {
   const pbInput = document.getElementById("pb");
+  const plInput = document.getElementById("pl");
   const custoKgInput = document.getElementById("custoKg");
   const custoUsadoDisplay = document.getElementById("custoUsado");
 
@@ -32,14 +33,17 @@ function initCalculoCustoUsadoFooter() {
 
   function atualizarCustoUsado() {
     const pb = parseFloat(pbInput?.value) || 0;
+    const pl = parseFloat(plInput?.value) || 0;
+    const pesoBase = pb > 0 ? pb : pl;
     const custoKg = parseFloat(custoKgInput?.value) || 0;
-    const usado = (custoKg * pb) / 1000;
+    const usado = (custoKg * pesoBase) / 1000;
     if (custoUsadoDisplay)
       custoUsadoDisplay.value = usado === 0 ? "" : usado.toFixed(2);
     if (custoUsadoValue) custoUsadoValue.value = usado.toFixed(2);
   }
 
   if (pbInput) pbInput.addEventListener("input", atualizarCustoUsado);
+  if (plInput) plInput.addEventListener("input", atualizarCustoUsado);
   if (custoKgInput) custoKgInput.addEventListener("input", atualizarCustoUsado);
 }
 

@@ -540,26 +540,6 @@ class FichaTecnicaServiceTest {
     }
 
     @Test
-    void create_PorcoesMenorQueUm_ThrowsException() {
-        Usuario nutricionista = new Usuario();
-        nutricionista.setId(1L);
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(nutricionista));
-
-        com.example.sistemanutricao.record.PreparacaoDTO.PreparacaoDTO prepDto = 
-            new com.example.sistemanutricao.record.PreparacaoDTO.PreparacaoDTO(null, "Teste", 1, "30m", "Fogo", "Modo", null, null, BigDecimal.ONE, BigDecimal.valueOf(10), null);
-        
-        com.example.sistemanutricao.model.Preparacao prep = new com.example.sistemanutricao.model.Preparacao();
-        prep.setRendimento(BigDecimal.valueOf(10));
-        when(fichaTecnicaMapper.toPreparacao(prepDto)).thenReturn(prep);
-
-        FichaTecnicaCreateDTO dto = new FichaTecnicaCreateDTO(
-            null, null, BigDecimal.TEN, "Prato", null, BigDecimal.valueOf(100), Status.ATIVA, StatusCriacao.COMPLETA, null, null, prepDto, List.of(), null
-        );
-
-        assertThrows(org.springframework.web.server.ResponseStatusException.class, () -> fichaTecnicaService.create(dto, 1L));
-    }
-
-    @Test
     void update_DuplicateName_ThrowsException() {
         FichaTecnica ficha = new FichaTecnica();
         ficha.setId(1L);

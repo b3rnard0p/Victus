@@ -175,31 +175,31 @@
 
           <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
             <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">PB (g)</span>
-            <input type="number" step="0.01" name="ingredientes[${index}].pb" value="${ing.pb}"
+            <input type="text" inputmode="decimal" name="ingredientes[${index}].pb" value="${ing.pb}"
                    class="w-full 950:w-16 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
           </td>
 
           <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
             <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">PL (g)</span>
-            <input type="number" step="0.01" name="ingredientes[${index}].pl" value="${ing.pl}"
+            <input type="text" inputmode="decimal" name="ingredientes[${index}].pl" value="${ing.pl}"
                    class="w-full 950:w-16 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
           </td>
 
           <td class="col-span-2 block 950:table-cell px-1 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
             <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">FC</span>
-            <input type="number" step="0.01" name="ingredientes[${index}].fc" value="${(ing.pb / ing.pl || 1).toFixed(2)}"
+            <input type="text" inputmode="decimal" name="ingredientes[${index}].fc" value="${(ing.pb / ing.pl || 1).toFixed(2)}"
                    class="w-full 950:w-14 950:mx-auto rounded p-1 fc-edit text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" readonly tabindex="-1" />
           </td>
 
           <td class="col-span-3 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
             <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">Custo/Kg (R$)</span>
-            <input type="number" step="0.01" name="ingredientes[${index}].custoKg" value="${ing.custoKg}"
+            <input type="text" inputmode="decimal" name="ingredientes[${index}].custoKg" value="${ing.custoKg}"
                    class="w-full 950:w-20 rounded p-1 text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none bg-transparent" />
           </td>
 
           <td class="col-span-3 block 950:table-cell px-2 py-2 border-none 950:border 950:border-[#4A6E18] text-center">
             <span class="950:hidden text-xs text-gray-800 font-bold block mb-1">Custo Usado</span>
-            <input type="number" step="0.01" name="ingredientes[${index}].custoUsado" value="${((ing.pb / 1000) * ing.custoKg || 0).toFixed(2)}"
+            <input type="text" inputmode="decimal" name="ingredientes[${index}].custoUsado" value="${(( (ing.pb > 0 ? ing.pb : (ing.pl || 0)) / 1000) * ing.custoKg || 0).toFixed(2)}"
                    class="w-full 950:w-20 rounded p-1 custo-usado-edit bg-[#f3ffe5] text-center text-sm text-gray-800 border border-[#4A6E18] 950:border-none" readonly tabindex="-1" />
           </td>
 

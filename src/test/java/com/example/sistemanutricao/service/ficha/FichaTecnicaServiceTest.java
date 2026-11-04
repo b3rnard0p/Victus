@@ -127,9 +127,9 @@ class FichaTecnicaServiceTest {
 
         FichaTecnicaGetDTO dto = fichaTecnicaService.create(fichaCreate, 1L);
 
-        // rendimento 800 / pesoPorcao 150 -> 5 porções
-        assertThat(dto.numeroPorcoes()).isEqualTo(5);
-        // 100 / 5 = 20.00
-        assertThat(dto.custoPerCapita()).isEqualByComparingTo("20.00");
+        // rendimento 800 / pesoPorcao 150 -> 5.33, com CEILING -> 6 porções
+        assertThat(dto.numeroPorcoes()).isEqualTo(6);
+        // 100 / 6 = 16.67
+        assertThat(dto.custoPerCapita()).isEqualByComparingTo("16.67");
     }
 }
