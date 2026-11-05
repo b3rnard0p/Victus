@@ -184,14 +184,14 @@ public class FichaController {
         return buscar(campo, valor, tipo, null, null, page, model, usuarioPrincipal, request, htmxRequest);
     }
 
-
-
     @GetMapping("/{id:[0-9]+}")
     public String mostrarFichaPorId(
-            @PathVariable Long id, Model model,
+            @PathVariable Long id,
+            Model model,
+            @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
             @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         try {
-            FichaTecnicaGetDTO ficha = fichaTecnicaService.getFichaById(id);
+            FichaTecnicaGetDTO ficha = fichaTecnicaService.getFichaById(id, usuarioPrincipal != null ? usuarioPrincipal.getUsuario() : null);
             model.addAttribute("ficha", ficha);
             return paginacaoViewSupport.renderizarView("pages/fichas/Detail", htmxRequest, model);
         } catch (EntityNotFoundException e) {
@@ -200,18 +200,21 @@ public class FichaController {
     }
 
     @PostMapping("/toggle-status/{id}")
-    public String toggleStatus(@PathVariable Long id) {
-        fichaTecnicaService.atualizaStatus(id);
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
+    public String toggleStatus(@PathVariable Long id, @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
+        fichaTecnicaService.atualizaStatus(id, usuarioPrincipal != null ? usuarioPrincipal.getId() : null);
         return "redirect:/ficha/" + id;
     }
 
     @GetMapping("/editar/{id}")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public String mostrarFormularioEdicao(
-            @PathVariable Long id, Model model,
+            @PathVariable Long id,
+            Model model,
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
             @RequestHeader(value = "HX-Request", required = false) String htmxRequest) {
         
-        FichaTecnicaGetDTO fichaGet = fichaTecnicaService.getFichaById(id);
+        FichaTecnicaGetDTO fichaGet = fichaTecnicaService.getFichaById(id, usuarioPrincipal != null ? usuarioPrincipal.getUsuario() : null);
         FichaTecnicaUpdateDTO fichaEdicao = fichaFormMapper.toUpdateDTO(fichaGet);
         model.addAttribute("ingredientesDisponiveis", new ArrayList<IngredienteGetDTO>());
         model.addAttribute("ficha", fichaEdicao);
@@ -220,6 +223,7 @@ public class FichaController {
     }
 
     @PostMapping("/editar/{id}")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public void updateFichaTecnica(
             @PathVariable Long id,
             @Valid @ModelAttribute("ficha") FichaTecnicaUpdateDTO dto,
@@ -237,7 +241,7 @@ public class FichaController {
             throw new FormValidationException(result.getAllErrors().get(0).getDefaultMessage());
         }
 
-        fichaTecnicaService.update(id, dto);
+        fichaTecnicaService.update(id, dto, usuarioPrincipal != null ? usuarioPrincipal.getId() : null);
 
         if ("true".equals(htmxRequest)) {
             response.setHeader("HX-Redirect", "/ficha");
@@ -251,6 +255,7 @@ public class FichaController {
     }
 
     @GetMapping("/nova")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public String mostrarFormularioNovaFicha(
             Model model,
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal,
@@ -272,6 +277,7 @@ public class FichaController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public void salvarFichaTecnica(
             @Valid @ModelAttribute("ficha") FichaTecnicaCreateDTO fichaTecnicaDTO,
             BindingResult result,
@@ -294,9 +300,11 @@ public class FichaController {
     }
 
     @GetMapping("/exportar-pdf/{id}")
-    public ResponseEntity<ByteArrayResource> exportarFichaTecnica(@PathVariable Long id) {
+    public ResponseEntity<ByteArrayResource> exportarFichaTecnica(
+            @PathVariable Long id,
+            @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
         try {
-            FichaTecnicaGetDTO ficha = fichaTecnicaService.getFichaById(id);
+            FichaTecnicaGetDTO ficha = fichaTecnicaService.getFichaById(id, usuarioPrincipal != null ? usuarioPrincipal.getUsuario() : null);
             byte[] pdfBytes = pdfExporter.generateFichaTecnicaPdf(ficha);
 
             ByteArrayResource resource = new ByteArrayResource(pdfBytes);

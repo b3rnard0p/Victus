@@ -48,6 +48,18 @@ public class Usuario {
 
     private String caminhoImagem;
 
+    @Column(unique = true)
+    @Size(max = 50, message = "O número de matrícula pode ter no máximo 50 caracteres.")
+    private String numeroMatricula;
+
+    public String getNumeroMatricula() {
+        return numeroMatricula;
+    }
+
+    public void setNumeroMatricula(String numeroMatricula) {
+        this.numeroMatricula = numeroMatricula;
+    }
+
     public String getCaminhoImagem() {
         return caminhoImagem;
     }

@@ -31,11 +31,11 @@ public class UsuarioDetailsService implements UserDetailsService {
                     return new UsernameNotFoundException("E-mail não encontrado");
                 });
         try {
-            org.slf4j.LoggerFactory.getLogger(UsuarioDetailsService.class)
-                .info("[DEBUG] Carregando UserDetails para {} - hash: {}", email, user.getSenha());
+            // Log de debug desativado
+                // Hash omitido por segurança
         } catch (Exception e) {
-            org.slf4j.LoggerFactory.getLogger(UsuarioDetailsService.class)
-                .warn("[DEBUG] Não foi possível logar hash do usuário: {}", e.getMessage());
+            // Log de debug desativado
+                // Ignorado
         }
 
         if (user.getCargo() == null) {

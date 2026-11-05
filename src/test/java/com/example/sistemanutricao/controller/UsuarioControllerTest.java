@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -15,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.Optional;
@@ -37,6 +39,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import com.example.sistemanutricao.exception.DuplicateNomeException;
 import com.example.sistemanutricao.model.enuns.Cargo;
 import com.example.sistemanutricao.record.UsuarioDTO.GetUsuarioDTO;
 import com.example.sistemanutricao.record.UsuarioDTO.UsuarioDTO;
@@ -113,6 +116,20 @@ class UsuarioControllerTest {
     }
 
     @Test
+    @DisplayName("Deve recuperar senha por matrícula com sucesso")
+    void deveRecuperarSenhaPorMatricula() throws Exception {
+        mockMvc.perform(post("/usuario/recuperar-senha")
+                .param("email", "teste@teste.com")
+                .param("numeroMatricula", "MAT123")
+                .param("novaSenha", "NovaSenha@123")
+                .param("confirmarNovaSenha", "NovaSenha@123"))
+                .andExpect(status().isFound())
+                .andExpect(view().name("redirect:/login"));
+
+        verify(usuarioService).recuperarSenhaPorMatricula("teste@teste.com", "MAT123", "NovaSenha@123", "NovaSenha@123");
+    }
+
+    @Test
     @DisplayName("Deve realizar login com acesso negado")
     void deveRealizarLoginAcessoNegado() throws Exception {
         when(authSessionService.login(anyString(), anyString(), anyBoolean(), any())).thenReturn(LoginStatus.ACCESS_DENIED);
@@ -145,7 +162,7 @@ class UsuarioControllerTest {
         mockMvc.perform(post("/usuario/registrar")
                 .param("username", "teste")
                 .param("email", "teste@teste.com")
-                .param("password", "123"))
+                .param("senha", "NovaSenha@123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/general/Registrado"));
         verify(usuarioService).create(any(UsuarioDTO.class));
@@ -158,7 +175,44 @@ class UsuarioControllerTest {
                 .param("username", "")
                 .param("email", "teste@teste.com")
                 .param("password", "123"))
-                .andExpect(status().isFound()); // Exception handler intercepta
+                .andExpect(status().isFound())
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(flash().attribute("abrirCard", "register"))
+                .andExpect(flash().attributeExists("registroDto"))
+                .andExpect(flash().attributeExists("errorMessage"));
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao registrar usuario duplicado preservando campos")
+    void deveFalharRegistrarUsuarioDuplicadoPreservandoDados() throws Exception {
+        doThrow(new DuplicateNomeException("Este e-mail já está em uso."))
+                .when(usuarioService).create(any());
+
+        mockMvc.perform(post("/usuario/registrar")
+                .param("username", "teste")
+                .param("email", "teste@teste.com")
+                .param("senha", "NovaSenha@123")
+                .param("confirmarSenha", "NovaSenha@123")
+                .param("numeroMatricula", "MAT999"))
+                .andExpect(status().isFound())
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(flash().attribute("abrirCard", "register"))
+                .andExpect(flash().attributeExists("registroDto"))
+                .andExpect(flash().attribute("errorMessage", "Este e-mail já está em uso."));
+    }
+
+    @Test
+    @DisplayName("Deve falhar ao registrar usuario com senha fraca")
+    void deveFalharRegistrarUsuarioSenhaFraca() throws Exception {
+        mockMvc.perform(post("/usuario/registrar")
+                .param("username", "teste")
+                .param("email", "teste@teste.com")
+                .param("senha", "123")
+                .param("confirmarSenha", "123"))
+                .andExpect(status().isFound())
+                .andExpect(view().name("redirect:/login"))
+                .andExpect(flash().attribute("abrirCard", "register"))
+                .andExpect(flash().attribute("errorMessage", PasswordValidationService.MENSAGEM_SENHA_FRACA));
     }
 
     @Test
@@ -180,7 +234,7 @@ class UsuarioControllerTest {
     @Test
     @DisplayName("Deve mostrar modal de perfil")
     void deveMostrarModalPerfil() throws Exception {
-        GetUsuarioDTO dto = new GetUsuarioDTO(1L, "Teste", "teste@teste.com", Cargo.NUTRICIONISTA, null, null, true, null);
+        GetUsuarioDTO dto = new GetUsuarioDTO(1L, "Teste", "teste@teste.com", Cargo.NUTRICIONISTA, null, null, true, null, "MAT123");
         when(usuarioService.findById(1L)).thenReturn(dto);
 
         mockMvc.perform(get("/usuario/perfil/modal"))
@@ -228,7 +282,7 @@ class UsuarioControllerTest {
         mockMvc.perform(multipart("/usuario/editar")
                 .param("username", "teste")
                 .param("email", "teste@teste.com")
-                .param("password", "123"))
+                .param("senha", "NovaSenha@123"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("fragments/Perfil"));
     }

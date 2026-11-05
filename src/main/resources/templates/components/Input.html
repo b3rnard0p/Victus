@@ -31,6 +31,10 @@
      class="relative mt-6 w-full group glow-wrapper rounded-xl p-[2px] bg-[#4A6E18] focus-within:bg-[#7AB648] transition-colors duration-200"
      style="--mouse-x: -100px; --mouse-y: -100px;">
 
+    <div class="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+         th:style="'background: radial-gradient(100px circle at var(--mouse-x) var(--mouse-y), ' + (${bgClass} != null ? '#e5e5e5' : '#f3ffe5') + ', transparent 100%);'">
+    </div>
+
     <div th:class="'relative w-full rounded-[10px] ' + ${corFundo}">
         <input th:id="${id}" th:name="${name}" th:type="${type}" th:value="${value}" th:required="${required}" th:disabled="${disabled}"
                step="any" placeholder=" "

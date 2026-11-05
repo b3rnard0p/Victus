@@ -160,7 +160,7 @@ class IngredienteControllerTest {
         mockMvc.perform(post("/ingrediente/atualiza-status/1"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/ingrediente"));
-        verify(ingredienteService).atualizaStatus(1L);
+        verify(ingredienteService).atualizaStatus(1L, 1L);
     }
 
     @Test
@@ -187,7 +187,7 @@ class IngredienteControllerTest {
     @Test
     @DisplayName("Deve mostrar formulário de edição")
     void deveMostrarFormularioEdicao() throws Exception {
-        when(ingredienteService.getIngredienteById(1L)).thenReturn(ingredienteDto());
+        when(ingredienteService.getIngredienteById(1L, 1L)).thenReturn(ingredienteDto());
 
         mockMvc.perform(get("/ingrediente/editar/1"))
                 .andExpect(status().isOk())
@@ -197,7 +197,7 @@ class IngredienteControllerTest {
     @Test
     @DisplayName("Deve atualizar ingrediente")
     void deveAtualizarIngrediente() throws Exception {
-        when(ingredienteService.getIngredienteById(1L)).thenReturn(ingredienteDto());
+        when(ingredienteService.getIngredienteById(1L, 1L)).thenReturn(ingredienteDto());
 
         mockMvc.perform(post("/ingrediente/editar/1")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -213,7 +213,7 @@ class IngredienteControllerTest {
                 .andExpect(model().attributeExists("ingrediente"))
                 .andExpect(view().name("pages/ingredientes/List :: ingrediente-item"));
 
-        verify(ingredienteService).update(eq(1L), any(IngredienteDTO.class));
+        verify(ingredienteService).update(eq(1L), any(IngredienteDTO.class), eq(1L));
     }
 
     @Test
@@ -232,6 +232,27 @@ class IngredienteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1))
                 .andExpect(jsonPath("$[1].id").value(1));
+    }
+
+    @Test
+    @DisplayName("Deve ordenar resultados da API priorizando correspondência exata")
+    void deveOrdenarResultadosApiPriorizandoExato() throws Exception {
+        IngredienteGetDTO boloOvo = new IngredienteGetDTO(10L, "Bolo sabor ovo", BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, Status.ATIVA, BigDecimal.ONE, BigDecimal.ONE, 1L);
+        IngredienteGetDTO ovoExato = new IngredienteGetDTO(20L, "Ovo", BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, Status.ATIVA, BigDecimal.ONE, BigDecimal.ONE, 1L);
+
+        Page<IngredienteGetDTO> pageUsuario = new PageImpl<>(List.of(boloOvo, ovoExato));
+        Page<IngredienteGetDTO> pageTaco = new PageImpl<>(List.of());
+
+        when((Page) ingredienteQueryService.pesquisar(eq("nome"), eq("ovo"), eq("especifico"), eq(1L), any(Pageable.class)))
+                .thenReturn(pageUsuario);
+        when((Page) ingredienteQueryService.pesquisarTaco(eq("nome"), eq("ovo"), eq("especifico"), any(Pageable.class)))
+                .thenReturn(pageTaco);
+
+        mockMvc.perform(get("/ingrediente/api/buscar")
+                .param("q", "ovo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].nome").value("Ovo"))
+                .andExpect(jsonPath("$[1].nome").value("Bolo sabor ovo"));
     }
 
 

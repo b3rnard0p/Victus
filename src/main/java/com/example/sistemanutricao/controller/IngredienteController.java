@@ -164,8 +164,8 @@ public class IngredienteController {
 
 
     @PostMapping("/atualiza-status/{id}")
-    public String atualizaStatus(@PathVariable Long id) {
-        ingredienteService.atualizaStatus(id);
+    public String atualizaStatus(@PathVariable Long id, @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
+        ingredienteService.atualizaStatus(id, usuarioPrincipal.getId());
         return "redirect:/ingrediente";
     }
 
@@ -193,8 +193,8 @@ public class IngredienteController {
 
     @GetMapping("/editar/{id}")
     @ResponseBody
-    public IngredienteGetDTO mostrarFormularioEdicaoIngredientes(@PathVariable Long id) {
-        return ingredienteService.getIngredienteById(id);
+    public IngredienteGetDTO mostrarFormularioEdicaoIngredientes(@PathVariable Long id, @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
+        return ingredienteService.getIngredienteById(id, usuarioPrincipal.getId());
     }
 
     @PostMapping("/editar/{id}")
@@ -202,14 +202,15 @@ public class IngredienteController {
                                        @Valid @ModelAttribute("ingrediente") IngredienteDTO dto,
                                        BindingResult result,
                                        HttpServletRequest request,
-                                       Model model) {
+                                       Model model,
+                                       @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
         if (result.hasErrors()) {
             var fieldError = result.getFieldError();
             throw new IllegalArgumentException(fieldError != null ? fieldError.getDefaultMessage() : "Erro de validação");
         }
 
-        ingredienteService.update(id, dto);
-        IngredienteGetDTO atualizado = ingredienteService.getIngredienteById(id);
+        ingredienteService.update(id, dto, usuarioPrincipal.getId());
+        IngredienteGetDTO atualizado = ingredienteService.getIngredienteById(id, usuarioPrincipal.getId());
 
         String htmxRequest = request.getHeader("HX-Request");
         if ("true".equals(htmxRequest)) {
@@ -228,7 +229,7 @@ public class IngredienteController {
             @AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
         
         List<IngredienteGetDTO> resultados = new ArrayList<>();
-        Pageable pageable = PageRequest.of(0, 20);
+        Pageable pageable = PageRequest.of(0, 50);
 
         if (usuarioPrincipal != null) {
             Long usuarioId = usuarioPrincipal.getId();
@@ -242,6 +243,12 @@ public class IngredienteController {
 
         resultados.addAll(ingredientesTaco.getContent());
 
-        return resultados;
+        Long usuarioId = usuarioPrincipal != null ? usuarioPrincipal.getId() : null;
+        List<IngredienteGetDTO> ordenados = com.example.sistemanutricao.util.IngredienteSearchRanker.ordenarPorRelevancia(resultados, query, usuarioId);
+
+        if (ordenados.size() > 30) {
+            return ordenados.subList(0, 30);
+        }
+        return ordenados;
     }
 }

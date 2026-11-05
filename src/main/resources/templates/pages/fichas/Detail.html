@@ -149,12 +149,12 @@
                         " th:text="${ingrediente.medidaCaseira()}"></div>
                     </div>
                   </td>
-                  <td class="border p-2 text-zinc-900" th:text="${ingrediente.pb()} + ' g'"></td>
-                  <td class="border p-2 text-zinc-900" th:text="${ingrediente.pl()} + ' g'"></td>
-                  <td class="border p-2 text-zinc-900" th:text="${ingrediente.fc()}"></td>
-                  <td class="border p-2 text-zinc-900"
+                  <td class="border p-2 text-zinc-900 whitespace-nowrap" th:text="${ingrediente.pbFormatado()} + ' g'"></td>
+                  <td class="border p-2 text-zinc-900 whitespace-nowrap" th:text="${ingrediente.plFormatado()} + ' g'"></td>
+                  <td class="border p-2 text-zinc-900 whitespace-nowrap" th:text="${ingrediente.fcFormatado()}"></td>
+                  <td class="border p-2 text-zinc-900 break-all"
                     th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoUsado(), 1, 2)}"></td>
-                  <td class="border p-2 text-zinc-900"
+                  <td class="border p-2 text-zinc-900 break-all"
                     th:text="'R$ ' + ${#numbers.formatDecimal(ingrediente.custoKg(), 1, 2)}"></td>
                 </tr>
               </tbody>
@@ -204,11 +204,11 @@
               </div>
               <div>
                 <p class="font-semibold text-zinc-900">Peso da porção:</p>
-                <p th:text="${ficha.pesoPorcao()} + ' g'"></p>
+                <p th:text="${ficha.pesoPorcaoFormatado()} + ' g'"></p>
               </div>
               <div>
                 <p class="font-semibold text-zinc-900">Rendimento:</p>
-                <p th:text="${ficha.preparacao().rendimento()} + ' g'"></p>
+                <p th:text="${ficha.preparacao().rendimentoFormatado()} + ' g'"></p>
               </div>
               <div>
                 <div class="flex flex-col items-center">
@@ -233,7 +233,7 @@
 
               <div th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
                 <p class="font-semibold text-zinc-900">Fcc:</p>
-                <p th:text="${ficha.preparacao().fcc()}"></p>
+                <p th:text="${ficha.preparacao().fccFormatado()}"></p>
               </div>
               <div th:unless="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
                 <p class="font-semibold text-zinc-900">Água:</p>
@@ -242,15 +242,15 @@
 
               <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
                 <p class="font-semibold text-zinc-900">Quantidade de água:</p>
-                <p th:text="${ficha.preparacao().qntdAgua()} + ' ml'"></p>
+                <p th:text="${ficha.preparacao().qntdAguaFormatado()} + ' ml'"></p>
               </div>
               <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
                 <p class="font-semibold text-zinc-900">Água que sobrou:</p>
-                <p th:text="${ficha.preparacao().porcentAgua()} + ' %'"></p>
+                <p th:text="${ficha.preparacao().porcentAguaFormatado()} + ' %'"></p>
               </div>
               <div th:if="${ficha.preparacao().qntdAgua() != null and ficha.preparacao().qntdAgua() > 0}">
                 <p class="font-semibold text-zinc-900">Fcc:</p>
-                <p th:text="${ficha.preparacao().fcc()}"></p>
+                <p th:text="${ficha.preparacao().fccFormatado()}"></p>
               </div>
             </div>
           </div>
@@ -300,22 +300,22 @@
                           " th:text="${ingrediente.ingrediente.nome}"></div>
                       </div>
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.pl != null ? ingrediente.pl : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'">
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.ptnCalculado != null ? ingrediente.ptnCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'">
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.choCalculado != null ? ingrediente.choCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'">
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.lipCalculado != null ? ingrediente.lipCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'">
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.sodioCalculado != null ? ingrediente.sodioCalculado : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' mg'">
                     </td>
-                    <td class="border p-2 text-zinc-800"
+                    <td class="border p-2 text-zinc-800 break-all"
                       th:text="${#numbers.formatDecimal((ingrediente.gorduraSaturadaCalculada != null ? ingrediente.gorduraSaturadaCalculada : 0) / (ficha.numeroPorcoes() != null and ficha.numeroPorcoes() > 0 ? ficha.numeroPorcoes() : 1), 1, 2)} + ' g'">
                     </td>
                   </tr>
@@ -330,12 +330,12 @@
               <table class="min-w-[650px] sm:w-full border text-sm sm:text-base bg-gray-50">
                 <tr>
                   <td class="border p-2 font-semibold">Gramas</td>
-                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasPTN()} + ' g'"></td>
-                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasCHO()} + ' g'"></td>
-                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasLIP()} + ' g'"></td>
-                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSodio()} + ' mg'">
+                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasPTNFormatado()} + ' g'"></td>
+                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasCHOFormatado()} + ' g'"></td>
+                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasLIPFormatado()} + ' g'"></td>
+                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSodioFormatado()} + ' mg'">
                   </td>
-                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSaturada()} + ' g'">
+                  <td class="border p-2 text-zinc-800" th:text="${ficha.perfilNutricional().gramasSaturadaFormatado()} + ' g'">
                   </td>
                 </tr>
                 <tr>
@@ -360,7 +360,7 @@
             <div class="flex justify-center mt-4">
               <p class="font-semibold text-lg bg-white px-4 py-2 rounded border border-[#7AB648]">
                 VCT:
-                <span class="font-bold text-zinc-900" th:text="${ficha.perfilNutricional().vtc()} + ' kcal'"></span>
+                <span class="font-bold text-zinc-900" th:text="${ficha.perfilNutricional().vtcFormatado()} + ' kcal'"></span>
               </p>
             </div>
           </div>

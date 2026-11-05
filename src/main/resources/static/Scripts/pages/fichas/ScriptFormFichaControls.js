@@ -1,3 +1,11 @@
+function parseNumero(val) {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  const str = String(val).trim().replace(",", ".");
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+}
+
 function initCalculoFCFooter() {
   const pbInput = document.getElementById("pb");
   const plInput = document.getElementById("pl");
@@ -5,8 +13,8 @@ function initCalculoFCFooter() {
   const fcValueInput = document.querySelector(".fc-value");
 
   function atualizarFC() {
-    const pb = parseFloat(pbInput?.value) || 0;
-    const pl = parseFloat(plInput?.value) || 0;
+    const pb = parseNumero(pbInput?.value);
+    const pl = parseNumero(plInput?.value);
     const fc = pl === 0 ? 0 : pb / pl;
     if (fcDisplayElem)
       fcDisplayElem.textContent = fc === 0 ? "0.00" : fc.toFixed(2);
@@ -32,10 +40,10 @@ function initCalculoCustoUsadoFooter() {
   }
 
   function atualizarCustoUsado() {
-    const pb = parseFloat(pbInput?.value) || 0;
-    const pl = parseFloat(plInput?.value) || 0;
+    const pb = parseNumero(pbInput?.value);
+    const pl = parseNumero(plInput?.value);
     const pesoBase = pb > 0 ? pb : pl;
-    const custoKg = parseFloat(custoKgInput?.value) || 0;
+    const custoKg = parseNumero(custoKgInput?.value);
     const usado = (custoKg * pesoBase) / 1000;
     if (custoUsadoDisplay)
       custoUsadoDisplay.value = usado === 0 ? "" : usado.toFixed(2);
@@ -74,12 +82,12 @@ function initCalculoFCC() {
     document
       .querySelectorAll('#ingredientesAdicionados input[name$=".pl"]')
       .forEach((input) => {
-        somaPLs += parseFloat(input.value) || 0;
+        somaPLs += parseNumero(input.value);
       });
 
-    const rendimento = parseFloat(rendimentoInput?.value) || 0;
-    const qntdAgua = parseFloat(qntdAguaInput?.value) || 0;
-    const porcentAgua = parseFloat(porcentAguaInput?.value) || 0;
+    const rendimento = parseNumero(rendimentoInput?.value);
+    const qntdAgua = parseNumero(qntdAguaInput?.value);
+    const porcentAgua = parseNumero(porcentAguaInput?.value);
 
     const aguaNoPrato = (qntdAgua * porcentAgua) / 100;
     const pesoCru = somaPLs + aguaNoPrato;
@@ -144,8 +152,8 @@ function initPesoPorcao() {
   }
 
   function atualizarNumeroPorcoes() {
-    const rendimento = parseFloat(rendEl?.value) || 0;
-    const pesoPorcao = parseFloat(pesoPorcaoEl?.value) || 0;
+    const rendimento = parseNumero(rendEl?.value);
+    const pesoPorcao = parseNumero(pesoPorcaoEl?.value);
 
     if (pesoPorcao > 0 && rendimento > 0 && numEl) {
       numEl.value = Math.ceil(rendimento / pesoPorcao).toString();
@@ -220,8 +228,8 @@ function initCalculoPerCapita() {
   const oculto = document.getElementById("custoPerCapitaHidden");
 
   function atualizarPerCapita() {
-    const total = parseFloat(custoTotalOculto?.value) || 0;
-    const porcoes = parseFloat(numeroPorcoesInput?.value) || 1;
+    const total = parseNumero(custoTotalOculto?.value);
+    const porcoes = parseNumero(numeroPorcoesInput?.value) || 1;
     const resultado = porcoes > 0 ? total / porcoes : 0;
 
     if (visivel) visivel.value = resultado > 0 ? resultado.toFixed(2) : "";
@@ -267,7 +275,33 @@ function initIngredienteAutocomplete() {
     if (medidaCaseiraEl) medidaCaseiraEl.focus();
   }
 
-  function renderSuggestions(ingredientes) {
+  function escapeHtml(text) {
+    if (!text) return "";
+    return String(text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  function highlightMatches(text, q) {
+    if (!q || !text) return escapeHtml(text);
+    const escapedText = escapeHtml(text);
+    const terms = q
+      .trim()
+      .split(/\s+/)
+      .filter((t) => t.length > 0)
+      .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+    if (terms.length === 0) return escapedText;
+    const regex = new RegExp(`(${terms.join("|")})`, "gi");
+    return escapedText.replace(
+      regex,
+      `<span class="text-[#386616] font-bold underline decoration-[#7AB648]">$1</span>`,
+    );
+  }
+
+  function renderSuggestions(ingredientes, currentQuery) {
     if (ingredientes.length === 0) {
       suggestionsContainer.innerHTML = `
           <div class="px-4 py-3 font-semibold text-base text-gray-500 border-b border-[#d4e6be] last:border-0">
@@ -280,7 +314,7 @@ function initIngredienteAutocomplete() {
           (ing) => `
           <div class="group/opt flex items-center px-4 py-3 font-semibold text-base text-black cursor-pointer hover:translate-x-1 transition-all duration-150 relative border-b border-[#d4e6be] last:border-0"
                data-id="${ing.id}" data-nome="${ing.nome}" data-ptn="${ing.ptn}" data-cho="${ing.cho}" data-lip="${ing.lip}" data-sodio="${ing.sodio}" data-saturada="${ing.gorduraSaturada}">
-            <span>${ing.nome}</span>
+            <span>${highlightMatches(ing.nome, currentQuery)}</span>
             <span class="absolute bottom-[6px] left-4 h-[2px] w-0 bg-[#4A6E18] rounded-full transition-all duration-200 group-hover/opt:w-[calc(100%-2rem)]"></span>
           </div>`,
         )
@@ -322,7 +356,7 @@ function initIngredienteAutocomplete() {
           return res.json();
         })
         .then((data) => {
-          renderSuggestions(data);
+          renderSuggestions(data, query);
 
           if (nomeCriadoPendente) {
             const alvo = data.find(
@@ -493,7 +527,7 @@ window.toggleCustoConfigInputs = function () {
 
 window.aplicarCustoConfig = function () {
   const tipoPeso = document.getElementById("tipo_peso").checked;
-  const precoPago = parseFloat(document.getElementById("modalCustoPreco").value);
+  const precoPago = parseNumero(document.getElementById("modalCustoPreco").value);
 
   if (isNaN(precoPago) || precoPago <= 0) {
     if (typeof dispararErroFicha === "function") dispararErroFicha("O preço pago deve ser maior que zero.");
@@ -504,7 +538,7 @@ window.aplicarCustoConfig = function () {
   let custoPorKg = 0;
 
   if (tipoPeso) {
-    const pesoComprado = parseFloat(document.getElementById("modalCustoPeso").value);
+    const pesoComprado = parseNumero(document.getElementById("modalCustoPeso").value);
     if (isNaN(pesoComprado) || pesoComprado <= 0) {
       if (typeof dispararErroFicha === "function") dispararErroFicha("O peso comprado deve ser maior que zero.");
       else alert("O peso comprado deve ser maior que zero.");
@@ -513,8 +547,8 @@ window.aplicarCustoConfig = function () {
     // Preço por grama * 1000 = Preço por Kg
     custoPorKg = (precoPago / pesoComprado) * 1000;
   } else {
-    const qtdComprada = parseFloat(document.getElementById("modalCustoQtd").value);
-    const pesoPorUnidade = parseFloat(document.getElementById("modalCustoPesoUnidade").value);
+    const qtdComprada = parseNumero(document.getElementById("modalCustoQtd").value);
+    const pesoPorUnidade = parseNumero(document.getElementById("modalCustoPesoUnidade").value);
 
     if (isNaN(qtdComprada) || qtdComprada <= 0) {
       if (typeof dispararErroFicha === "function") dispararErroFicha("A quantidade comprada deve ser maior que zero.");

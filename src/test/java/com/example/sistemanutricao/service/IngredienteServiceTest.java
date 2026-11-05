@@ -163,6 +163,30 @@ class IngredienteServiceTest {
         verify(ingredienteRepository).save(ingrediente);
     }
 
+    @Test
+    void shouldThrowExceptionWhenUserTriesToUpdateAnotherUsersOrTacoIngrediente() {
+        Usuario tacoUser = criarUsuario(99L);
+        Ingrediente ingredienteTaco = new Ingrediente();
+        ingredienteTaco.setId(20L);
+        ingredienteTaco.setNome("Arroz TACO");
+        ingredienteTaco.setUsuario(tacoUser);
+
+        IngredienteDTO dto = new IngredienteDTO(
+                20L, "Arroz Alterado", BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE,
+                BigDecimal.ONE, Status.ATIVA, BigDecimal.ONE, 8L
+        );
+
+        when(ingredienteRepository.findById(20L)).thenReturn(Optional.of(ingredienteTaco));
+
+        assertThatThrownBy(() -> ingredienteService.update(20L, dto, 8L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Você não tem permissão para alterar este ingrediente.");
+
+        assertThatThrownBy(() -> ingredienteService.atualizaStatus(20L, 8L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Você não tem permissão para alterar este ingrediente.");
+    }
+
     private Usuario criarUsuario(Long id) {
         Usuario usuario = new Usuario();
         usuario.setId(id);

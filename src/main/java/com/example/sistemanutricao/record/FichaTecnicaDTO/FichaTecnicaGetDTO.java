@@ -21,5 +21,9 @@ public record FichaTecnicaGetDTO(
         PreparacaoGetDTO preparacao,
         List<IngredientePorFichaDTO> ingredientes,
         PerfilNutricionalGetDTO perfilNutricional
-) {}
+) {
+    public String pesoPorcaoFormatado() {
+        return com.example.sistemanutricao.util.NumberFormatUtil.formatar(this.pesoPorcao);
+    }
+}
 

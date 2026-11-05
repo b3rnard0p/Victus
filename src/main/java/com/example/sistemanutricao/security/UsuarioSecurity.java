@@ -28,7 +28,7 @@ public class UsuarioSecurity implements UserDetails {
     }
 
     public Long getEstabelecimentoId() {
-        return usuario.getEstabelecimento().getId();
+        return usuario.getEstabelecimento() != null ? usuario.getEstabelecimento().getId() : null;
     }
 
     @Override

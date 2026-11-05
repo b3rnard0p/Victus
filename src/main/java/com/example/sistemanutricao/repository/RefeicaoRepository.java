@@ -10,7 +10,7 @@ import com.example.sistemanutricao.model.Refeicao;
 
 public interface RefeicaoRepository extends JpaRepository<Refeicao, Long>, JpaSpecificationExecutor<Refeicao> {
 
-    @EntityGraph(value = "Refeicao.completa")
+    @EntityGraph(attributePaths = {"nutricionista"})
     @Override
     Page<Refeicao> findAll(org.springframework.data.jpa.domain.Specification<Refeicao> spec, Pageable pageable);
 
@@ -18,4 +18,7 @@ public interface RefeicaoRepository extends JpaRepository<Refeicao, Long>, JpaSp
 
     boolean existsByNutricionistaIdAndNomeIgnoreCaseAndIdNot(Long nutricionistaId, String nome, Long id);
     boolean existsByNutricionistaId(Long nutricionistaId);
+
+    @org.springframework.data.jpa.repository.Query("SELECT DISTINCT r FROM Refeicao r JOIN r.fichasPorRefeicao fp WHERE fp.fichaTecnica.id = :fichaId")
+    java.util.List<Refeicao> buscarPorFichaTecnicaId(@org.springframework.data.repository.query.Param("fichaId") Long fichaId);
 }

@@ -210,7 +210,7 @@ class FichaControllerTest {
     @DisplayName("Deve mostrar ficha por id")
     void deveMostrarFichaPorId() throws Exception {
         FichaTecnicaGetDTO ficha = new FichaTecnicaGetDTO(1L, null, null, null, null, null, Status.ATIVA, StatusCriacao.COMPLETA, null, null, null);
-        when(fichaTecnicaService.getFichaById(1L)).thenReturn(ficha);
+        when(fichaTecnicaService.getFichaById(eq(1L), any())).thenReturn(ficha);
         when(paginacaoViewSupport.renderizarView(any(), any(), any())).thenReturn("pages/fichas/Detail");
 
         mockMvc.perform(get("/ficha/1"))
@@ -221,7 +221,7 @@ class FichaControllerTest {
     @Test
     @DisplayName("Deve retornar not found ao mostrar ficha por id inexistente")
     void deveRetornarNotFoundAoMostrarFicha() throws Exception {
-        when(fichaTecnicaService.getFichaById(1L)).thenThrow(new EntityNotFoundException());
+        when(fichaTecnicaService.getFichaById(eq(1L), any())).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(get("/ficha/1"))
                 .andExpect(status().isFound())
@@ -234,7 +234,7 @@ class FichaControllerTest {
         mockMvc.perform(post("/ficha/toggle-status/1"))
                 .andExpect(status().isFound())
                 .andExpect(view().name("redirect:/ficha/1"));
-        verify(fichaTecnicaService).atualizaStatus(1L);
+        verify(fichaTecnicaService).atualizaStatus(1L, 1L);
     }
 
     @Test
@@ -243,7 +243,7 @@ class FichaControllerTest {
         FichaTecnicaGetDTO fichaGet = new FichaTecnicaGetDTO(1L, null, null, null, null, null, Status.ATIVA, StatusCriacao.COMPLETA, null, null, null);
         FichaTecnicaUpdateDTO fichaUpdate = new FichaTecnicaUpdateDTO(1L, null, null, null, null, null, Status.ATIVA, StatusCriacao.COMPLETA, null, null, null);
         
-        when(fichaTecnicaService.getFichaById(1L)).thenReturn(fichaGet);
+        when(fichaTecnicaService.getFichaById(eq(1L), any())).thenReturn(fichaGet);
         when(fichaFormMapper.toUpdateDTO(fichaGet)).thenReturn(fichaUpdate);
         when(paginacaoViewSupport.renderizarView(any(), any(), any())).thenReturn("pages/fichas/FormFicha");
 
@@ -269,7 +269,7 @@ class FichaControllerTest {
     void deveExportarPdf() throws Exception {
         PreparacaoGetDTO prep = new PreparacaoGetDTO(1L, "Prep", null, null, null, null, null, null, null, null, null);
         FichaTecnicaGetDTO fichaGet = new FichaTecnicaGetDTO(1L, null, null, null, null, null, Status.ATIVA, StatusCriacao.COMPLETA, prep, null, null);
-        when(fichaTecnicaService.getFichaById(1L)).thenReturn(fichaGet);
+        when(fichaTecnicaService.getFichaById(eq(1L), any())).thenReturn(fichaGet);
         when(pdfExporter.generateFichaTecnicaPdf(fichaGet)).thenReturn(new byte[]{1,2,3});
 
         mockMvc.perform(get("/ficha/exportar-pdf/1"))
@@ -281,7 +281,7 @@ class FichaControllerTest {
     @Test
     @DisplayName("Deve retornar erro ao exportar pdf inexistente")
     void deveRetornarErroExportarPdf() throws Exception {
-        when(fichaTecnicaService.getFichaById(1L)).thenThrow(new EntityNotFoundException());
+        when(fichaTecnicaService.getFichaById(eq(1L), any())).thenThrow(new EntityNotFoundException());
 
         mockMvc.perform(get("/ficha/exportar-pdf/1"))
                 .andExpect(status().isNotFound());
@@ -300,7 +300,7 @@ class FichaControllerTest {
                 .param("ingredientes[0].pesoBruto", "100.0"))
                 .andExpect(status().isFound())
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/ficha"));
-        verify(fichaTecnicaService).update(eq(1L), any());
+        verify(fichaTecnicaService).update(eq(1L), any(), eq(1L));
     }
 
     @Test
@@ -379,6 +379,21 @@ class FichaControllerTest {
                 .param("ingredientes[0].pesoBruto", "10.0"))
                 .andExpect(status().isOk())
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.header().string("HX-Redirect", "/ficha"));
+    }
+
+    @Test
+    @DisplayName("Deve salvar ficha tecnica com virgula decimal")
+    void deveSalvarFichaTecnicaComVirgulaDecimal() throws Exception {
+        mockMvc.perform(post("/ficha")
+                .param("custoTotal", "100,50")
+                .param("medidaCaseira", "Colher")
+                .param("numeroPorcoes", "10")
+                .param("pesoPorcao", "50,5")
+                .param("ingredientes[0].ingredienteId", "1")
+                .param("ingredientes[0].pb", "222,9")
+                .param("ingredientes[0].pl", "222,0"))
+                .andExpect(status().isFound())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl("/ficha"));
     }
 
     @Test

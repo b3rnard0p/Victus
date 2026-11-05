@@ -39,6 +39,18 @@ public class UsuarioController {
     private final UsuarioService usuarioService;
     private final AuthSessionService authSessionService;
     private final PasswordValidationService passwordValidationService;
+    private final com.example.sistemanutricao.security.RateLimitService rateLimitService;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public UsuarioController(UsuarioService usuarioService,
+            AuthSessionService authSessionService,
+            PasswordValidationService passwordValidationService,
+            com.example.sistemanutricao.security.RateLimitService rateLimitService) {
+        this.usuarioService = usuarioService;
+        this.authSessionService = authSessionService;
+        this.passwordValidationService = passwordValidationService;
+        this.rateLimitService = rateLimitService;
+    }
 
     public UsuarioController(UsuarioService usuarioService,
             AuthSessionService authSessionService,
@@ -46,6 +58,7 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
         this.authSessionService = authSessionService;
         this.passwordValidationService = passwordValidationService;
+        this.rateLimitService = null;
     }
 
     // PÁGINAS GERAIS
@@ -76,6 +89,9 @@ public class UsuarioController {
             @RequestParam(name = "remember-me", required = false) String rememberMeParam,
             jakarta.servlet.http.HttpServletResponse response,
             RedirectAttributes redirectAttributes) {
+        if (rateLimitService != null) {
+            rateLimitService.verificarLimite("login:" + email);
+        }
         boolean rememberMe = "on".equals(rememberMeParam);
         LoginStatus loginStatus = authSessionService.login(email, password, rememberMe, response);
         if (loginStatus == LoginStatus.SUCCESS)
@@ -110,12 +126,63 @@ public class UsuarioController {
 
     @PostMapping("/usuario/registrar")
     public String registrarUsuario(@Valid @ModelAttribute("usuario") UsuarioDTO registroDto,
-            BindingResult result) {
+            BindingResult result,
+            RedirectAttributes redirectAttributes) {
         if (result.hasErrors()) {
-            throw new IllegalArgumentException(result.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("errorMessage", result.getAllErrors().get(0).getDefaultMessage());
+            redirectAttributes.addFlashAttribute("registroDto", registroDto);
+            redirectAttributes.addFlashAttribute("abrirCard", "register");
+            return "redirect:/login";
         }
-        usuarioService.create(registroDto);
+        if (rateLimitService != null) {
+            try {
+                rateLimitService.verificarLimite("registro:" + (registroDto != null ? registroDto.email() : "anon"));
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+                redirectAttributes.addFlashAttribute("registroDto", registroDto);
+                redirectAttributes.addFlashAttribute("abrirCard", "register");
+                return "redirect:/login";
+            }
+        }
+        try {
+            usuarioService.create(registroDto);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("registroDto", registroDto);
+            redirectAttributes.addFlashAttribute("abrirCard", "register");
+            return "redirect:/login";
+        }
         return "pages/general/Registrado";
+    }
+
+    @PostMapping("/usuario/recuperar-senha")
+    public String recuperarSenha(@RequestParam String email,
+            @RequestParam String numeroMatricula,
+            @RequestParam String novaSenha,
+            @RequestParam String confirmarNovaSenha,
+            RedirectAttributes redirectAttributes) {
+        if (rateLimitService != null) {
+            try {
+                rateLimitService.verificarLimite("recuperar:" + email);
+            } catch (Exception e) {
+                redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+                redirectAttributes.addFlashAttribute("recuperarEmail", email);
+                redirectAttributes.addFlashAttribute("recuperarMatricula", numeroMatricula);
+                redirectAttributes.addFlashAttribute("abrirCard", "forgot");
+                return "redirect:/login";
+            }
+        }
+        try {
+            usuarioService.recuperarSenhaPorMatricula(email, numeroMatricula, novaSenha, confirmarNovaSenha);
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("recuperarEmail", email);
+            redirectAttributes.addFlashAttribute("recuperarMatricula", numeroMatricula);
+            redirectAttributes.addFlashAttribute("abrirCard", "forgot");
+            return "redirect:/login";
+        }
+        redirectAttributes.addFlashAttribute("successMessage", "Senha redefinida com sucesso! Faça login com sua nova senha.");
+        return "redirect:/login";
     }
 
     // PERFIL

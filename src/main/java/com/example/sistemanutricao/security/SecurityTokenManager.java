@@ -58,7 +58,7 @@ public class SecurityTokenManager {
 
     public String generateAccessToken(String username, boolean rememberMe) {
         long expiration = rememberMe ? REMEMBER_ME_EXPIRATION_MS : jwtExpirationMs;
-        return generateTokenFromUsername(username, expiration);
+        return generateTokenFromUsername(username, expiration, "access", rememberMe);
     }
 
     public String generateRefreshToken(String username) {
@@ -67,7 +67,51 @@ public class SecurityTokenManager {
 
     public String generateRefreshToken(String username, boolean rememberMe) {
         long expiration = rememberMe ? REMEMBER_ME_EXPIRATION_MS : refreshExpirationMs;
-        return generateTokenFromUsername(username, expiration);
+        return generateTokenFromUsername(username, expiration, "refresh", rememberMe);
+    }
+
+    private String generateTokenFromUsername(String username, long expiration, String type, boolean rememberMe) {
+        return Jwts.builder()
+                .setSubject(username)
+                .claim("type", type)
+                .claim("rememberMe", rememberMe)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date((new Date()).getTime() + expiration))
+                .signWith(key(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public boolean validateAccessToken(String authToken) {
+        return validateJwtTokenByType(authToken, "access");
+    }
+
+    public boolean validateRefreshToken(String authToken) {
+        return validateJwtTokenByType(authToken, "refresh");
+    }
+
+    public boolean isRememberMeToken(String token) {
+        try {
+            Claims claims = Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody();
+            return Boolean.TRUE.equals(claims.get("rememberMe", Boolean.class));
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    private boolean validateJwtTokenByType(String authToken, String expectedType) {
+        try {
+            Claims claims = Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(authToken).getBody();
+            String tokenType = claims.get("type", String.class);
+            return expectedType.equals(tokenType);
+        } catch (JwtException | IllegalArgumentException e) {
+            logger.debug("Token inválido: {}", e.getMessage());
+            return false;
+        }
+    }
+
+    @SuppressWarnings("unused")
+    private String unusedLegacyHelper(String username, long expiration, boolean rememberMe) {
+        return generateTokenFromUsername(username, expiration, "access", rememberMe);
     }
 
     private String generateTokenFromUsername(String username, long expiration) {

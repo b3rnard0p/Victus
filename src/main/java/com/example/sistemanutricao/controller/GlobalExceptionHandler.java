@@ -3,6 +3,12 @@ package com.example.sistemanutricao.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import java.math.BigDecimal;
+import java.beans.PropertyEditorSupport;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -12,6 +18,42 @@ import com.example.sistemanutricao.exception.ValidationException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        binder.registerCustomEditor(BigDecimal.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                if (text == null || text.trim().isEmpty()) {
+                    setValue(null);
+                    return;
+                }
+                String trimmed = text.trim();
+                if (trimmed.contains(",") && trimmed.contains(".")) {
+                    if (trimmed.indexOf(",") < trimmed.indexOf(".")) {
+                        trimmed = trimmed.replace(",", "");
+                    } else {
+                        trimmed = trimmed.replace(".", "").replace(",", ".");
+                    }
+                } else if (trimmed.contains(",")) {
+                    trimmed = trimmed.replace(",", ".");
+                }
+                try {
+                    setValue(new BigDecimal(trimmed));
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("Valor numérico inválido: " + text, e);
+                }
+            }
+
+            @Override
+            public String getAsText() {
+                BigDecimal value = (BigDecimal) getValue();
+                return value != null ? value.toPlainString() : "";
+            }
+        });
+    }
 
     @ExceptionHandler({
         IllegalArgumentException.class,
@@ -24,6 +66,9 @@ public class GlobalExceptionHandler {
     public ModelAndView handleException(Exception ex, HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response,
                                                        RedirectAttributes redirectAttributes) {
         String message = ex.getMessage();
+        if (message != null && message.contains("Failed to convert")) {
+            message = "Existem campos com valores ou formatos numéricos inválidos.";
+        }
 
         if (ex instanceof ConstraintViolationException constraintViolationException
                 && !constraintViolationException.getConstraintViolations().isEmpty()) {
@@ -89,6 +134,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ModelAndView handleGenericException(Exception ex, HttpServletRequest request, jakarta.servlet.http.HttpServletResponse response,
                                                        RedirectAttributes redirectAttributes) {
+        log.error("Erro interno não tratado na requisição [{}]: ", request.getRequestURI(), ex);
         String message = "Ocorreu um erro interno. Por favor, tente novamente.";
         
         String isHtmxRequest = request.getHeader("HX-Request");

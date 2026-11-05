@@ -9,6 +9,9 @@
   initCalculoCustoUsadoFooter();
   initCalculoFCC();
   initEventDelegationTabela();
+  if (typeof formatarInputsDecimais === "function") {
+    formatarInputsDecimais();
+  }
 
   atualizarTotaisDaFicha();
   document.dispatchEvent(new Event("ingredienteAdicionado"));

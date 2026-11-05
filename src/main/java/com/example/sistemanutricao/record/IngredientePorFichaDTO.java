@@ -27,5 +27,17 @@ public record IngredientePorFichaDTO(
         BigDecimal sodioCalculado,
         BigDecimal gorduraSaturadaCalculada,
         FichaTecnicaCreateDTO fichaTecnica
-) {}
+) {
+    public String pbFormatado() {
+        return com.example.sistemanutricao.util.NumberFormatUtil.formatar(this.pb);
+    }
+
+    public String plFormatado() {
+        return com.example.sistemanutricao.util.NumberFormatUtil.formatar(this.pl);
+    }
+
+    public String fcFormatado() {
+        return com.example.sistemanutricao.util.NumberFormatUtil.formatar(this.fc);
+    }
+}
 

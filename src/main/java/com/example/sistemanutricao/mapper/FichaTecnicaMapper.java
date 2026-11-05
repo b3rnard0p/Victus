@@ -16,8 +16,15 @@ import org.mapstruct.MappingTarget;
 public interface FichaTecnicaMapper {
 
     @Mapping(source = "ingredientesPorFicha", target = "ingredientes")
+    @Mapping(target = "pesoPorcao", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ficha.getPesoPorcao()))")
+    @Mapping(target = "custoTotal", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ficha.getCustoTotal()))")
+    @Mapping(target = "custoPerCapita", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ficha.getCustoPerCapita()))")
     FichaTecnicaGetDTO toGetDTO(FichaTecnica ficha);
 
+    @Mapping(target = "rendimento", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(prep.getRendimento()))")
+    @Mapping(target = "fcc", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(prep.getFcc()))")
+    @Mapping(target = "qntdAgua", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(prep.getQntdAgua()))")
+    @Mapping(target = "porcentAgua", expression = "java(com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(prep.getPorcentAgua()))")
     PreparacaoGetDTO mapPreparacao(Preparacao prep);
 
     PerfilNutricionalGetDTO mapPerfil(PerfilNutricional perfil);
@@ -31,17 +38,17 @@ public interface FichaTecnicaMapper {
             ipf.getId(),
             ipf.getIngrediente() != null ? ipf.getIngrediente().getId() : null,
             mapIngrediente(ipf.getIngrediente()),
-            ipf.getCustoKG(),
-            ipf.getCustoUsado(),
-            ipf.getFc(),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getCustoKG()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getCustoUsado()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getFc()),
             ipf.getMedidaCaseria(),
-            ipf.getPb(),
-            ipf.getPl(),
-            ipf.getPtnCalculado(),
-            ipf.getChoCalculado(),
-            ipf.getLipCalculado(),
-            ipf.getSodioCalculado(),
-            ipf.getGorduraSaturadaCalculada(),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getPb()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getPl()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getPtnCalculado()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getChoCalculado()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getLipCalculado()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getSodioCalculado()),
+            com.example.sistemanutricao.util.NumberFormatUtil.limparDecimais(ipf.getGorduraSaturadaCalculada()),
             null
         );
     }

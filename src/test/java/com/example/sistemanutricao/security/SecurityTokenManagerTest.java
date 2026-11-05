@@ -141,4 +141,18 @@ class SecurityTokenManagerTest {
         assertEquals("", cookie.getValue());
         assertEquals(0, cookie.getMaxAge().getSeconds());
     }
+
+    @Test
+    @DisplayName("Deve distinguir access token de refresh token e preservar rememberMe")
+    void deveDistinguirAccessERefreshToken() {
+        String access = tokenManager.generateAccessToken("user@test.com", true);
+        String refresh = tokenManager.generateRefreshToken("user@test.com", true);
+
+        assertTrue(tokenManager.validateAccessToken(access));
+        assertFalse(tokenManager.validateRefreshToken(access));
+
+        assertTrue(tokenManager.validateRefreshToken(refresh));
+        assertFalse(tokenManager.validateAccessToken(refresh));
+        assertTrue(tokenManager.isRememberMeToken(refresh));
+    }
 }

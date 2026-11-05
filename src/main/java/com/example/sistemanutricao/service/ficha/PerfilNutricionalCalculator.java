@@ -69,13 +69,32 @@ public class PerfilNutricionalCalculator {
             return new TotaisNutrientes(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO);
         }
 
+        java.util.Set<Long> ids = ingredientes.stream()
+                .filter(i -> i != null && i.ingredienteId() != null)
+                .map(IngredientePorFichaDTO::ingredienteId)
+                .collect(java.util.stream.Collectors.toSet());
+        java.util.Map<Long, Ingrediente> ingredientesMap = new java.util.HashMap<>();
+        if (!ids.isEmpty()) {
+            List<Ingrediente> encontrados = ingredienteRepository.findAllById(ids);
+            if (encontrados != null) {
+                for (Ingrediente ing : encontrados) {
+                    if (ing != null && ing.getId() != null) {
+                        ingredientesMap.put(ing.getId(), ing);
+                    }
+                }
+            }
+        }
+
         for (IngredientePorFichaDTO ingrediente : ingredientes) {
             if (ingrediente == null || ingrediente.ingredienteId() == null) {
                 continue;
             }
 
             Long ingredienteId = ingrediente.ingredienteId();
-            Ingrediente ingredienteBase = ingredienteRepository.findById(ingredienteId).orElse(null);
+            Ingrediente ingredienteBase = ingredientesMap.get(ingredienteId);
+            if (ingredienteBase == null) {
+                ingredienteBase = ingredienteRepository.findById(ingredienteId).orElse(null);
+            }
             if (ingredienteBase == null) {
                 continue;
             }

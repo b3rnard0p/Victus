@@ -25,7 +25,14 @@ public class IngredienteSpecification {
 
             if (campo != null && valor != null) {
                 switch (campo.toLowerCase()) {
-                    case "nome" -> predicates = cb.and(predicates, cb.like(cb.lower(root.get("nome")), "%" + valor.toString().toLowerCase() + "%"));
+                    case "nome" -> {
+                        String[] tokens = valor.toString().trim().split("[\\s,]+");
+                        for (String token : tokens) {
+                            if (!token.isBlank()) {
+                                predicates = cb.and(predicates, cb.like(cb.lower(root.get("nome")), "%" + token.toLowerCase() + "%"));
+                            }
+                        }
+                    }
                     case "ptn" -> predicates = cb.and(predicates, cb.equal(root.get("ptn"), valor));
                     case "cho" -> predicates = cb.and(predicates, cb.equal(root.get("cho"), valor));
                     case "lip" -> predicates = cb.and(predicates, cb.equal(root.get("lip"), valor));

@@ -60,8 +60,8 @@ public class RefeicaoController {
 
 
     @GetMapping("/{id}/nutrientes-totais")
-    public ResponseEntity<RefeicaoNutrientesResponseDTO> getTotaisNutrientesRefeicao(@PathVariable @NonNull Long id) {
-        RefeicaoNutrientesResponseDTO dto = refeicaoService.buscarTotaisNutrientesPorId(id);
+    public ResponseEntity<RefeicaoNutrientesResponseDTO> getTotaisNutrientesRefeicao(@PathVariable @NonNull Long id, @AuthenticationPrincipal @NonNull UsuarioSecurity usuarioPrincipal) {
+        RefeicaoNutrientesResponseDTO dto = refeicaoService.buscarTotaisNutrientesPorId(id, usuarioPrincipal.getUsuario());
         return ResponseEntity.ok(dto);
     }
 
@@ -111,9 +111,11 @@ public class RefeicaoController {
     }
 
     @PostMapping("/toggle-status/{id}")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public String toggleStatusRefeicao(@PathVariable("id") @NonNull Long id,
+                                       @AuthenticationPrincipal @NonNull UsuarioSecurity usuarioPrincipal,
                                        @RequestParam(value = "currentStatus", required = false) String currentStatus) {
-        refeicaoService.atualizaStatus(id);
+        refeicaoService.atualizaStatus(id, usuarioPrincipal.getId());
 
         if (currentStatus != null && currentStatus.equals("INATIVA")) {
             return "redirect:/refeicao/por-status?status=INATIVA";
@@ -123,11 +125,13 @@ public class RefeicaoController {
 
     @GetMapping("/editar/{id}")
     @ResponseBody
-    public RefeicaoResponseDTO mostrarFormularioEdicaoRefeicoes(@PathVariable("id") @NonNull Long id) {
-        return refeicaoService.buscarPorId(id);
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
+    public RefeicaoResponseDTO mostrarFormularioEdicaoRefeicoes(@PathVariable("id") @NonNull Long id, @AuthenticationPrincipal @NonNull UsuarioSecurity usuarioPrincipal) {
+        return refeicaoService.buscarPorId(id, usuarioPrincipal.getId());
     }
 
     @PostMapping("/novo")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public String criarRefeicao(
             @Valid @ModelAttribute("dto") RefeicaoDTO dto,
             BindingResult result,
@@ -143,7 +147,9 @@ public class RefeicaoController {
     }
 
     @PostMapping("/editar/{id}")
+    @PreAuthorize("hasRole('NUTRICIONISTA')")
     public String atualizarRefeicao(
+            @AuthenticationPrincipal @NonNull UsuarioSecurity usuarioPrincipal,
             @PathVariable("id") @NonNull Long id,
             @Valid @ModelAttribute("dto") RefeicaoDTO dto,
             BindingResult result,
@@ -155,10 +161,10 @@ public class RefeicaoController {
             throw new IllegalArgumentException(fieldError != null ? fieldError.getDefaultMessage() : "Erro de validação");
         }
 
-        refeicaoService.update(id, dto);
+        refeicaoService.update(id, dto, usuarioPrincipal.getId());
 
         if ("true".equals(htmxRequest)) {
-            RefeicaoResponseDTO atualizada = refeicaoService.buscarPorId(id);
+            RefeicaoResponseDTO atualizada = refeicaoService.buscarPorId(id, usuarioPrincipal.getId());
             model.addAttribute("refeicao", atualizada);
             return "pages/refeicoes/List :: refeicao-item";
         }

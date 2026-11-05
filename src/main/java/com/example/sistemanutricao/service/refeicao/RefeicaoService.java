@@ -1,5 +1,6 @@
 package com.example.sistemanutricao.service.refeicao;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -51,8 +52,18 @@ public class RefeicaoService {
                 .orElseThrow(() -> new RefeicaoNotFoundException("Refeição não encontrada"));
     }
 
+    public RefeicaoNutrientesResponseDTO buscarTotaisNutrientesPorId(@NonNull Long id, Usuario usuario) {
+        var refeicao = findRefeicaoById(id);
+        validarAcessoLeituraRefeicao(refeicao, usuario);
+        return montarTotaisNutrientes(id, refeicao);
+    }
+
     public RefeicaoNutrientesResponseDTO buscarTotaisNutrientesPorId(@NonNull Long id) {
-        Refeicao refeicao = findRefeicaoById(id);
+        return montarTotaisNutrientes(id, findRefeicaoById(id));
+    }
+
+    private RefeicaoNutrientesResponseDTO montarTotaisNutrientes(Long id, Refeicao refeicaoAlvo) {
+        Refeicao refeicao = refeicaoAlvo != null ? refeicaoAlvo : findRefeicaoById(id);
         if (refeicao.getTotalGramasPTN() == null) {
             atualizarNutrientes(refeicao);
             refeicao = refeicaoRepository.save(refeicao);
@@ -98,11 +109,23 @@ public class RefeicaoService {
 
     @Transactional(rollbackFor = Exception.class)
     @RegistrarAcao(acao = TipoAcao.EDITOU_REFEICAO)
+    public RefeicaoResponseDTO update(@NonNull Long id, RefeicaoDTO dto, Long nutricionistaId) {
+        var refeicao = findRefeicaoById(id);
+        validarPropriedadeRefeicao(refeicao, nutricionistaId);
+        return executarUpdate(id, dto, refeicao);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_REFEICAO)
     public RefeicaoResponseDTO update(@NonNull Long id, RefeicaoDTO dto) {
+        return executarUpdate(id, dto, null);
+    }
+
+    private RefeicaoResponseDTO executarUpdate(@NonNull Long id, RefeicaoDTO dto, Refeicao refeicaoAlvo) {
         List<Long> fichasIds = normalizarFichasIds(dto.fichasTecnicasIds());
         validarFichasObrigatorias(fichasIds);
 
-        Refeicao refeicao = findRefeicaoById(id);
+        Refeicao refeicao = refeicaoAlvo != null ? refeicaoAlvo : findRefeicaoById(id);
         validarDuplicidadeNomeUpdate(dto.nome(), refeicao.getNutricionista().getId(), id);
 
         refeicao.setNome(normalizarTexto(dto.nome()));
@@ -123,6 +146,21 @@ public class RefeicaoService {
         refeicao.setTotalGramasLIP(totais.totalGramasLIP());
         refeicao.setTotalGramasSodio(totais.totalGramasSodio());
         refeicao.setTotalGramasSaturada(totais.totalGramasSaturada());
+
+        if (refeicao.getFichasPorRefeicao() != null && !refeicao.getFichasPorRefeicao().isEmpty()) {
+            BigDecimal totalVtc = BigDecimal.ZERO;
+            for (FichasPorRefeicao fp : refeicao.getFichasPorRefeicao()) {
+                if (fp != null && fp.getFichaTecnica() != null && fp.getFichaTecnica().getPerfilNutricional() != null) {
+                    BigDecimal vtc = fp.getFichaTecnica().getPerfilNutricional().getVtc();
+                    if (vtc != null) {
+                        totalVtc = totalVtc.add(vtc);
+                    }
+                }
+            }
+            if (totalVtc.compareTo(BigDecimal.ZERO) > 0) {
+                refeicao.setKcalTotal(totalVtc.setScale(2, java.math.RoundingMode.HALF_UP).toPlainString());
+            }
+        }
     }
 
     private void syncFichas(Refeicao refeicao, List<Long> fichasIds) {
@@ -140,6 +178,10 @@ public class RefeicaoService {
         if (!novosIds.isEmpty()) {
             List<FichaTecnica> fichasParaAdicionar = fichaTecnicaRepository.findAllById(novosIds);
             for (FichaTecnica ft : fichasParaAdicionar) {
+                if (refeicao.getNutricionista() != null && ft.getNutricionista() != null
+                        && !ft.getNutricionista().getId().equals(refeicao.getNutricionista().getId())) {
+                    throw new IllegalArgumentException("Você não pode vincular fichas técnicas de outro nutricionista.");
+                }
                 atuais.add(new FichasPorRefeicao(refeicao, ft));
             }
         }
@@ -174,14 +216,55 @@ public class RefeicaoService {
     }
 
     @Transactional(readOnly = true)
+    public RefeicaoResponseDTO buscarPorId(@NonNull Long id, Long nutricionistaId) {
+        var refeicao = findRefeicaoById(id);
+        validarPropriedadeRefeicao(refeicao, nutricionistaId);
+        return refeicaoMapper.toResponseDTO(refeicao);
+    }
+
+    @Transactional(readOnly = true)
     public RefeicaoResponseDTO buscarPorId(@NonNull Long id) {
         return refeicaoMapper.toResponseDTO(findRefeicaoById(id));
     }
 
     @Transactional
     @RegistrarAcao(acao = TipoAcao.ARQUIVOU_REFEICAO)
+    public void atualizaStatus(@NonNull Long id, Long nutricionistaId) {
+        var refeicao = findRefeicaoById(id);
+        validarPropriedadeRefeicao(refeicao, nutricionistaId);
+        refeicao.setStatus(refeicao.getStatus() == Status.ATIVA ? Status.INATIVA : Status.ATIVA);
+        refeicaoRepository.save(refeicao);
+    }
+
+    private void validarPropriedadeRefeicao(Refeicao refeicao, Long nutricionistaId) {
+        if (nutricionistaId == null || refeicao.getNutricionista() == null || !refeicao.getNutricionista().getId().equals(nutricionistaId)) {
+            throw new IllegalArgumentException("Você não tem permissão para alterar esta refeição.");
+        }
+    }
+
+    private void validarAcessoLeituraRefeicao(Refeicao refeicao, Usuario usuario) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("Você não tem permissão para acessar esta refeição.");
+        }
+        if (usuario.getCargo() != null && "PRODUCAO".equals(usuario.getCargo().name())) {
+            Long estabUsuario = usuario.getEstabelecimento() != null ? usuario.getEstabelecimento().getId() : null;
+            Long estabRefeicao = (refeicao.getNutricionista() != null && refeicao.getNutricionista().getEstabelecimento() != null)
+                    ? refeicao.getNutricionista().getEstabelecimento().getId()
+                    : null;
+            if (estabUsuario == null || !estabUsuario.equals(estabRefeicao)) {
+                throw new IllegalArgumentException("Você não tem permissão para acessar esta refeição.");
+            }
+            return;
+        }
+        validarPropriedadeRefeicao(refeicao, usuario.getId());
+    }
+
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_REFEICAO)
     public void atualizaStatus(@NonNull Long id) {
-        Refeicao refeicao = findRefeicaoById(id);
+        Refeicao refeicaoAlvo = null;
+        Long idIgnorado = id;
+        Refeicao refeicao = refeicaoAlvo != null ? refeicaoAlvo : findRefeicaoById(id);
         refeicao.setStatus(refeicao.getStatus() == Status.ATIVA ? Status.INATIVA : Status.ATIVA);
         refeicaoRepository.save(refeicao);
     }

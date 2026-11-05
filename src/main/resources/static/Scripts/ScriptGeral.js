@@ -47,6 +47,52 @@ window.mostrarToastSucesso = function (mensagem) {
   }, 5000);
 };
 
+window.parseNumero = function (val) {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  const str = String(val).trim().replace(",", ".");
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+};
+
+function inicializarInputGlow() {
+  if (window.InputGlowInitialized) return;
+  window.InputGlowInitialized = true;
+
+  document.addEventListener("mousemove", function (e) {
+    const wrapper = e.target.closest(".glow-wrapper");
+    if (wrapper) {
+      const rect = wrapper.getBoundingClientRect();
+      wrapper.style.setProperty("--mouse-x", e.clientX - rect.left + "px");
+      wrapper.style.setProperty("--mouse-y", e.clientY - rect.top + "px");
+    }
+  });
+}
+
+inicializarInputGlow();
+
+window.fecharViewFicha = function () {
+  const listView = document.getElementById("fichas-list-view");
+  const detailView = document.getElementById("fichas-detail-view");
+
+  if (listView && detailView && !detailView.classList.contains("hidden")) {
+    detailView.classList.add("hidden");
+    detailView.innerHTML = "";
+    listView.classList.remove("hidden");
+    return;
+  }
+
+  if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host) && !document.referrer.endsWith(window.location.pathname)) {
+    window.history.back();
+  } else if (document.referrer && document.referrer.includes(window.location.host)) {
+    window.location.href = document.referrer;
+  } else if (window.history.length > 1) {
+    window.history.back();
+  } else {
+    window.location.href = "/ficha";
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   if (typeof atualizarMenuAtivo === 'function') {
     atualizarMenuAtivo();

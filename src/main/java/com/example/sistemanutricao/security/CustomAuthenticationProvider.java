@@ -41,6 +41,12 @@ public class CustomAuthenticationProvider implements AuthenticationProvider {
                 logger.info("Usuário inativo: {}", username);
                 throw new DisabledException("Usuário inativo");
             }
+            if (userDetails instanceof UsuarioSecurity us
+                    && us.getCargo() != com.example.sistemanutricao.model.enuns.Cargo.ADMIN
+                    && us.getEstabelecimentoId() == null) {
+                logger.info("Usuário sem estabelecimento vinculado: {}", username);
+                throw new DisabledException("Usuário sem estabelecimento vinculado");
+            }
             
             if (passwordEncoder.matches(password, userDetails.getPassword())) {
                 logger.info("Autenticação bem-sucedida para: {}", username);

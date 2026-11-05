@@ -89,4 +89,28 @@ class PerfilNutricionalCalculatorTest {
         assertNotNull(result);
         assertEquals(0, BigDecimal.ZERO.compareTo(result.vtc()));
     }
+
+    @Test
+    void calcularPerfilNutricional_BatchFindAllById() {
+        Ingrediente ing1 = new Ingrediente();
+        ing1.setId(1L);
+        ing1.setPtn(BigDecimal.valueOf(10));
+        ing1.setCho(BigDecimal.valueOf(20));
+        ing1.setLip(BigDecimal.valueOf(5));
+        ing1.setSodio(BigDecimal.valueOf(50));
+        ing1.setGorduraSaturada(BigDecimal.valueOf(2));
+
+        when(ingredienteRepository.findAllById(any())).thenReturn(List.of(ing1));
+
+        IngredientePorFichaDTO dto = new IngredientePorFichaDTO(
+            null, 1L, null, null, null, null, null, null, BigDecimal.valueOf(100),
+            null, null, null, null, null, null
+        );
+
+        PerfilNutricionalDTO result = calculator.calcularPerfilNutricionalPorPorcaoCreate(List.of(dto), 1);
+
+        assertNotNull(result);
+        assertEquals(0, BigDecimal.valueOf(165).compareTo(result.vtc()));
+        verify(ingredienteRepository, never()).findById(any());
+    }
 }

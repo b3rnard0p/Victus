@@ -30,6 +30,12 @@ public class IngredienteService {
     private final IngredienteRepository ingredienteRepository;
     private final UsuarioRepository usuarioRepository;
     private final IngredienteMapper ingredienteMapper;
+    private com.example.sistemanutricao.service.ficha.FichaTecnicaService fichaTecnicaService;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setFichaTecnicaService(com.example.sistemanutricao.service.ficha.FichaTecnicaService fichaTecnicaService) {
+        this.fichaTecnicaService = fichaTecnicaService;
+    }
 
     public IngredienteService(IngredienteRepository ingredienteRepository,
                               UsuarioRepository usuarioRepository,
@@ -74,16 +80,32 @@ public class IngredienteService {
     @Transactional(rollbackFor = Exception.class)
     @RegistrarAcao(acao = TipoAcao.EDITOU_INGREDIENTE)
     public IngredienteGetDTO update(Long id, IngredienteDTO dto) {
+        return update(id, dto, dto != null ? dto.usuarioId() : null);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_INGREDIENTE)
+    public IngredienteGetDTO update(Long id, IngredienteDTO dto, Long usuarioId) {
         Ingrediente ingrediente = buscarIngredienteOuFalhar(id);
 
+        validarPropriedadeIngrediente(ingrediente, usuarioId);
         if (!ingrediente.getNome().equalsIgnoreCase(dto.nome())) {
             validarDuplicidadeIngredienteUpdate(dto.nome(), id, ingrediente.getUsuario().getId());
         }
 
         validarCamposObrigatorios(dto);
         ingredienteMapper.updateEntity(ingrediente, dto);
+        if (fichaTecnicaService != null) {
+            fichaTecnicaService.recalcularFichasPorIngrediente(id);
+        }
 
         return convertToDto(ingredienteRepository.save(ingrediente));
+    }
+
+    public IngredienteGetDTO getIngredienteById(Long id, Long usuarioId) {
+        Ingrediente ingrediente = buscarIngredienteOuFalhar(id);
+        validarPropriedadeIngrediente(ingrediente, usuarioId);
+        return convertToDto(ingrediente);
     }
 
     public IngredienteGetDTO getIngredienteById(Long id) {
@@ -98,6 +120,25 @@ public class IngredienteService {
 
     public Long buscarUsuarioTacoId() {
         return buscarUsuarioTaco().getId();
+    }
+
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_INGREDIENTE)
+    public void atualizaStatus(Long id, Long usuarioId) {
+        Ingrediente ingrediente = buscarIngredienteOuFalhar(id);
+        validarPropriedadeIngrediente(ingrediente, usuarioId);
+        ingrediente.setStatus(
+                ingrediente.getStatus() == Status.ATIVA ?
+                        Status.INATIVA :
+                        Status.ATIVA
+        );
+        ingredienteRepository.save(ingrediente);
+    }
+
+    private void validarPropriedadeIngrediente(Ingrediente ingrediente, Long usuarioId) {
+        if (usuarioId == null || ingrediente.getUsuario() == null || !ingrediente.getUsuario().getId().equals(usuarioId)) {
+            throw new IllegalArgumentException("Você não tem permissão para alterar este ingrediente.");
+        }
     }
 
     @Transactional

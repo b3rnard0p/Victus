@@ -1,6 +1,31 @@
 (function() {
+  const RASCUNHO_KEY = "ficha_rascunho_nova";
+  const CAMPOS_RELEVANTES = [
+    "preparacao.nome",
+    "preparacao.numero",
+    "preparacao.categoria",
+    "preparacao.tempoPreparo",
+    "preparacao.qntdAgua",
+    "preparacao.porcentAgua",
+    "preparacao.fcc",
+    "preparacao.rendimento",
+    "medidaCaseira",
+    "pesoPorcao",
+    "numeroPorcoes",
+    "preparacao.modoPreparo",
+    "preparacao.equipamentos"
+  ];
+  let formularioSalvoComSucesso = false;
+  let formularioEnviando = false;
+
+  const idInput = document.querySelector('input[name="id"]');
+  if (idInput?.value) {
+    try {
+      localStorage.removeItem(RASCUNHO_KEY);
+    } catch (e) {}
+  }
+
   const formFicha = document.getElementById("form-ficha");
-  let limparRascunhoAposSalvarNova = false;
   if (formFicha) {
     formFicha.addEventListener("submit", function (e) {
       if (document.querySelectorAll(".ingrediente-row").length === 0) {
@@ -8,17 +33,18 @@
         return;
       }
       const isNova = !document.querySelector('input[name="id"]')?.value;
-      limparRascunhoAposSalvarNova = isNova;
+      if (isNova) {
+        formularioEnviando = true;
+        clearTimeout(_rascunhoTimer);
+        if (!formFicha.hasAttribute("data-hx-post") && !formFicha.hasAttribute("hx-post")) {
+          formularioSalvoComSucesso = true;
+          try {
+            sessionStorage.setItem("ficha_salva_sucesso", "true");
+          } catch (err) {}
+          limparRascunho();
+        }
+      }
     });
-  }
-
-  const RASCUNHO_KEY = "ficha_rascunho_nova";
-
-  const idInput = document.querySelector('input[name="id"]');
-  if (idInput?.value) {
-    try {
-      localStorage.removeItem(RASCUNHO_KEY);
-    } catch (e) {}
   }
 
 
@@ -32,7 +58,7 @@
     for (const [name, value] of Object.entries(dados.campos || {})) {
       const valorStr = String(value).trim();
 
-      if (name.startsWith("id") || name === "status") continue;
+      if (!CAMPOS_RELEVANTES.includes(name)) continue;
 
       if (!valoresPadrao.includes(valorStr) && valorStr !== "") {
         return true;
@@ -43,6 +69,8 @@
   }
 
   function salvarRascunho() {
+    if (formularioSalvoComSucesso || formularioEnviando) return;
+
     const isNova = !document.querySelector('input[name="id"]')?.value;
     if (!isNova) return;
 
@@ -54,7 +82,7 @@
       .querySelectorAll("input[name], select[name], textarea[name]")
       .forEach((el) => {
         const name = el.name;
-        if (!name || name.startsWith("ingredientes[")) return;
+        if (!name || !CAMPOS_RELEVANTES.includes(name)) return;
         if (el.type === "checkbox") {
           dados.campos[name] = el.checked;
         } else {
@@ -94,7 +122,18 @@
 
   function restaurarRascunho() {
     const idInput = document.querySelector('input[name="id"]');
-    if (idInput?.value) return;
+    if (idInput?.value) {
+      limparRascunho();
+      return;
+    }
+
+    try {
+      if (sessionStorage.getItem("ficha_salva_sucesso") === "true") {
+        sessionStorage.removeItem("ficha_salva_sucesso");
+        limparRascunho();
+        return;
+      }
+    } catch (e) {}
 
     let dados;
     try {
@@ -117,6 +156,7 @@
     let fezAlteracaoReal = false;
 
     Object.entries(dados.campos || {}).forEach(([name, value]) => {
+      if (!CAMPOS_RELEVANTES.includes(name)) return;
       const el = form.querySelector(`[name="${name}"]`);
       if (!el) return;
 
@@ -299,31 +339,74 @@
   const form = document.getElementById("form-ficha");
   if (form) {
     form.addEventListener("input", () => {
+      if (formularioSalvoComSucesso || formularioEnviando) return;
       clearTimeout(_rascunhoTimer);
       _rascunhoTimer = setTimeout(salvarRascunho, 800);
     });
     form.addEventListener("change", () => {
+      if (formularioSalvoComSucesso || formularioEnviando) return;
       clearTimeout(_rascunhoTimer);
       _rascunhoTimer = setTimeout(salvarRascunho, 800);
     });
   }
 
-  document.addEventListener("htmx:beforeRequest", salvarRascunho);
+  document.addEventListener("htmx:beforeRequest", function (event) {
+    const elt = event.detail?.elt;
+    if (elt && (elt.id === "form-ficha" || elt.closest("#form-ficha"))) {
+      formularioEnviando = true;
+      clearTimeout(_rascunhoTimer);
+      return;
+    }
+    salvarRascunho();
+  });
 
-  document.addEventListener("htmx:afterSwap", (event) => {
-    if (!limparRascunhoAposSalvarNova) return;
-    if (event?.detail?.target?.id !== "slot-conteudo") return;
-
-    const formAindaAberto = document.getElementById("form-ficha");
-    if (!formAindaAberto) {
-      limparRascunho();
-      limparRascunhoAposSalvarNova = false;
+  document.addEventListener("htmx:beforeOnLoad", function (event) {
+    const elt = event.detail?.elt;
+    const xhr = event.detail?.xhr;
+    if (elt && (elt.id === "form-ficha" || elt.closest("#form-ficha"))) {
+      const hxRedirect = xhr ? xhr.getResponseHeader("HX-Redirect") : null;
+      if (hxRedirect) {
+        formularioSalvoComSucesso = true;
+        formularioEnviando = false;
+        try {
+          sessionStorage.setItem("ficha_salva_sucesso", "true");
+        } catch (e) {}
+        limparRascunho();
+      } else {
+        formularioEnviando = false;
+      }
     }
   });
 
-  window.addEventListener("beforeunload", salvarRascunho);
+  document.addEventListener("htmx:afterRequest", function (event) {
+    const elt = event.detail?.elt;
+    const xhr = event.detail?.xhr;
+    if (elt && (elt.id === "form-ficha" || elt.closest("#form-ficha"))) {
+      const hxRedirect = xhr ? xhr.getResponseHeader("HX-Redirect") : null;
+      if (hxRedirect) {
+        formularioSalvoComSucesso = true;
+        formularioEnviando = false;
+        try {
+          sessionStorage.setItem("ficha_salva_sucesso", "true");
+        } catch (e) {}
+        limparRascunho();
+      }
+    }
+  });
+
+  document.addEventListener("htmx:afterSwap", (event) => {
+    if (formularioSalvoComSucesso) {
+      limparRascunho();
+    }
+  });
+
+  window.addEventListener("beforeunload", () => {
+    if (formularioSalvoComSucesso || formularioEnviando) return;
+    salvarRascunho();
+  });
 
   function agendarSalvamentoRascunho() {
+    if (formularioSalvoComSucesso || formularioEnviando) return;
     clearTimeout(_rascunhoTimer);
     _rascunhoTimer = setTimeout(salvarRascunho, 300);
   }

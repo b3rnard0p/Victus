@@ -12,4 +12,7 @@ public interface IngredientesPorFichaRepository extends JpaRepository<Ingredient
     @Query("SELECT i FROM IngredientesPorFicha i WHERE i.fichaTecnica.id = :fichaId")
     List<IngredientesPorFicha> buscarPorFichaTecnicaId(@Param("fichaId") Long fichaId);
 
+    @Query("SELECT DISTINCT i.fichaTecnica FROM IngredientesPorFicha i WHERE i.ingrediente.id = :ingredienteId")
+    List<com.example.sistemanutricao.model.FichaTecnica> buscarFichasPorIngredienteId(@Param("ingredienteId") Long ingredienteId);
+
 }

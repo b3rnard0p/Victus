@@ -10,6 +10,7 @@ public record GetUsuarioDTO(
         Long estabelecimentoId,
         String estabelecimentoNome,
         boolean ativo,
-        String caminhoImagem
+        String caminhoImagem,
+        String numeroMatricula
 ) {
 }

@@ -74,6 +74,7 @@ public class Refeicao {
     private Usuario nutricionista;
 
     @OneToMany(mappedBy = "refeicao", cascade = CascadeType.ALL, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 25)
     private List<FichasPorRefeicao> fichasPorRefeicao = new ArrayList<>();
 
     public Refeicao() {

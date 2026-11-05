@@ -1,8 +1,8 @@
-<div th:fragment="conteudo" class="w-full flex flex-col items-center">
+<div th:fragment="conteudo" class="w-full flex-1 flex flex-col items-center">
   <main
     class="flex-1 flex items-start justify-center w-full px-4 pt-8 md:pt-16 mb-16 sm:mb-0"
   >
-    <div class="rounded-3xl w-full max-w-5xl sm:p-6 md:p-8 lg:p-10 xl:p-12">
+    <div class="rounded-3xl w-full max-w-5xl flex-1 flex flex-col sm:p-6 md:p-8 lg:p-10 xl:p-12">
       <div class="flex justify-center items-center gap-4 mb-8 relative">
         <h1 class="text-3xl font-bold text-zinc-800">Estabelecimentos</h1>
 
@@ -97,7 +97,7 @@
 
       <div
         th:if="${paginaAtual == 0 and estabelecimentos != null and estabelecimentos.empty}"
-        class="flex flex-col items-center justify-center py-12 sm:py-16 gap-4"
+        class="flex-1 flex flex-col items-center justify-center my-auto py-12 min-h-[40vh] sm:min-h-[45vh] gap-4"
       >
         <div class="text-[#4A6E18]">
           <i data-lucide="store" class="text-6xl sm:text-7xl"></i>

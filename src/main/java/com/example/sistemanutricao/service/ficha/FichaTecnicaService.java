@@ -48,6 +48,18 @@ public class FichaTecnicaService {
     private final PerfilNutricionalCalculator perfilCalculator;
     private final UsuarioRepository usuarioRepository;
     private final FichaTecnicaMapper fichaTecnicaMapper;
+    private com.example.sistemanutricao.repository.IngredientesPorFichaRepository ingredientesPorFichaRepository;
+    private com.example.sistemanutricao.repository.RefeicaoRepository refeicaoRepository;
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setIngredientesPorFichaRepository(com.example.sistemanutricao.repository.IngredientesPorFichaRepository ingredientesPorFichaRepository) {
+        this.ingredientesPorFichaRepository = ingredientesPorFichaRepository;
+    }
+
+    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    public void setRefeicaoRepository(com.example.sistemanutricao.repository.RefeicaoRepository refeicaoRepository) {
+        this.refeicaoRepository = refeicaoRepository;
+    }
 
     public FichaTecnicaService(FichaTecnicaRepository fichaRepository,
                                IngredienteRepository ingredienteRepository,
@@ -104,6 +116,7 @@ public class FichaTecnicaService {
         
         List<IngredientesPorFicha> ingredientes = buildIngredientes(dto.ingredientes(), ficha, perfil);
         ficha.setIngredientesPorFicha(ingredientes);
+        recalcularCustosEFcc(ficha, dto.custoTotal(), numeroPorcoes);
 
         FichaTecnica fichaSalva = fichaRepository.save(ficha);
 
@@ -112,8 +125,21 @@ public class FichaTecnicaService {
 
     @Transactional(rollbackFor = Exception.class)
     @RegistrarAcao(acao = TipoAcao.EDITOU_FICHA)
+    public FichaTecnicaGetDTO update(@NonNull Long id, FichaTecnicaUpdateDTO dto, Long usuarioLogadoId) {
+        var fichaExistente = findFichaById(id);
+        validarPropriedadeFicha(fichaExistente, usuarioLogadoId);
+        return executarUpdate(id, dto, fichaExistente);
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @RegistrarAcao(acao = TipoAcao.EDITOU_FICHA)
     public FichaTecnicaGetDTO update(@NonNull Long id, FichaTecnicaUpdateDTO dto) {
-        FichaTecnica fichaExistente = findFichaById(id);
+        var fichaExistente = findFichaById(id);
+        return executarUpdate(id, dto, fichaExistente);
+    }
+
+    private FichaTecnicaGetDTO executarUpdate(@NonNull Long id, FichaTecnicaUpdateDTO dto, FichaTecnica fichaExistente) {
+        // fichaExistente já carregada
 
         Long nutricionistaId = fichaExistente.getNutricionista() != null
             ? fichaExistente.getNutricionista().getId()
@@ -145,8 +171,10 @@ public class FichaTecnicaService {
         fichaExistente.setStatusCriacao(dto.statusCriacao());
 
         syncIngredientes(fichaExistente, dto.ingredientes());
+        recalcularCustosEFcc(fichaExistente, dto.custoTotal(), numeroPorcoes);
 
         FichaTecnica fichaAtualizada = fichaRepository.save(fichaExistente);
+        recalcularRefeicoesDaFicha(fichaAtualizada != null ? fichaAtualizada.getId() : id);
 
         return fichaTecnicaMapper.toGetDTO(fichaAtualizada);
     }
@@ -174,11 +202,12 @@ public class FichaTecnicaService {
                 .filter(ipf -> ipf.getId() != null)
                 .collect(Collectors.toMap(IngredientesPorFicha::getId, ipf -> ipf));
 
+        Map<Long, Ingrediente> mapaIngredientes = carregarMapaIngredientes(dtos);
         for (IngredientePorFichaDTO dto : dtos) {
             if (dto.id() != null && mapAtuais.containsKey(dto.id())) {
                 updateIngredientePorFicha(mapAtuais.get(dto.id()), dto);
             } else {
-                IngredientesPorFicha novo = buildIngredientePorFicha(dto, ficha, ficha.getPerfilNutricional());
+                IngredientesPorFicha novo = buildIngredientePorFicha(dto, ficha, ficha.getPerfilNutricional(), mapaIngredientes);
                 atuais.add(novo);
             }
         }
@@ -186,16 +215,19 @@ public class FichaTecnicaService {
 
     private List<IngredientesPorFicha> buildIngredientes(List<IngredientePorFichaDTO> dtos, FichaTecnica ficha, PerfilNutricional perfil) {
         if (dtos == null) return new ArrayList<>();
-        return dtos.stream().map(dto -> buildIngredientePorFicha(dto, ficha, perfil)).collect(Collectors.toCollection(ArrayList::new));
+        Map<Long, Ingrediente> mapaIngredientes = carregarMapaIngredientes(dtos);
+        return dtos.stream().map(dto -> buildIngredientePorFicha(dto, ficha, perfil, mapaIngredientes)).collect(Collectors.toCollection(ArrayList::new));
     }
 
-    private IngredientesPorFicha buildIngredientePorFicha(IngredientePorFichaDTO dto, FichaTecnica ficha, PerfilNutricional perfil) {
+    private IngredientesPorFicha buildIngredientePorFicha(IngredientePorFichaDTO dto, FichaTecnica ficha, PerfilNutricional perfil, Map<Long, Ingrediente> mapaIngredientes) {
         Long ingredienteId = dto.ingredienteId();
         if (ingredienteId == null) {
             throw new IllegalArgumentException("Ingrediente inválido.");
         }
 
-        Ingrediente ingrediente = ingredienteRepository.findById(ingredienteId)
+        Ingrediente ingrediente = (mapaIngredientes != null && mapaIngredientes.containsKey(ingredienteId)
+                ? java.util.Optional.of(mapaIngredientes.get(ingredienteId))
+                : ingredienteRepository.findById(ingredienteId))
                 .orElseThrow(() -> new IngredienteNotFoundException("Ingrediente não encontrado"));
 
         IngredientesPorFicha ipf = new IngredientesPorFicha();
@@ -208,8 +240,16 @@ public class FichaTecnicaService {
 
     private void updateIngredientePorFicha(IngredientesPorFicha ipf, IngredientePorFichaDTO dto) {
         ipf.setCustoKG(dto.custoKg());
-        ipf.setCustoUsado(dto.custoUsado());
-        ipf.setFc(dto.fc());
+        if (dto.pb() != null && dto.custoKg() != null) {
+            ipf.setCustoUsado(dto.pb().multiply(dto.custoKg()).divide(BigDecimal.valueOf(1000), 2, RoundingMode.HALF_UP));
+        } else {
+            ipf.setCustoUsado(dto.custoUsado());
+        }
+        if (dto.pb() != null && dto.pl() != null && dto.pl().compareTo(BigDecimal.ZERO) > 0) {
+            ipf.setFc(dto.pb().divide(dto.pl(), 2, RoundingMode.HALF_UP));
+        } else {
+            ipf.setFc(dto.fc());
+        }
         ipf.setMedidaCaseria(dto.medidaCaseira());
         ipf.setPb(dto.pb());
         ipf.setPl(dto.pl());
@@ -237,6 +277,142 @@ public class FichaTecnicaService {
         }
     }
 
+
+    private Map<Long, Ingrediente> carregarMapaIngredientes(List<IngredientePorFichaDTO> dtos) {
+        Map<Long, Ingrediente> mapa = new java.util.HashMap<>();
+        if (dtos == null || dtos.isEmpty()) {
+            return mapa;
+        }
+        Set<Long> ids = dtos.stream()
+                .filter(d -> d != null && d.ingredienteId() != null)
+                .map(IngredientePorFichaDTO::ingredienteId)
+                .collect(Collectors.toSet());
+        if (!ids.isEmpty()) {
+            List<Ingrediente> encontrados = ingredienteRepository.findAllById(ids);
+            if (encontrados != null) {
+                for (Ingrediente ing : encontrados) {
+                    if (ing != null && ing.getId() != null) {
+                        mapa.put(ing.getId(), ing);
+                    }
+                }
+            }
+        }
+        return mapa;
+    }
+
+    private void recalcularCustosEFcc(FichaTecnica ficha, BigDecimal custoTotalDto, int numeroPorcoes) {
+        List<IngredientesPorFicha> itens = ficha.getIngredientesPorFicha();
+        if (itens != null && !itens.isEmpty()) {
+            BigDecimal somaCusto = BigDecimal.ZERO;
+            BigDecimal somaPl = BigDecimal.ZERO;
+            for (IngredientesPorFicha ipf : itens) {
+                if (ipf.getCustoUsado() != null) {
+                    somaCusto = somaCusto.add(ipf.getCustoUsado());
+                }
+                if (ipf.getPl() != null) {
+                    somaPl = somaPl.add(ipf.getPl());
+                }
+            }
+            if (somaCusto.compareTo(BigDecimal.ZERO) > 0) {
+                ficha.setCustoTotal(somaCusto);
+                ficha.setCustoPerCapita(somaCusto.divide(BigDecimal.valueOf(numeroPorcoes), 2, RoundingMode.HALF_UP));
+            }
+            if (somaPl.compareTo(BigDecimal.ZERO) > 0
+                    && ficha.getPreparacao() != null
+                    && ficha.getPreparacao().getRendimento() != null) {
+                ficha.getPreparacao().setFcc(
+                        ficha.getPreparacao().getRendimento().divide(somaPl, 2, RoundingMode.HALF_UP));
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void recalcularFichasPorIngrediente(Long ingredienteId) {
+        if (ingredienteId == null || ingredientesPorFichaRepository == null) {
+            return;
+        }
+        List<FichaTecnica> fichasAfetadas = ingredientesPorFichaRepository.buscarFichasPorIngredienteId(ingredienteId);
+        if (fichasAfetadas == null || fichasAfetadas.isEmpty()) {
+            return;
+        }
+        for (FichaTecnica ficha : fichasAfetadas) {
+            List<IngredientesPorFicha> itens = ficha.getIngredientesPorFicha();
+            if (itens == null || itens.isEmpty()) {
+                continue;
+            }
+            List<IngredientePorFichaDTO> dtos = new ArrayList<>();
+            for (IngredientesPorFicha ipf : itens) {
+                Ingrediente ing = ipf.getIngrediente();
+                BigDecimal pl = ipf.getPl();
+                if (ing != null && pl != null && pl.compareTo(BigDecimal.ZERO) > 0) {
+                    ipf.setPtnCalculado(normalizar(ing.getPtn()).multiply(pl).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                    ipf.setChoCalculado(normalizar(ing.getCho()).multiply(pl).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                    ipf.setLipCalculado(normalizar(ing.getLip()).multiply(pl).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                    ipf.setSodioCalculado(normalizar(ing.getSodio()).multiply(pl).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                    ipf.setGorduraSaturadaCalculada(normalizar(ing.getGorduraSaturada()).multiply(pl).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP));
+                }
+                dtos.add(new IngredientePorFichaDTO(
+                        ipf.getId(),
+                        ing != null ? ing.getId() : null,
+                        null,
+                        ipf.getCustoKG(),
+                        ipf.getCustoUsado(),
+                        ipf.getFc(),
+                        ipf.getMedidaCaseria(),
+                        ipf.getPb(),
+                        ipf.getPl(),
+                        ipf.getPtnCalculado(),
+                        ipf.getChoCalculado(),
+                        ipf.getLipCalculado(),
+                        ipf.getSodioCalculado(),
+                        ipf.getGorduraSaturadaCalculada(),
+                        null
+                ));
+            }
+            int numPorcoes = ficha.getNumeroPorcoes() != null && ficha.getNumeroPorcoes() > 0 ? ficha.getNumeroPorcoes() : 1;
+            PerfilNutricionalDTO perfilCalculado = perfilCalculator.calcularPerfilNutricionalPorPorcaoUpdate(dtos, numPorcoes);
+            if (ficha.getPerfilNutricional() != null) {
+                fichaTecnicaMapper.updatePerfil(ficha.getPerfilNutricional(), perfilCalculado);
+            }
+            fichaRepository.save(ficha);
+            recalcularRefeicoesDaFicha(ficha.getId());
+        }
+    }
+
+    private void recalcularRefeicoesDaFicha(Long fichaId) {
+        if (fichaId == null || refeicaoRepository == null) {
+            return;
+        }
+        List<com.example.sistemanutricao.model.Refeicao> refeicoes = refeicaoRepository.buscarPorFichaTecnicaId(fichaId);
+        if (refeicoes == null || refeicoes.isEmpty()) {
+            return;
+        }
+        com.example.sistemanutricao.service.refeicao.RefeicaoNutrientesCalculator calc =
+                new com.example.sistemanutricao.service.refeicao.RefeicaoNutrientesCalculator();
+        for (com.example.sistemanutricao.model.Refeicao refeicao : refeicoes) {
+            var totais = calc.calcularTotais(refeicao);
+            refeicao.setTotalGramasPTN(totais.totalGramasPTN());
+            refeicao.setTotalGramasCHO(totais.totalGramasCHO());
+            refeicao.setTotalGramasLIP(totais.totalGramasLIP());
+            refeicao.setTotalGramasSodio(totais.totalGramasSodio());
+            refeicao.setTotalGramasSaturada(totais.totalGramasSaturada());
+            if (refeicao.getFichasPorRefeicao() != null && !refeicao.getFichasPorRefeicao().isEmpty()) {
+                BigDecimal totalVtc = BigDecimal.ZERO;
+                for (com.example.sistemanutricao.model.FichasPorRefeicao fp : refeicao.getFichasPorRefeicao()) {
+                    if (fp != null && fp.getFichaTecnica() != null && fp.getFichaTecnica().getPerfilNutricional() != null) {
+                        BigDecimal vtc = fp.getFichaTecnica().getPerfilNutricional().getVtc();
+                        if (vtc != null) {
+                            totalVtc = totalVtc.add(vtc);
+                        }
+                    }
+                }
+                if (totalVtc.compareTo(BigDecimal.ZERO) > 0) {
+                    refeicao.setKcalTotal(totalVtc.setScale(2, RoundingMode.HALF_UP).toPlainString());
+                }
+            }
+            refeicaoRepository.save(refeicao);
+        }
+    }
 
     private void validarDuplicidadeFichaCreate(FichaTecnicaCreateDTO dto, Long nutricionistaId) {
         if (nutricionistaId == null || dto == null || dto.preparacao() == null) {
@@ -323,8 +499,21 @@ public class FichaTecnicaService {
 
     @Transactional
     @RegistrarAcao(acao = TipoAcao.ARQUIVOU_FICHA)
+    public void atualizaStatus(@NonNull Long id, Long nutricionistaId) {
+        var ficha = findFichaById(id);
+        validarPropriedadeFicha(ficha, nutricionistaId);
+        executarAtualizaStatus(id, ficha);
+    }
+
+    @Transactional
+    @RegistrarAcao(acao = TipoAcao.ARQUIVOU_FICHA)
     public void atualizaStatus(@NonNull Long id) {
-        FichaTecnica ficha = findFichaById(id);
+        var ficha = findFichaById(id);
+        executarAtualizaStatus(id, ficha);
+    }
+
+    private void executarAtualizaStatus(Long id, FichaTecnica fichaAlvo) {
+        FichaTecnica ficha = fichaAlvo != null ? fichaAlvo : findFichaById(id);
 
         if (ficha.getStatus() == Status.ATIVA && ficha.getStatusCriacao() == StatusCriacao.INCOMPLETA) {
             throw new IllegalArgumentException("Não é permitido arquivar uma ficha incompleta.");
@@ -340,8 +529,39 @@ public class FichaTecnicaService {
     }
 
     @Transactional(readOnly = true)
+    public FichaTecnicaGetDTO getFichaById(@NonNull Long id, Usuario usuario) {
+        var ficha = findFichaById(id);
+        validarAcessoLeituraFicha(ficha, usuario);
+        return fichaTecnicaMapper.toGetDTO(ficha);
+    }
+
+    private void validarPropriedadeFicha(FichaTecnica ficha, Long nutricionistaId) {
+        if (nutricionistaId == null || ficha.getNutricionista() == null || !ficha.getNutricionista().getId().equals(nutricionistaId)) {
+            throw new IllegalArgumentException("Você não tem permissão para alterar esta ficha técnica.");
+        }
+    }
+
+    private void validarAcessoLeituraFicha(FichaTecnica ficha, Usuario usuario) {
+        if (usuario == null) {
+            throw new IllegalArgumentException("Você não tem permissão para acessar esta ficha técnica.");
+        }
+        if (usuario.getCargo() != null && "PRODUCAO".equals(usuario.getCargo().name())) {
+            Long estabUsuario = usuario.getEstabelecimento() != null ? usuario.getEstabelecimento().getId() : null;
+            Long estabFicha = (ficha.getNutricionista() != null && ficha.getNutricionista().getEstabelecimento() != null)
+                    ? ficha.getNutricionista().getEstabelecimento().getId()
+                    : null;
+            if (estabUsuario == null || !estabUsuario.equals(estabFicha)) {
+                throw new IllegalArgumentException("Você não tem permissão para acessar esta ficha técnica.");
+            }
+            return;
+        }
+        validarPropriedadeFicha(ficha, usuario.getId());
+    }
+
+    @Transactional(readOnly = true)
     public FichaTecnicaGetDTO getFichaById(@NonNull Long id) {
-        FichaTecnica ficha = findFichaById(id);
+        FichaTecnica fichaAlvo = null;
+        FichaTecnica ficha = fichaAlvo != null ? fichaAlvo : findFichaById(id);
         return fichaTecnicaMapper.toGetDTO(ficha);
     }
 

@@ -211,6 +211,11 @@ window.salvarPerfil = function () {
       mostrarToastErro("Por favor, confirme a nova senha.");
       return;
     }
+    const regexSenhaForte = /^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?":{}|<>_\-]).{8,50}$/;
+    if (!regexSenhaForte.test(novaSenha)) {
+      mostrarToastErro("A nova senha deve ter entre 8 e 50 caracteres e conter ao menos uma letra, um número e um caractere especial.");
+      return;
+    }
     if (novaSenha !== confirmarSenha) {
       mostrarToastErro("As senhas novas não coincidem!");
       return;

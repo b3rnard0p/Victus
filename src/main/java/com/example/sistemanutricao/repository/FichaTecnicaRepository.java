@@ -12,7 +12,7 @@ import com.example.sistemanutricao.model.enuns.StatusCriacao;
 
 public interface FichaTecnicaRepository extends JpaRepository<FichaTecnica, Long>, JpaSpecificationExecutor<FichaTecnica> {
 
-    @EntityGraph(value = "Ficha.completa")
+    @EntityGraph(attributePaths = {"preparacao", "perfilNutricional", "nutricionista"})
     @Override
     Page<FichaTecnica> findAll(org.springframework.data.jpa.domain.Specification<FichaTecnica> spec, Pageable pageable);
 

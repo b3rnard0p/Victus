@@ -22,6 +22,7 @@
 
     <div
             id="login-card"
+            th:classappend="${abrirCard == 'register' or abrirCard == 'forgot'} ? ' hidden' : ''"
             class="backdrop-blur-md rounded-2xl overflow-hidden transition-all duration-300 shadow-xl shadow-black/20 border border-white/30 w-full"
     >
       <div class="p-6 md:p-8 lg:p-10">
@@ -76,6 +77,9 @@
             <label for="remember-me" class="ml-2 text-sm text-zinc-800 cursor-pointer">
               Lembrar de mim
             </label>
+
+
+
           </div>
 
           <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-login', texto='Entrar', tipo='submit')}"></div>
@@ -83,13 +87,49 @@
 
         <div class="w-full mt-4 px-4 pb-4">
           <div th:replace="~{components/Buttom :: btn-animado(idBtn='show-register', texto='Criar conta', tipo='submit')}"></div>
+          <div class="text-center mt-4">
+            <button type="button" id="show-forgot-password" class="text-sm font-medium text-[#4A6E18] hover:text-[#7AB648] hover:underline cursor-pointer transition-colors">
+              Esqueci minha senha
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+            id="forgot-password-card"
+            th:classappend="${abrirCard == 'forgot'} ? '' : ' hidden'"
+            class="backdrop-blur-md rounded-2xl shadow-xl shadow-black/20 border border-white/30 overflow-hidden transition-all duration-300 w-full"
+    >
+      <div class="p-6 md:p-8 lg:p-10">
+        <h2 class="text-2xl font-bold text-[#4A6E18] text-center mb-6">Recuperar Senha</h2>
+        <form id="forgot-password-form" th:action="@{/usuario/recuperar-senha}" method="post" class="space-y-4">
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='forgot-email', name='email', type='email', label='Email', value=${recuperarEmail ?: ''}, required=true)}"></div>
+          </div>
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='forgot-matricula', name='numeroMatricula', type='text', label='Número de Matrícula', value=${recuperarMatricula ?: ''}, required=true)}"></div>
+          </div>
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='forgot-new-password', name='novaSenha', type='password', label='Nova Senha', value='', required=true)}"></div>
+          </div>
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='forgot-confirm-password', name='confirmarNovaSenha', type='password', label='Repita a Nova Senha', value='', required=true)}"></div>
+          </div>
+          <div class="w-full mt-4">
+            <div th:replace="~{components/Buttom :: btn-animado(idBtn='btn-recuperar', texto='Redefinir Senha', tipo='submit')}"></div>
+          </div>
+        </form>
+        <div class="w-full mt-4 px-4 pb-4">
+          <div th:replace="~{components/Buttom :: btn-animado(idBtn='back-to-login', texto='Voltar ao login', tipo='button')}"></div>
         </div>
       </div>
     </div>
 
     <div
             id="register-card"
-            class="backdrop-blur-md rounded-2xl shadow-xl shadow-black/20 border border-white/30 overflow-hidden hidden transition-all duration-300 w-full"
+            th:classappend="${abrirCard == 'register'} ? '' : ' hidden'"
+            class="backdrop-blur-md rounded-2xl shadow-xl shadow-black/20 border border-white/30 overflow-hidden transition-all duration-300 w-full"
     >
       <div class="p-6 md:p-8 lg:p-10">
         <div class="flex justify-center mb-6 lg:hidden">
@@ -125,11 +165,15 @@
                 class="space-y-4"
         >
           <div>
-            <div th:replace="~{components/Input :: flutuante(id='new-username', name='username', type='text', label='Usuário', value='', required=true)}"></div>
+            <div th:replace="~{components/Input :: flutuante(id='new-username', name='username', type='text', label='Usuário', value=${registroDto != null ? registroDto.username() : ''}, required=true)}"></div>
           </div>
 
           <div>
-            <div th:replace="~{components/Input :: flutuante(id='new-email', name='email', type='email', label='Email', value='', required=true)}"></div>
+            <div th:replace="~{components/Input :: flutuante(id='new-email', name='email', type='email', label='Email', value=${registroDto != null ? registroDto.email() : ''}, required=true)}"></div>
+          </div>
+
+          <div>
+            <div th:replace="~{components/Input :: flutuante(id='new-matricula', name='numeroMatricula', type='text', label='Número de Matrícula', value=${registroDto != null ? registroDto.numeroMatricula() : ''}, required=true)}"></div>
           </div>
 
           <div>
@@ -174,6 +218,9 @@
       class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
     >
       <div th:replace="~{components/Toast :: toast-templates}"></div>
+      <th:block th:if="${successMessage != null}">
+        <div th:replace="~{components/Toast :: success(mensagem=${successMessage})}"></div>
+      </th:block>
       <th:block th:if="${errorMessage != null}">
         <div
           th:replace="~{components/Toast :: error(mensagem=${errorMessage})}"

@@ -73,6 +73,7 @@ public class FichaTecnica {
     private PerfilNutricional perfilNutricional;
 
     @OneToMany(mappedBy = "fichaTecnica", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @org.hibernate.annotations.BatchSize(size = 25)
     private List<IngredientesPorFicha> ingredientesPorFicha;
 
     public FichaTecnica() {

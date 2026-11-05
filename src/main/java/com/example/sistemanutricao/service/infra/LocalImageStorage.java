@@ -41,13 +41,17 @@ public class LocalImageStorage implements ImageStorage {
                 throw new RuntimeException("Arquivo vazio");
             }
 
+            validarImagem(arquivo);
             String extensao = "";
             String nomeOriginal = arquivo.getOriginalFilename();
             if (nomeOriginal != null && nomeOriginal.contains(".")) {
                 extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf("."));
             }
             String nomeArquivo = nomeUsuario.replaceAll("[^a-zA-Z0-9]", "_") + "_" + UUID.randomUUID().toString().substring(0, 8) + extensao;
-            Path destino = this.rootLocation.resolve(nomeArquivo);
+            Path destino = this.rootLocation.resolve(nomeArquivo).normalize();
+            if (!destino.startsWith(this.rootLocation.normalize())) {
+                throw new IllegalArgumentException("Caminho de destino inválido.");
+            }
 
             Files.copy(arquivo.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
             
@@ -69,6 +73,10 @@ public class LocalImageStorage implements ImageStorage {
                 arquivo = rootLocation.resolve(nomeArquivo);
             }
             
+            arquivo = arquivo.normalize();
+            if (!arquivo.startsWith(this.rootLocation.normalize())) {
+                throw new IllegalArgumentException("Acesso negado ao caminho informado.");
+            }
             Resource resource = new UrlResource(arquivo.toUri());
 
             if (resource.exists() || resource.isReadable()) {
@@ -83,6 +91,45 @@ public class LocalImageStorage implements ImageStorage {
 
     @Override
     public void removerImagemPerfil(String caminhoImagem) {
+        executarRemoverImagemPerfil(caminhoImagem);
+    }
+
+    private void validarImagem(MultipartFile arquivo) throws IOException {
+        String nomeOriginal = arquivo.getOriginalFilename();
+        if (nomeOriginal == null || !nomeOriginal.contains(".")) {
+            throw new IllegalArgumentException("Arquivo sem extensão válida.");
+        }
+        String extensao = nomeOriginal.substring(nomeOriginal.lastIndexOf(".")).toLowerCase();
+        java.util.Set<String> extensoesPermitidas = java.util.Set.of(".jpg", ".jpeg", ".png", ".webp");
+        if (!extensoesPermitidas.contains(extensao)) {
+            throw new IllegalArgumentException("Extensão de arquivo não permitida. Use JPG, PNG ou WEBP.");
+        }
+
+        String contentType = arquivo.getContentType();
+        java.util.Set<String> mimesPermitidos = java.util.Set.of("image/jpeg", "image/png", "image/webp");
+        if (contentType == null || !mimesPermitidos.contains(contentType.toLowerCase())) {
+            throw new IllegalArgumentException("Tipo MIME não permitido.");
+        }
+
+        byte[] bytes = arquivo.getBytes();
+        if (!possuiAssinaturaValida(bytes)) {
+            throw new IllegalArgumentException("O conteúdo do arquivo não corresponde a uma imagem válida.");
+        }
+    }
+
+    private boolean possuiAssinaturaValida(byte[] b) {
+        if (b == null || b.length < 4) {
+            return false;
+        }
+        boolean isJpeg = (b[0] & 0xFF) == 0xFF && (b[1] & 0xFF) == 0xD8 && (b[2] & 0xFF) == 0xFF;
+        boolean isPng = (b[0] & 0xFF) == 0x89 && b[1] == 0x50 && b[2] == 0x4E && b[3] == 0x47;
+        boolean isWebp = b.length >= 12
+                && b[0] == 'R' && b[1] == 'I' && b[2] == 'F' && b[3] == 'F'
+                && b[8] == 'W' && b[9] == 'E' && b[10] == 'B' && b[11] == 'P';
+        return isJpeg || isPng || isWebp;
+    }
+
+    private void executarRemoverImagemPerfil(String caminhoImagem) {
         if (caminhoImagem == null || caminhoImagem.isEmpty()) {
             return;
         }
@@ -99,6 +146,9 @@ public class LocalImageStorage implements ImageStorage {
             }
             
             Path arquivo = this.rootLocation.resolve(nomeArquivo).normalize();
+            if (!arquivo.startsWith(this.rootLocation.normalize())) {
+                throw new IllegalArgumentException("Caminho inválido para remoção.");
+            }
 
             if (Files.exists(arquivo) && Files.isRegularFile(arquivo)) {
                 Files.delete(arquivo);

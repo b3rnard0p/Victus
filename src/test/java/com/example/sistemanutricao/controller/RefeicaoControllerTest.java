@@ -94,7 +94,7 @@ class RefeicaoControllerTest {
     @DisplayName("Deve retornar totais de nutrientes")
     void deveRetornarTotaisNutrientes() throws Exception {
         RefeicaoNutrientesResponseDTO dto = new RefeicaoNutrientesResponseDTO(1L, "Nome", "100", Status.ATIVA, List.of(), java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, java.math.BigDecimal.TEN, java.math.BigDecimal.TEN);
-        when(refeicaoService.buscarTotaisNutrientesPorId(1L)).thenReturn(dto);
+        when(refeicaoService.buscarTotaisNutrientesPorId(eq(1L), any())).thenReturn(dto);
 
         mockMvc.perform(get("/refeicao/1/nutrientes-totais"))
                 .andExpect(status().isOk());
@@ -136,7 +136,7 @@ class RefeicaoControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(view().name("redirect:/refeicao"));
                 
-        verify(refeicaoService).atualizaStatus(1L);
+        verify(refeicaoService).atualizaStatus(1L, 1L);
     }
     
     @Test
@@ -146,14 +146,14 @@ class RefeicaoControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(view().name("redirect:/refeicao/por-status?status=INATIVA"));
                 
-        verify(refeicaoService).atualizaStatus(1L);
+        verify(refeicaoService).atualizaStatus(1L, 1L);
     }
 
     @Test
     @DisplayName("Deve mostrar form edicao retornando dto json")
     void deveMostrarFormEdicao() throws Exception {
         RefeicaoResponseDTO dto = new RefeicaoResponseDTO(1L, "Café", "10", Status.ATIVA, List.of());
-        when(refeicaoService.buscarPorId(1L)).thenReturn(dto);
+        when(refeicaoService.buscarPorId(1L, 1L)).thenReturn(dto);
 
         mockMvc.perform(get("/refeicao/editar/1"))
                 .andExpect(status().isOk());
@@ -190,14 +190,14 @@ class RefeicaoControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(view().name("redirect:/refeicao"));
 
-        verify(refeicaoService).update(eq(1L), any(RefeicaoDTO.class));
+        verify(refeicaoService).update(eq(1L), any(RefeicaoDTO.class), eq(1L));
     }
 
     @Test
     @DisplayName("Deve atualizar refeicao via htmx")
     void deveAtualizarRefeicaoHtmx() throws Exception {
         RefeicaoResponseDTO dto = new RefeicaoResponseDTO(1L, "Janta", "10", Status.ATIVA, List.of());
-        when(refeicaoService.buscarPorId(1L)).thenReturn(dto);
+        when(refeicaoService.buscarPorId(1L, 1L)).thenReturn(dto);
 
         mockMvc.perform(post("/refeicao/editar/1")
                 .param("nome", "Janta")
@@ -206,6 +206,6 @@ class RefeicaoControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(view().name("pages/refeicoes/List :: refeicao-item"));
 
-        verify(refeicaoService).update(eq(1L), any(RefeicaoDTO.class));
+        verify(refeicaoService).update(eq(1L), any(RefeicaoDTO.class), eq(1L));
     }
 }

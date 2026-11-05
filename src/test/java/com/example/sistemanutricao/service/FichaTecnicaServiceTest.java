@@ -608,4 +608,94 @@ class FichaTecnicaServiceTest {
         fichaTecnicaService.update(1L, dto);
         verify(fichaRepository).save(any(FichaTecnica.class));
     }
+
+    @Test
+    void shouldRejectUpdateAndStatusAndReadWhenUserDoesNotOwnFicha() {
+        FichaTecnica ficha = new FichaTecnica();
+        ficha.setId(1L);
+        Usuario dono = new Usuario();
+        dono.setId(10L);
+        ficha.setNutricionista(dono);
+
+        when(fichaRepository.findById(1L)).thenReturn(Optional.of(ficha));
+
+        Usuario outroNutri = new Usuario();
+        outroNutri.setId(20L);
+        outroNutri.setCargo(com.example.sistemanutricao.model.enuns.Cargo.NUTRICIONISTA);
+
+        assertThrows(IllegalArgumentException.class, () -> fichaTecnicaService.update(1L, null, 20L));
+        assertThrows(IllegalArgumentException.class, () -> fichaTecnicaService.atualizaStatus(1L, 20L));
+        assertThrows(IllegalArgumentException.class, () -> fichaTecnicaService.getFichaById(1L, outroNutri));
+    }
+
+    @Test
+    void shouldRecalculateCostsFactorsAndCascadeToFichaAndRefeicao() {
+        Usuario nutricionista = new Usuario();
+        nutricionista.setId(1L);
+        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(nutricionista));
+
+        com.example.sistemanutricao.record.PreparacaoDTO.PreparacaoDTO prepDto =
+                new com.example.sistemanutricao.record.PreparacaoDTO.PreparacaoDTO(
+                        null, "Arroz", 1, "20m", "Fogão", "Modo", null, null, BigDecimal.ONE, new BigDecimal("400.00"), null);
+
+        // PB = 250g, PL = 200g -> FC = 1.25; CustoKg = 20.00 -> CustoUsado = 5.00
+        com.example.sistemanutricao.record.IngredientePorFichaDTO ingDto =
+                new com.example.sistemanutricao.record.IngredientePorFichaDTO(
+                        null, 10L, null, new BigDecimal("20.00"), BigDecimal.ZERO, BigDecimal.ZERO,
+                        "1 xícara", new BigDecimal("250.00"), new BigDecimal("200.00"),
+                        null, null, null, null, null, null);
+
+        FichaTecnicaCreateDTO createDto = new FichaTecnicaCreateDTO(
+                null, new BigDecimal("999.00"), new BigDecimal("100.00"), "Colher", null, new BigDecimal("100.00"),
+                Status.ATIVA, StatusCriacao.COMPLETA, null, null, prepDto, List.of(ingDto), null);
+
+        com.example.sistemanutricao.model.Preparacao prep = new com.example.sistemanutricao.model.Preparacao();
+        prep.setRendimento(new BigDecimal("400.00"));
+        when(fichaTecnicaMapper.toPreparacao(prepDto)).thenReturn(prep);
+        when(fichaTecnicaMapper.toPerfilNutricional(any())).thenReturn(new com.example.sistemanutricao.model.PerfilNutricional());
+
+        com.example.sistemanutricao.model.Ingrediente ing = new com.example.sistemanutricao.model.Ingrediente();
+        ing.setId(10L);
+        ing.setPtn(new BigDecimal("10.00"));
+        when(ingredienteRepository.findAllById(any())).thenReturn(List.of(ing));
+
+        final FichaTecnica[] savedHolder = new FichaTecnica[1];
+        when(fichaRepository.save(any(FichaTecnica.class))).thenAnswer(inv -> {
+            savedHolder[0] = inv.getArgument(0);
+            return savedHolder[0];
+        });
+        when(fichaTecnicaMapper.toGetDTO(any())).thenReturn(new FichaTecnicaGetDTO(1L, null, null, null, null, null, null, null, null, null, null));
+
+        fichaTecnicaService.create(createDto, 1L);
+
+        assertNotNull(savedHolder[0]);
+        assertEquals(new BigDecimal("5.00"), savedHolder[0].getCustoTotal());
+        assertEquals(new BigDecimal("1.25"), savedHolder[0].getCustoPerCapita());
+        assertEquals(new BigDecimal("2.00"), savedHolder[0].getPreparacao().getFcc());
+        assertEquals(new BigDecimal("1.25"), savedHolder[0].getIngredientesPorFicha().get(0).getFc());
+        assertEquals(new BigDecimal("5.00"), savedHolder[0].getIngredientesPorFicha().get(0).getCustoUsado());
+
+        // Cascade test
+        var ipfRepo = mock(com.example.sistemanutricao.repository.IngredientesPorFichaRepository.class);
+        var refRepo = mock(com.example.sistemanutricao.repository.RefeicaoRepository.class);
+        fichaTecnicaService.setIngredientesPorFichaRepository(ipfRepo);
+        fichaTecnicaService.setRefeicaoRepository(refRepo);
+
+        savedHolder[0].setId(50L);
+        savedHolder[0].getPerfilNutricional().setVtc(new BigDecimal("320.00"));
+        ing.setPtn(new BigDecimal("25.00"));
+
+        com.example.sistemanutricao.model.Refeicao refeicao = new com.example.sistemanutricao.model.Refeicao();
+        refeicao.setId(70L);
+        refeicao.setFichasPorRefeicao(List.of(new com.example.sistemanutricao.model.FichasPorRefeicao(refeicao, savedHolder[0])));
+
+        when(ipfRepo.buscarFichasPorIngredienteId(10L)).thenReturn(List.of(savedHolder[0]));
+        when(refRepo.buscarPorFichaTecnicaId(50L)).thenReturn(List.of(refeicao));
+
+        fichaTecnicaService.recalcularFichasPorIngrediente(10L);
+
+        assertEquals(new BigDecimal("50.00"), savedHolder[0].getIngredientesPorFicha().get(0).getPtnCalculado());
+        assertEquals("320.00", refeicao.getKcalTotal());
+        verify(refRepo).save(refeicao);
+    }
 }

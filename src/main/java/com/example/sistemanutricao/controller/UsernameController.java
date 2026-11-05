@@ -12,9 +12,17 @@ import com.example.sistemanutricao.service.usuario.UsuarioService;
 public class UsernameController {
 
     private final UsuarioService usuarioService;
+    private final com.example.sistemanutricao.mapper.UsuarioMapper usuarioMapper;
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public UsernameController(UsuarioService usuarioService, com.example.sistemanutricao.mapper.UsuarioMapper usuarioMapper) {
+        this.usuarioService = usuarioService;
+        this.usuarioMapper = usuarioMapper;
+    }
 
     public UsernameController(UsuarioService usuarioService) {
         this.usuarioService = usuarioService;
+        this.usuarioMapper = null;
     }
 
     @ModelAttribute("Username")
@@ -25,13 +33,15 @@ public class UsernameController {
     @ModelAttribute("usuarioLogado")
     public GetUsuarioDTO getUsuarioLogado(@AuthenticationPrincipal UsuarioSecurity usuarioPrincipal) {
         if (usuarioPrincipal != null) {
-            GetUsuarioDTO usuario = usuarioService.findById(usuarioPrincipal.getId());
+            GetUsuarioDTO usuario = (usuarioMapper != null && usuarioPrincipal.getUsuario() != null)
+                    ? usuarioMapper.toGetDTO(usuarioPrincipal.getUsuario())
+                    : usuarioService.findById(usuarioPrincipal.getId());
             return usuario != null ? usuario : getEmptyUsuario();
         }
         return getEmptyUsuario();
     }
 
     private GetUsuarioDTO getEmptyUsuario() {
-        return new GetUsuarioDTO(null, "", "", null, null, "", false, "");
+        return new GetUsuarioDTO(null, "", "", null, null, "", false, "", "");
     }
 }

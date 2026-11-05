@@ -54,15 +54,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         Optional<String> refreshTokenOpt = getCookieValueByName(request, "refresh_token");
 
         try {
-            if (accessTokenOpt.isPresent() && tokenManager.validateJwtToken(accessTokenOpt.get())) {
+            if (accessTokenOpt.isPresent() && tokenManager.validateAccessToken(accessTokenOpt.get())) {
                 authenticateUser(accessTokenOpt.get(), request);
             }
-            else if (refreshTokenOpt.isPresent() && tokenManager.validateJwtToken(refreshTokenOpt.get())) {
+            else if (refreshTokenOpt.isPresent() && tokenManager.validateRefreshToken(refreshTokenOpt.get())) {
                 String username = tokenManager.getUserNameFromJwtToken(refreshTokenOpt.get());
 
-                String newAccessToken = tokenManager.generateAccessToken(username);
+                boolean rememberMe = tokenManager.isRememberMeToken(refreshTokenOpt.get());
+                String newAccessToken = tokenManager.generateAccessToken(username, rememberMe);
 
-                response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateAccessTokenCookie(newAccessToken).toString());
+                response.addHeader(HttpHeaders.SET_COOKIE, tokenManager.generateAccessTokenCookie(newAccessToken, rememberMe).toString());
 
                 authenticateUser(newAccessToken, request);
             }
@@ -76,6 +77,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void authenticateUser(String token, HttpServletRequest request) {
         String username = tokenManager.getUserNameFromJwtToken(token);
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        if (!userDetails.isEnabled()) {
+            return;
+        }
+        if (userDetails instanceof UsuarioSecurity us
+                && us.getCargo() != com.example.sistemanutricao.model.enuns.Cargo.ADMIN
+                && us.getEstabelecimentoId() == null) {
+            return;
+        }
 
         UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                 userDetails, null, userDetails.getAuthorities());

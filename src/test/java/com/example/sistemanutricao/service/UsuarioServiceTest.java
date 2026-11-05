@@ -48,7 +48,7 @@ class UsuarioServiceTest {
     void atualizarPerfilComImagem_NotFound() {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.empty());
 
-        UsuarioDTO dto = new UsuarioDTO("test", "test@test.com", "123", "test", "test", "test", "test");
+        UsuarioDTO dto = new UsuarioDTO("test", "test@test.com", "123", "test", "test", "test", "test", null);
         assertThrows(UsuarioNotFoundException.class, () -> 
             usuarioService.atualizarPerfilComImagem(1L, dto, null)
         );
@@ -61,10 +61,10 @@ class UsuarioServiceTest {
         when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
         
-        GetUsuarioDTO getDto = new GetUsuarioDTO(1L, "test", "test@test.com", null, null, null, false, null);
+        GetUsuarioDTO getDto = new GetUsuarioDTO(1L, "test", "test@test.com", null, null, null, false, null, null);
         when(usuarioMapper.toGetDTO(usuario)).thenReturn(getDto);
 
-        UsuarioDTO dto = new UsuarioDTO("test", "test@test.com", "123", "test", "test", "test", "test");
+        UsuarioDTO dto = new UsuarioDTO("test", "test@test.com", "123", "test", "test", "test", "test", null);
         GetUsuarioDTO result = usuarioService.atualizarPerfilComImagem(1L, dto, null);
 
         assertNotNull(result);

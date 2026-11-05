@@ -2,6 +2,7 @@ package com.example.sistemanutricao.record.UsuarioDTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record UsuarioDTO(
@@ -14,10 +15,15 @@ public record UsuarioDTO(
         @Size(max = 100, message = "O e-mail deve ter no máximo 100 caracteres.")
         String email,
 
-        @Size(max = 50, message = "A senha deve ter no máximo 50 caracteres.")
+        @Pattern(
+                regexp = "^$|^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[!@#$%^&*(),.?\":{}|<>_\\-]).{8,50}$",
+                message = "A senha deve ter entre 8 e 50 caracteres e conter ao menos uma letra, um número e um caractere especial."
+        )
         String senha,
         String novaSenha,
         String confirmarNovaSenha,
         String senhaAtual,
-        String caminhoImagem
+        String caminhoImagem,
+        @Size(max = 50, message = "O número de matrícula deve ter no máximo 50 caracteres.")
+        String numeroMatricula
 ) {}

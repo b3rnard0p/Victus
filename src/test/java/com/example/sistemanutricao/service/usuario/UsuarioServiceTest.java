@@ -120,6 +120,7 @@ class UsuarioServiceTest {
                 "novaSenha123",
                 "novaSenha123",
                 null,
+                null,
                 null
         );
 
@@ -141,9 +142,9 @@ class UsuarioServiceTest {
 
     @Test
     void create_Success() {
-        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "senha", "senha", "senha", null, null);
+        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "Senha@123", "Senha@123", "Senha@123", null, null, "MAT123");
         when(usuarioRepository.findByEmail("user@test.com")).thenReturn(Optional.empty());
-        when(passwordEncoder.encode("senha")).thenReturn("hash");
+        when(passwordEncoder.encode("Senha@123")).thenReturn("hash");
 
         Usuario saved = new Usuario();
         saved.setId(1L);
@@ -156,11 +157,19 @@ class UsuarioServiceTest {
 
     @Test
     void create_DuplicateEmail() {
-        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "senha", "senha", "senha", null, null);
+        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "Senha@123", "Senha@123", "Senha@123", null, null, "MAT123");
         when(usuarioRepository.findByEmail("user@test.com")).thenReturn(Optional.of(new Usuario()));
 
         assertThatThrownBy(() -> usuarioService.create(dto))
             .isInstanceOf(DuplicateNomeException.class);
+    }
+
+    @Test
+    void create_WeakPassword_ThrowsException() {
+        UsuarioDTO dto = new UsuarioDTO("user", "user@test.com", "fraca", "fraca", "fraca", null, null, "MAT123");
+        assertThatThrownBy(() -> usuarioService.create(dto))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining(PasswordValidationService.MENSAGEM_SENHA_FRACA);
     }
 
     @Test
@@ -274,5 +283,33 @@ class UsuarioServiceTest {
         when(usuarioRepository.findAdministradoresComuns(any(), any(), any())).thenReturn(new PageImpl<>(List.of(new Usuario())));
         List<GetUsuarioDTO> result = usuarioService.listAll();
         assertThat(result).hasSize(1);
+    }
+
+    @Test
+    void recuperarSenhaPorMatricula_Success() {
+        Usuario usuario = new Usuario();
+        usuario.setId(1L);
+        usuario.setEmail("user@test.com");
+        usuario.setNumeroMatricula("MAT123");
+
+        when(usuarioRepository.findByEmailIgnoreCaseAndNumeroMatricula("user@test.com", "MAT123"))
+                .thenReturn(Optional.of(usuario));
+        when(passwordEncoder.encode("NovaSenha@123")).thenReturn("hashNovaSenha");
+
+        usuarioService.recuperarSenhaPorMatricula("user@test.com", "MAT123", "NovaSenha@123", "NovaSenha@123");
+
+        assertThat(usuario.getSenha()).isEqualTo("hashNovaSenha");
+        verify(usuarioRepository).save(usuario);
+    }
+
+    @Test
+    void recuperarSenhaPorMatricula_InvalidCredentials_ThrowsException() {
+        when(usuarioRepository.findByEmailIgnoreCaseAndNumeroMatricula("user@test.com", "ERRADA"))
+                .thenReturn(Optional.empty());
+
+        assertThatThrownBy(() ->
+                usuarioService.recuperarSenhaPorMatricula("user@test.com", "ERRADA", "NovaSenha@123", "NovaSenha@123")
+        ).isInstanceOf(IllegalArgumentException.class)
+         .hasMessageContaining("E-mail ou número de matrícula inválidos");
     }
 }

@@ -98,6 +98,14 @@ window.toggleFicha = function (header) {
   }
 };
 
+function parseNumero(val) {
+  if (val === null || val === undefined) return 0;
+  if (typeof val === "number") return isNaN(val) ? 0 : val;
+  const str = String(val).trim().replace(",", ".");
+  const num = parseFloat(str);
+  return isNaN(num) ? 0 : num;
+}
+
 window.adicionarIngrediente = function () {
   const select = document.getElementById("ingredienteSelect");
   const ingredienteId = select.value;
@@ -105,9 +113,9 @@ window.adicionarIngrediente = function () {
   if (!ingredienteId) return;
 
   const medidaCaseira = document.getElementById("medidaCaseira").value;
-  const pb = parseFloat(document.getElementById("pb").value) || 0;
-  const pl = parseFloat(document.getElementById("pl").value) || 0;
-  const custoKg = parseFloat(document.getElementById("custoKg").value) || 0;
+  const pb = parseNumero(document.getElementById("pb")?.value);
+  const pl = parseNumero(document.getElementById("pl")?.value);
+  const custoKg = parseNumero(document.getElementById("custoKg")?.value);
 
   if (!validarTextoMaximo(medidaCaseira, 100)) {
     dispararErroFicha(
@@ -264,9 +272,9 @@ function initEventDelegationTabela() {
       const fcInput = row.querySelector('input[name$=".fc"]');
       const custoUsadoInput = row.querySelector('input[name$=".custoUsado"]');
 
-      const pb = parseFloat(pbInput?.value) || 0;
-      const pl = parseFloat(plInput?.value) || 0;
-      const custoKg = parseFloat(custoKgInput?.value) || 0;
+      const pb = parseNumero(pbInput?.value);
+      const pl = parseNumero(plInput?.value);
+      const custoKg = parseNumero(custoKgInput?.value);
 
       if (
         fcInput &&
@@ -289,12 +297,27 @@ function initEventDelegationTabela() {
   });
 }
 
+function formatarInputsDecimais() {
+  const inputs = document.querySelectorAll(
+    '#ingredientesAdicionados input[inputmode="decimal"], #pesoPorcao, #rendimento'
+  );
+  inputs.forEach((input) => {
+    const val = input.value;
+    if (val) {
+      const num = parseNumero(val);
+      if (!isNaN(num) && num > 0) {
+        input.value = Number(num.toFixed(3)).toString();
+      }
+    }
+  });
+}
+
 function atualizarCustoTotal() {
   let total = 0;
   document
     .querySelectorAll('#ingredientesAdicionados input[name$=".custoUsado"]')
     .forEach((input) => {
-      total += parseFloat(input.value) || 0;
+      total += parseNumero(input.value);
     });
 
   const visivel = document.getElementById("custoTotalVisivel");
@@ -326,7 +349,7 @@ function calcularPerfilNutricional() {
 
   document.querySelectorAll(".ingrediente-row").forEach((row) => {
     const plInput = row.querySelector('input[name$=".pl"]');
-    if (!plInput || !plInput.value || parseFloat(plInput.value) <= 0) return;
+    if (!plInput || !plInput.value || parseNumero(plInput.value) <= 0) return;
 
     const nutriData = calcularNutrientesPorIngrediente(row);
     adicionarLinhaNutricional(tabelaNutricional, nutriData, divisor);
@@ -353,7 +376,7 @@ function obterDivisorNutricional() {
   const numeroPorcoesInput =
     document.querySelector('input[name="numeroPorcoes"]') ||
     document.getElementById("numeroPorcoes");
-  const porcoes = parseFloat(numeroPorcoesInput?.value) || 0;
+  const porcoes = parseNumero(numeroPorcoesInput?.value);
   return porcoes > 0 ? porcoes : 1;
 }
 
@@ -362,13 +385,13 @@ function aplicarDivisorNutrientes(nutrientes, divisor) {
   return Object.fromEntries(
     Object.entries(nutrientes).map(([chave, valor]) => [
       chave,
-      (parseFloat(valor) || 0) / fator,
+      parseNumero(valor) / fator,
     ]),
   );
 }
 
 function calcularNutrientesPorIngrediente(row) {
-  const pl = parseFloat(row.querySelector('input[name$=".pl"]')?.value) || 0;
+  const pl = parseNumero(row.querySelector('input[name$=".pl"]')?.value);
 
   const ptnBase = parseFloat(row.querySelector(".ingrediente-ptn")?.value) || 0;
   const choBase = parseFloat(row.querySelector(".ingrediente-cho")?.value) || 0;
@@ -547,8 +570,8 @@ window.validarFormFicha = function () {
   const rendimentoVal = document.getElementById("rendimento")?.value;
   const pesoPorcaoVal = document.getElementById("pesoPorcao")?.value;
 
-  const rendimento = parseFloat(rendimentoVal) || 0;
-  const pesoPorcao = parseFloat(pesoPorcaoVal) || 0;
+  const rendimento = parseNumero(rendimentoVal);
+  const pesoPorcao = parseNumero(pesoPorcaoVal);
 
   const medidaCaseiraFicha = document
     .getElementById("medidaCaseiraFicha")
@@ -562,8 +585,8 @@ window.validarFormFicha = function () {
   const porcentAguaInput = document.getElementById("porcentAgua");
   const qntdAguaVal = qntdAguaInput?.value?.trim() ?? "";
   const porcentAguaVal = porcentAguaInput?.value?.trim() ?? "";
-  const qntdAgua = parseFloat(qntdAguaVal);
-  const porcentAgua = parseFloat(porcentAguaVal);
+  const qntdAgua = parseNumero(qntdAguaVal);
+  const porcentAgua = parseNumero(porcentAguaVal);
 
   if (!nome) {
     dispararErroFicha("O nome da preparação é obrigatório.");

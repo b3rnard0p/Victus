@@ -132,7 +132,7 @@ class AdminControllerTest {
     @DisplayName("Deve alternar status ativo do usuário com HTMX")
     @WithMockUser(roles = "ADMIN")
     void deveAlternarAtivoHtmx() throws Exception {
-        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null));
+        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null, null));
         mockMvc.perform(post("/admin/usuarios/1/toggle-ativo")
                 .header("HX-Request", "true"))
                 .andExpect(status().isOk())
@@ -145,7 +145,7 @@ class AdminControllerTest {
     @DisplayName("Deve mostrar form de vínculo de estabelecimento")
     @WithMockUser(roles = "ADMIN")
     void deveMostrarFormVinculoEstabelecimento() throws Exception {
-        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null));
+        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null, null));
         when(estabelecimentoService.listAll()).thenReturn(List.of(new GetEstabelecimentoDTO(1L, "Est", List.of())));
         when(paginacaoViewSupport.renderizarView(any(), any(), any(), eq(false)))
                 .thenReturn("pages/admin/usuarios/Form");
@@ -183,7 +183,7 @@ class AdminControllerTest {
     @DisplayName("Deve atualizar vínculo de estabelecimento com HTMX")
     @WithMockUser(roles = "ADMIN")
     void deveAtualizarVinculoEstabelecimentoHtmx() throws Exception {
-        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null));
+        when(usuarioService.findById(1L)).thenReturn(new GetUsuarioDTO(1L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null, null));
         mockMvc.perform(post("/admin/usuarios/1/estabelecimento")
                 .param("estabelecimentoId", "2")
                 .header("HX-Request", "true"))
@@ -197,7 +197,7 @@ class AdminControllerTest {
     @DisplayName("Deve atualizar cargo com HTMX")
     @WithMockUser(roles = "ADMIN")
     void deveAtualizarCargoHtmx() throws Exception {
-        when(usuarioService.findById(2L)).thenReturn(new GetUsuarioDTO(2L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null));
+        when(usuarioService.findById(2L)).thenReturn(new GetUsuarioDTO(2L, "Nome", "email", Cargo.NUTRICIONISTA, null, "Est", true, null, null));
         mockMvc.perform(post("/admin/usuarios/2/cargo")
                 .param("cargo", "NUTRICIONISTA")
                 .header("HX-Request", "true"))

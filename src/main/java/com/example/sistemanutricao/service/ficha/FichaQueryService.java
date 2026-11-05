@@ -68,6 +68,7 @@ public class FichaQueryService {
             return buscarPorTag(campo, valor, usuario, pageable);
         }
 
+        if (isProducao(usuario) && usuario.getEstabelecimento() == null) return Page.empty();
         Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
@@ -101,6 +102,7 @@ public class FichaQueryService {
     public List<FichaTecnicaComTagDTO> buscarPorTag(String campo, String tag, Usuario usuario) {
         if (campo == null || tag == null || usuario == null) return new ArrayList<>();
 
+        if (isProducao(usuario) && usuario.getEstabelecimento() == null) return new ArrayList<>();
         Long nutricionistaId = (!isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
@@ -117,6 +119,7 @@ public class FichaQueryService {
     }
 
     public Page<FichaTecnicaComTagDTO> buscarPorTag(String campo, String tag, Usuario usuario, Pageable pageable) {
+        if (isProducao(usuario) && usuario.getEstabelecimento() == null) return Page.empty();
         Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
@@ -147,6 +150,7 @@ public class FichaQueryService {
     }
 
     private Page<FichaTecnica> fichasStatus(Status status, StatusCriacao sc, Usuario u, Pageable p) {
+        if (isProducao(u) && u.getEstabelecimento() == null) return Page.empty(p);
         Long nutricionistaId = (u == null || isProducao(u)) ? null : u.getId();
         Long estabelecimentoId = (isProducao(u) && u.getEstabelecimento() != null) ? u.getEstabelecimento().getId() : null;
         
@@ -155,6 +159,7 @@ public class FichaQueryService {
     }
 
     private Page<FichaTecnica> fichasStatusSimples(Status status, Usuario u, Pageable p) {
+        if (isProducao(u) && u.getEstabelecimento() == null) return Page.empty(p);
         Long nutricionistaId = (u == null || isProducao(u)) ? null : u.getId();
         Long estabelecimentoId = (isProducao(u) && u.getEstabelecimento() != null) ? u.getEstabelecimento().getId() : null;
 

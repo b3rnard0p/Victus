@@ -79,7 +79,7 @@
               <div th:id="'refeicao-row-' + ${refeicao.id}"
                    th:fragment="refeicao-item"
                    class="animate-slide-down-fade bg-[#f3ffe5] border border-[#4A6E18] shadow flex flex-col rounded-[2rem] relative overflow-hidden mb-4 sm:mb-6 last:mb-0"
-                   th:style="'animation-delay: ' + (${stat.index} * 50) + 'ms'">
+                   th:style="${stat != null ? 'animation-delay: ' + (stat.index * 50) + 'ms' : ''}">
 
                       <div class="px-6 py-4 flex justify-center items-center cursor-pointer relative" onclick="toggleCard(this)">
                         <div class="flex flex-grid w-full relative min-w-0">
@@ -184,7 +184,7 @@
         </div>
 
         <div th:if="${paginaAtual == 0 and (refeicoes == null or refeicoes.empty)}"
-             class="flex flex-col items-center justify-center py-12 sm:py-16 gap-4">
+             class="flex-1 flex flex-col items-center justify-center my-auto py-12 min-h-[40vh] sm:min-h-[45vh] gap-4">
 
           <div class="text-[#4A6E18]">
             <i data-lucide="utensils" class="text-6xl sm:text-7xl"></i>

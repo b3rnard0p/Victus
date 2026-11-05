@@ -86,7 +86,8 @@ public class EstabelecimentoService {
                                 estabelecimentoId,
                                 estabelecimentoNome,
                                 usuario.isAtivo(),
-                                usuario.getCaminhoImagem()
+                                usuario.getCaminhoImagem(),
+                                usuario.getNumeroMatricula()
                         );
                     })
                     .collect(Collectors.toList());

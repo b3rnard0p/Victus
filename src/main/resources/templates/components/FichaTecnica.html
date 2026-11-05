@@ -97,11 +97,11 @@
                         <td>
                             <span class="break-word" th:text="${ingItem.medidaCaseira != null ? ingItem.medidaCaseira : '-'}"></span>
                         </td>
-                        <td th:text="${ingItem.pb != null ? #numbers.formatDecimal(ingItem.pb, 1, 2) + ' g' : '0,00 g'}"></td>
-                        <td th:text="${ingItem.pl != null ? #numbers.formatDecimal(ingItem.pl, 1, 2) + ' g' : '0,00 g'}"></td>
-                        <td th:text="${ingItem.fc != null ? #numbers.formatDecimal(ingItem.fc, 1, 2) : '1,00'}"></td>
-                        <td th:text="${ingItem.custoUsado != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoUsado, 1, 2) : 'R$ 0,00'}"></td>
-                        <td th:text="${ingItem.custoKg != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoKg, 1, 2) : 'R$ 0,00'}"></td>
+                        <td class="break-word" th:text="${ingItem.pb != null ? ingItem.pbFormatado() + ' g' : '0 g'}"></td>
+                        <td class="break-word" th:text="${ingItem.pl != null ? ingItem.plFormatado() + ' g' : '0 g'}"></td>
+                        <td class="break-word" th:text="${ingItem.fc != null ? ingItem.fcFormatado() : '1'}"></td>
+                        <td class="break-word" th:text="${ingItem.custoUsado != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoUsado, 1, 2) : 'R$ 0,00'}"></td>
+                        <td class="break-word" th:text="${ingItem.custoKg != null ? 'R$ ' + #numbers.formatDecimal(ingItem.custoKg, 1, 2) : 'R$ 0,00'}"></td>
                     </tr>
                 </th:block>
             </tbody>
@@ -157,15 +157,15 @@
             <table class="grid-table" style="margin-bottom: 0;">
                 <tr>
                     <td width="25%"><span class="font-semibold">Tempo de preparo:</span><br/><span class="break-word" th:text="${ficha.preparacao != null ? ficha.preparacao.tempoPreparo : '-'}"></span></td>
-                    <td width="25%"><span class="font-semibold">Peso da porção:</span><br/><span th:text="${(ficha.pesoPorcao != null ? ficha.pesoPorcao : '0') + ' g'}"></span></td>
-                    <td width="25%"><span class="font-semibold">Rendimento:</span><br/><span th:text="${(ficha.preparacao != null ? ficha.preparacao.rendimento : '0') + ' g'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Peso da porção:</span><br/><span th:text="${(ficha.pesoPorcao != null ? ficha.pesoPorcaoFormatado() : '0') + ' g'}"></span></td>
+                    <td width="25%"><span class="font-semibold">Rendimento:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.rendimento != null ? ficha.preparacao.rendimentoFormatado() : '0') + ' g'}"></span></td>
                     <td width="25%"><span class="font-semibold">Medida caseira:</span><br/><span class="break-word" th:text="${ficha.medidaCaseira != null ? ficha.medidaCaseira : '-'}"></span></td>
                 </tr>
                 <tr>
                     <td><span class="font-semibold">Número de porções:</span><br/><span th:text="${ficha.numeroPorcoes != null ? ficha.numeroPorcoes : '0'}"></span></td>
-                    <td><span class="font-semibold">Quantidade de água:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.qntdAgua != null ? ficha.preparacao.qntdAgua : '0.00') + ' ml'}"></span></td>
-                    <td><span class="font-semibold">Água que sobrou:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.porcentAgua != null ? ficha.preparacao.porcentAgua : '0.00') + ' %'}"></span></td>
-                    <td><span class="font-semibold">Fcc:</span><br/><span th:text="${ficha.preparacao != null ? #numbers.formatDecimal(ficha.preparacao.fcc, 1, 2) : '1,00'}"></span></td>
+                    <td><span class="font-semibold">Quantidade de água:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.qntdAgua != null ? ficha.preparacao.qntdAguaFormatado() : '0') + ' ml'}"></span></td>
+                    <td><span class="font-semibold">Água que sobrou:</span><br/><span th:text="${(ficha.preparacao != null and ficha.preparacao.porcentAgua != null ? ficha.preparacao.porcentAguaFormatado() : '0') + ' %'}"></span></td>
+                    <td><span class="font-semibold">Fcc:</span><br/><span th:text="${ficha.preparacao != null and ficha.preparacao.fcc != null ? ficha.preparacao.fccFormatado() : '1'}"></span></td>
                 </tr>
             </table>
         </div>

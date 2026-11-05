@@ -82,6 +82,7 @@ public class UsuarioService {
 
         usuario.setUsername(dto.username());
         usuario.setEmail(dto.email());
+        atualizarMatricula(id, usuario, dto.numeroMatricula());
 
         if (dto.novaSenha() != null && !dto.novaSenha().isEmpty()) {
             usuario.setSenha(passwordEncoder.encode(dto.novaSenha()));
@@ -114,6 +115,9 @@ public class UsuarioService {
 
     @Transactional(rollbackFor = Exception.class)
     public Usuario create(UsuarioDTO registroDto) {
+        if (!PasswordValidationService.isSenhaValida(registroDto.senha())) {
+            throw new IllegalArgumentException(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+        }
         if (usuarioRepository.findByEmail(registroDto.email()).isPresent()) {
             throw new DuplicateNomeException("Este e-mail já está em uso. Tente fazer login.");
         }
@@ -121,6 +125,13 @@ public class UsuarioService {
         Usuario usuario = new Usuario();
         usuario.setUsername(registroDto.username());
         usuario.setEmail(registroDto.email());
+        if (registroDto.numeroMatricula() != null && !registroDto.numeroMatricula().isBlank()) {
+            String matricula = registroDto.numeroMatricula().trim();
+            if (usuarioRepository.findByNumeroMatricula(matricula).isPresent()) {
+                throw new DuplicateNomeException("Este número de matrícula já está em uso.");
+            }
+            usuario.setNumeroMatricula(matricula);
+        }
         usuario.setSenha(passwordEncoder.encode(registroDto.senha()));
         usuario.setAtivo(false);
 
@@ -200,6 +211,7 @@ public class UsuarioService {
 
         usuario.setUsername(dto.username());
         usuario.setEmail(dto.email());
+        atualizarMatricula(id, usuario, dto.numeroMatricula());
 
         if (dto.novaSenha() != null && !dto.novaSenha().isEmpty()) {
             usuario.setSenha(passwordEncoder.encode(dto.novaSenha()));
@@ -245,6 +257,43 @@ public class UsuarioService {
     }
 
     // HELPERS
+
+    private void atualizarMatricula(Long id, Usuario usuario, String numeroMatricula) {
+        if (numeroMatricula != null) {
+            String matricula = numeroMatricula.trim();
+            if (!matricula.isEmpty()) {
+                if (usuarioRepository.existsByNumeroMatriculaAndIdNot(matricula, id)) {
+                    throw new DuplicateNomeException("Este número de matrícula já está em uso.");
+                }
+                usuario.setNumeroMatricula(matricula);
+            } else {
+                usuario.setNumeroMatricula(null);
+            }
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "usuarios", allEntries = true)
+    public void recuperarSenhaPorMatricula(String email, String numeroMatricula, String novaSenha, String confirmarNovaSenha) {
+        if (email == null || email.isBlank() || numeroMatricula == null || numeroMatricula.isBlank()) {
+            throw new IllegalArgumentException("Informe o e-mail e o número de matrícula.");
+        }
+        if (novaSenha == null || novaSenha.isBlank() || confirmarNovaSenha == null || confirmarNovaSenha.isBlank()) {
+            throw new IllegalArgumentException("Informe e confirme a nova senha.");
+        }
+        if (!novaSenha.equals(confirmarNovaSenha)) {
+            throw new IllegalArgumentException("As senhas não coincidem.");
+        }
+        if (!PasswordValidationService.isSenhaValida(novaSenha)) {
+            throw new IllegalArgumentException(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+        }
+
+        Usuario usuario = usuarioRepository.findByEmailIgnoreCaseAndNumeroMatricula(email.trim(), numeroMatricula.trim())
+                .orElseThrow(() -> new IllegalArgumentException("E-mail ou número de matrícula inválidos."));
+
+        usuario.setSenha(passwordEncoder.encode(novaSenha));
+        usuarioRepository.save(usuario);
+    }
 
     private Usuario findUsuarioById(@NonNull Long id) {
         return usuarioRepository.findById(id)

@@ -39,7 +39,7 @@ class PasswordValidationServiceTest {
     void shouldReturnErrorWhenSenhaAtualIncorreta() {
         when(passwordEncoder.matches(any(), anyString())).thenReturn(false);
 
-        Optional<String> result = service.validar("senhaErrada", "nova123", "nova123", "hash");
+        Optional<String> result = service.validar("senhaErrada", "Nova@1234", "Nova@1234", "hash");
         assertThat(result).contains("Senha atual incorreta");
     }
 
@@ -47,7 +47,7 @@ class PasswordValidationServiceTest {
     void shouldReturnErrorWhenSenhasNaoCoincidem() {
         when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
 
-        Optional<String> result = service.validar("certa", "nova123", "diferente", "hash");
+        Optional<String> result = service.validar("certa", "Nova@1234", "diferente", "hash");
         assertThat(result).contains("As novas senhas não coincidem");
     }
 
@@ -55,13 +55,45 @@ class PasswordValidationServiceTest {
     void shouldReturnEmptyWhenValidacaoPassar() {
         when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
 
-        Optional<String> result = service.validar("certa", "nova123", "nova123", "hash");
+        Optional<String> result = service.validar("certa", "Nova@1234", "Nova@1234", "hash");
         assertThat(result).isEmpty();
     }
 
     @Test
+    void shouldReturnErrorWhenNovaSenhaIsTooShort() {
+        when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
+
+        Optional<String> result = service.validar("certa", "123", "123", "hash");
+        assertThat(result).contains(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+    }
+
+    @Test
+    void shouldReturnErrorWhenNovaSenhaLacksSpecialChar() {
+        when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
+
+        Optional<String> result = service.validar("certa", "SenhaForte123", "SenhaForte123", "hash");
+        assertThat(result).contains(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+    }
+
+    @Test
+    void shouldReturnErrorWhenNovaSenhaLacksNumber() {
+        when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
+
+        Optional<String> result = service.validar("certa", "SenhaForte@", "SenhaForte@", "hash");
+        assertThat(result).contains(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+    }
+
+    @Test
+    void shouldReturnErrorWhenNovaSenhaLacksLetter() {
+        when(passwordEncoder.matches(any(), anyString())).thenReturn(true);
+
+        Optional<String> result = service.validar("certa", "12345678@", "12345678@", "hash");
+        assertThat(result).contains(PasswordValidationService.MENSAGEM_SENHA_FRACA);
+    }
+
+    @Test
     void shouldReturnErrorWhenSenhaAtualIsNullAndNovaSenhaProvided() {
-        Optional<String> result = service.validar(null, "nova123", "nova123", "hash");
+        Optional<String> result = service.validar(null, "Nova@1234", "Nova@1234", "hash");
         assertThat(result).contains("Senha atual incorreta");
     }
 }

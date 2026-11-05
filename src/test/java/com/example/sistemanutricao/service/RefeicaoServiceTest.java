@@ -257,6 +257,34 @@ class RefeicaoServiceTest {
     // HELPERS
     // =========================================================================
 
+    @Test
+    void shouldRejectUpdateAndStatusAndFichasFromAnotherNutricionista() {
+        Usuario dono = criarUsuario(1L);
+        Refeicao refeicao = criarRefeicao(5L, "Almoço");
+        refeicao.setNutricionista(dono);
+
+        when(refeicaoRepository.findById(5L)).thenReturn(Optional.of(refeicao));
+
+        RefeicaoDTO dto = new RefeicaoDTO("Almoço", "500", Status.ATIVA, List.of(10L));
+
+        assertThatThrownBy(() -> refeicaoService.update(5L, dto, 2L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Você não tem permissão para alterar esta refeição.");
+
+        assertThatThrownBy(() -> refeicaoService.atualizaStatus(5L, 2L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Você não tem permissão para alterar esta refeição.");
+
+        FichaTecnica fichaOutro = criarFichaTecnica(10L);
+        fichaOutro.setNutricionista(criarUsuario(2L));
+        when(refeicaoRepository.existsByNutricionistaIdAndNomeIgnoreCaseAndIdNot(1L, "Almoço", 5L)).thenReturn(false);
+        when(fichaTecnicaRepository.findAllById(List.of(10L))).thenReturn(List.of(fichaOutro));
+
+        assertThatThrownBy(() -> refeicaoService.update(5L, dto, 1L))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("Você não pode vincular fichas técnicas de outro nutricionista.");
+    }
+
     private Refeicao criarRefeicao(Long id, String nome) {
         Refeicao r = new Refeicao();
         r.setId(id);

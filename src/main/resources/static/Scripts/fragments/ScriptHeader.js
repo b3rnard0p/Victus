@@ -174,5 +174,9 @@ document.body.addEventListener('htmx:afterSwap', function() {
 
 window.fazerLogout = function() {
     localStorage.removeItem("rememberMe");
-    window.location.href = "/login";
+    const form = document.createElement("form");
+    form.method = "POST";
+    form.action = "/sair-do-sistema";
+    document.body.appendChild(form);
+    form.submit();
 };

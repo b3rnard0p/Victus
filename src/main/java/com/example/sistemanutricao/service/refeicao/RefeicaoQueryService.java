@@ -36,6 +36,7 @@ public class RefeicaoQueryService {
     }
 
     public Page<RefeicaoResponseDTO> buscarPorStatus(Status status, Usuario usuario, Pageable pageable) {
+        if (isProducao(usuario) && usuario.getEstabelecimento() == null) return Page.empty(pageable);
         Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 
@@ -48,6 +49,7 @@ public class RefeicaoQueryService {
     }
 
     public Page<RefeicaoResponseDTO> buscarPorNome(String nome, Usuario usuario, Pageable pageable) {
+        if (isProducao(usuario) && usuario.getEstabelecimento() == null) return Page.empty(pageable);
         Long nutricionistaId = (usuario != null && !isProducao(usuario)) ? usuario.getId() : null;
         Long estabelecimentoId = (usuario != null && isProducao(usuario) && usuario.getEstabelecimento() != null) ? usuario.getEstabelecimento().getId() : null;
 

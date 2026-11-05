@@ -101,4 +101,28 @@
     if (event.target == modalPreparo) fecharModalPreparo();
   };
 
+  if (!window.fecharViewFicha) {
+    window.fecharViewFicha = function () {
+      const listView = document.getElementById("fichas-list-view");
+      const detailView = document.getElementById("fichas-detail-view");
+
+      if (listView && detailView && !detailView.classList.contains("hidden")) {
+        detailView.classList.add("hidden");
+        detailView.innerHTML = "";
+        listView.classList.remove("hidden");
+        return;
+      }
+
+      if (window.history.length > 1 && document.referrer && document.referrer.includes(window.location.host) && !document.referrer.endsWith(window.location.pathname)) {
+        window.history.back();
+      } else if (document.referrer && document.referrer.includes(window.location.host)) {
+        window.location.href = document.referrer;
+      } else if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = "/ficha";
+      }
+    };
+  }
+
 })();
